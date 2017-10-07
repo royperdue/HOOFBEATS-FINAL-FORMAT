@@ -19,11 +19,13 @@ import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.UnsupportedModuleException;
 import com.mbientlab.metawear.android.BtleService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public abstract class ModuleFragmentBase extends Fragment implements ServiceConnection {
     public interface FragmentBus {
-        BluetoothDevice getBtDevice();
+        List<BluetoothDevice> getBtDevices();
         void resetConnectionStateHandler(long delay);
         void initiateDfu(Object path);
     }
@@ -32,6 +34,8 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
     protected MetaWearBoard mwBoard;
     protected FragmentBus fragBus;
     protected int sensorResId;
+    protected List<BluetoothDevice> bluetoothDevices;
+    protected List<MetaWearBoard> metaWearBoards = new ArrayList<>();
 
     protected abstract void boardReady() throws UnsupportedModuleException;
     protected abstract void fillHelpOptionAdapter(HelpOptionAdapter adapter);
@@ -98,7 +102,14 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        mwBoard= ((BtleService.LocalBinder) iBinder).getMetaWearBoard(fragBus.getBtDevice());
+        bluetoothDevices = fragBus.getBtDevices();
+
+        for (int i = 0; i < bluetoothDevices.size(); i++)
+        {
+            MetaWearBoard metaWearBoard = ((BtleService.LocalBinder) iBinder).getMetaWearBoard(bluetoothDevices.get(i));
+            metaWearBoards.add(metaWearBoard);
+        }
+
         try {
             boardReady= true;
             boardReady();
