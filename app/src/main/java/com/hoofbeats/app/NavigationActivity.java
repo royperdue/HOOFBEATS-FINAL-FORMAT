@@ -74,6 +74,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             DFU_PROGRESS_FRAGMENT_TAG= "NavigationActivity.DFU_PROGRESS_FRAGMENT_TAG";
     private final static Map<Integer, Class<? extends ModuleFragmentBase>> FRAGMENT_CLASSES;
     private final static Map<String, String> EXTENSION_TO_APP_TYPE;
+    private List<BluetoothDevice> bluetoothDevices = new ArrayList<>();
+    private List<MetaWearBoard> metaWearBoards = new ArrayList<>();
 
     static {
         Map<Integer, Class<? extends ModuleFragmentBase>> tempMap= new LinkedHashMap<>();
@@ -439,7 +441,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            mwBoard.disconnectAsync();
+            if (metaWearBoards.size() > 0)
+                mwBoard.disconnectAsync();
+
             super.onBackPressed();
         }
     }
