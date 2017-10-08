@@ -10,4 +10,111 @@
   <color name="white">#ffffff</color>
   <color name="black">#000000</color>
   <color name="blue">#ff14445a</color>
+
+
+
+
+
+
+
+
+
+    <color name="theme_primary_light">#BBDEFB</color> <!--Blue 100-->
+    <color name="theme_window_background">#64B5F6</color> <!--Blue 300-->
+    <color name="theme_divider">#BDBDBD</color> <!--Grey 400-->
+
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+
+    <color name="blue_100">#BBDEFB</color>
+    <color name="blue_200">#90CAF9</color>
+    <color name="blue_300">#64B5F6</color>
+    <color name="blue_400">#42A5F5</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="blue_600">#1E88E5</color>
+    <color name="blue_700">#1976D2</color>
+    <color name="blue_800">#1565C0</color>
+    <color name="blue_900">#0D47A1</color>
+    <color name="blue_A100">#82B1FF</color>
+    <color name="blue_A200">#448AFF</color>
+    <color name="blue_A300">#2979FF</color>
+
+    <color name="orange_100">#FFE0B2</color>
+    <color name="orange_200">#FFCC80</color>
+    <color name="orange_300">#FFB74D</color>
+    <color name="orange_400">#FFA726</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="orange_600">#FB8C00</color>
+
+    <color name="yellow_300">#FFF176</color>
+    <color name="yellow_400">#FFEE58</color>
+    <color name="yellow_500">#FFEB3B</color>
+
+    <color name="red_400">#ef5350</color>
+    <color name="red_500">#f44336</color>
+    <color name="red_600">#e53935</color>
+    <color name="red_700">#d32f2f</color>
+    <color name="red_800">#c62828</color>
+    <color name="red_900">#b71c1c</color>
+
+    <color name="green_100">#DCEDC8</color>
+    <color name="green_200">#C5E1A5</color>
+    <color name="green_300">#AED581</color>
+    <color name="green_400">#9CCC65</color>
+    <color name="green_500">#8BC34A</color>
+    <color name="green_600">#7CB342</color>
+    <color name="green_700">#689F38</color>
+    <color name="green_800">#558B2F</color>
+
+    <color name="purple_100">#E1BEE7</color>
+    <color name="purple_200">#CE93D8</color>
+    <color name="purple_300">#BA68C8</color>
+    <color name="purple_400">#AB47BC</color>
+    <color name="purple_500">#9C27B0</color>
+    <color name="purple_600">#8E24AA</color>
+    <color name="purple_700">#7B1FA2</color>
+    <color name="purple_800">#6A1B9A</color>
+
+    <color name="pink_100">#F8BBD0</color>
+    <color name="pink_200">#F48FB1</color>
+    <color name="pink_300">#F06292</color>
+    <color name="pink_400">#EC407A</color>
+    <color name="pink_500">#E91E63</color>
+    <color name="pink_600">#D81B60</color>
+    <color name="pink_700">#C2185B</color>
+    <color name="pink_800">#AD1457</color>
+
+    <color name="grey_100">#F5F5F5</color>
+    <color name="grey_200">#EEEEEE</color>
+    <color name="grey_300">#E0E0E0</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="grey_500">#9E9E9E</color>
+    <color name="grey_600">#757575</color>
+    <color name="grey_700">#616161</color>
+    <color name="grey_800">#424242</color>
+
+
+
+
+    <color name="backgroundColor">#E8E8E0</color>
+    <color name="backgroundColorPress">#DBDBD3</color>
+
+    <color name="colorPrimaryLight">#BBDEFB</color>
+    <color name="textColorPrimary">#111111</color>
+    <color name="textColorSecondary">#888888</color>
+    <color name="colorBackground">#111111</color>
+    <color name="colorTrackBackground">#707070</color>
+
+    <color name="colorRoundedCornerDarktop">#202020</color>
+    <color name="colorRoundedCornerDarkBottom">#161616</color>
+    <color name="colorRoundedCornerDarkBorder">#707070</color>
+
+    <color name="colorCurrentTrackCardBackground">#202020</color>
+    <color name="colorCardBackground">#3b3b3b</color>
+    <color name="colorCardTrackBackground">#2f2f2f</color>
+    <color name="colorThumbnailLineColor">#d7d7d7</color>
+    <color name="colorThumbnailLineBackground">#161616</color>
+
+    <color name="preference_accent">#FB8C00</color>
+    <color name="preference_fallback_accent_color">#FB8C00</color>
 </resources>

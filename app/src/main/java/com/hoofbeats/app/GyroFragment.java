@@ -65,7 +65,7 @@ public class GyroFragment extends ThreeAxisChartFragment {
 
     @Override
     protected void boardReady() throws UnsupportedModuleException {
-        gyro = mwBoard.getModuleOrThrow(GyroBmi160.class);
+        //gyro = mwBoard.getModuleOrThrow(GyroBmi160.class);
     }
 
     @Override

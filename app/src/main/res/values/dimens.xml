@@ -82,6 +82,7 @@
     <dimen name="pad_500dp">500dp</dimen>
     <dimen name="pad_520dp">520dp</dimen>
     <dimen name="pad_600dp">600dp</dimen>
+    <dimen name="pad_700dp">700dp</dimen>
     <dimen name="pad_1000dp">1000dp</dimen>
 
 

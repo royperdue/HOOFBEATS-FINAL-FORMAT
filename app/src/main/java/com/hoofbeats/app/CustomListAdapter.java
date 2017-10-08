@@ -15,8 +15,10 @@ import java.util.Map;
 
 public class CustomListAdapter extends ArrayAdapter<Map<String, Object>> {
 
+    public static final String KEY_HORSE_ID = "horseId";
     public static final String KEY_AVATAR = "avatar";
     public static final String KEY_NAME = "name";
+    public static final String KEY_HORSE_AGE = "horseAge";
     public static final String KEY_DESCRIPTION_SHORT = "description_short";
     public static final String KEY_DESCRIPTION_FULL = "description_full";
 
@@ -38,7 +40,7 @@ public class CustomListAdapter extends ArrayAdapter<Map<String, Object>> {
             viewHolder.mViewOverlay = convertView.findViewById(R.id.view_avatar_overlay);
             viewHolder.mListItemAvatar = (ImageView) convertView.findViewById(R.id.image_view_avatar);
             viewHolder.mListItemName = (TextView) convertView.findViewById(R.id.text_view_name);
-            viewHolder.mListItemDescription = (TextView) convertView.findViewById(R.id.text_view_description);
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -50,7 +52,7 @@ public class CustomListAdapter extends ArrayAdapter<Map<String, Object>> {
                 .into(viewHolder.mListItemAvatar);
 
         viewHolder.mListItemName.setText(mData.get(position).get(KEY_NAME).toString().toUpperCase());
-        viewHolder.mListItemDescription.setText((String) mData.get(position).get(KEY_DESCRIPTION_SHORT));
+        //viewHolder.mListItemDescription.setText((String) mData.get(position).get(KEY_DESCRIPTION_SHORT));
         viewHolder.mViewOverlay.setBackground(BaseActivity.sOverlayShape);
 
         return convertView;

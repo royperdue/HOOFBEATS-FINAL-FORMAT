@@ -6,7 +6,9 @@ import android.animation.ObjectAnimator;
 import android.graphics.RectF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,6 +19,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +27,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.hoofbeats.app.model.Horse;
+import com.hoofbeats.app.model.Horseshoe;
+import com.hoofbeats.app.utility.DatabaseUtility;
+import com.hoofbeats.app.utility.DialogUtility;
+import com.hoofbeats.app.utility.LittleDB;
 import com.nhaarman.listviewanimations.appearance.ViewAnimator;
 import com.nhaarman.listviewanimations.appearance.simple.SwingLeftInAnimationAdapter;
 import com.squareup.picasso.Picasso;
@@ -51,10 +59,12 @@ public abstract class BaseActivity extends AppCompatActivity
     protected RelativeLayout mToolbarProfile;
     protected LinearLayout mProfileDetails;
     protected TextView mTextViewProfileName;
-    protected TextView mTextViewProfileDescription;
     protected View mButtonProfile;
     protected NestedScrollView nestedScrollView;
     protected FloatingActionButton fab;
+    protected Button connectButton;
+    protected NavigationView navigationView;
+    protected Bundle savedInstanceState;
 
     public static ShapeDrawable sOverlayShape;
     static int sScreenWidth;
@@ -84,8 +94,29 @@ public abstract class BaseActivity extends AppCompatActivity
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Map<String, Object> profileMap = (Map<String, Object>) parent.getItemAtPosition(position);
+                List<Horse> horses = DatabaseUtility.retrieveHorses(BaseActivity.this);
+
+                if (horses.size() > 0)
+                {
+                    LittleDB.get().putLong(Config.SELECTED_HORSE_ID, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
+
+                    List<Horse> horseList = DatabaseUtility.retrieveHorseForId(BaseActivity.this, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
+                    List<Horseshoe> horseshoes = horseList.get(0).getHorseshoes();
+                    List<String> macAddresses = new ArrayList<>();
+                    if (horseshoes.size() > 0)
+                    {
+                        for (int i = 0; i < horseshoes.size(); i++)
+                        {
+                            macAddresses.add(horseshoes.get(i).getMacAddress());
+                        }
+                    } else if (horseshoes.size() == 0)
+                        DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horseshoes_assigned));
+                } else if (horses.size() == 0)
+                    DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horse_found));
+
                 mState = CustomState.Opening;
-                showProfileDetails((Map<String, Object>) parent.getItemAtPosition(position), view);
+                showProfileDetails(profileMap, view);
             }
         });
     }
@@ -150,7 +181,7 @@ public abstract class BaseActivity extends AppCompatActivity
      */
     private void setProfileDetailsInfo(Map<String, Object> item) {
         mTextViewProfileName.setText((String) item.get(CustomListAdapter.KEY_NAME));
-        mTextViewProfileDescription.setText((String) item.get(CustomListAdapter.KEY_DESCRIPTION_FULL));
+
     }
 
     /**

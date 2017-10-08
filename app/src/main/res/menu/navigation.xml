@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_disconnect" android:title="@string/action_disconnect"
-        app:showAsAction="withText|ifRoom" />
-    <item android:id="@+id/action_reset" android:title="@string/action_reset"
-        android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_manual_dfu" android:title="@string/action_manual_dfu"
-        android:orderInCategory="100" app:showAsAction="never" />
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_disconnect"
+          android:title="@string/action_disconnect"
+          app:showAsAction="withText|ifRoom"/>
+    <item android:id="@+id/action_reset"
+          android:orderInCategory="100"
+          android:title="@string/action_reset"
+          app:showAsAction="never"/>
+    <item android:id="@+id/action_manual_dfu"
+          android:orderInCategory="100"
+          android:title="@string/action_manual_dfu"
+          app:showAsAction="never"/>
 </menu>

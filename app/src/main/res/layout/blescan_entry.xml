@@ -1,40 +1,124 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<android.support.v7.widget.CardView
     android:id="@+id/blescan_entry_layout"
-    android:padding="6dp">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/pad_160dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/pad_10dp"
+    app:cardElevation="@dimen/pad_10dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="true"
+    app:contentPadding="@dimen/pad_2dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/ble_device"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+    <FrameLayout
+        android:id="@+id/assign_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center"
+                      android:layout_marginTop="@dimen/pad_6dp"
+                      android:gravity="center"
+                      android:orientation="vertical">
+            <LinearLayout android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_gravity="center_horizontal"
+                          android:orientation="horizontal">
+                <RadioGroup android:id="@+id/radio_group_hooves"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/pad_5dp"
+                            android:orientation="horizontal">
+                    <RadioButton android:id="@+id/radio_left_hind"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:text="@string/label_lh"
+                                 android:textColor="@color/white"
+                                 android:textSize="@dimen/txt_10sp"/>
+                    <RadioButton android:id="@+id/radio_left_front"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:text="@string/label_lf"
+                                 android:textColor="@color/white"
+                                 android:textSize="@dimen/txt_10sp"/>
+                    <RadioButton android:id="@+id/radio_right_hind"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:text="@string/label_rh"
+                                 android:textColor="@color/white"
+                                 android:textSize="@dimen/txt_10sp"/>
+                    <RadioButton android:id="@+id/radio_right_front"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:text="@string/label_rf"
+                                 android:textColor="@color/white"
+                                 android:textSize="@dimen/txt_10sp"/>
+                </RadioGroup>
+            </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/ble_mac_address"
-        android:layout_below="@+id/ble_device"
-        android:layout_alignParentStart="true" />
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:orientation="horizontal"
+                          android:weightSum="3">
+                <LinearLayout android:layout_width="0dp"
+                              android:layout_height="match_parent"
+                              android:layout_weight="2"
+                              android:weightSum="3"
+                              android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/ble_device"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2"
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                    <TextView
+                        android:id="@+id/ble_mac_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/configure"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:text="@string/label_ok"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/ble_rssi_value"
-        android:layout_alignTop="@+id/ble_mac_address"
-        android:layout_alignParentEnd="true" />
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_margin="@dimen/pad_2dp"
+                          android:orientation="horizontal"
+                          android:weightSum="3">
+                <TextView
+                    android:id="@+id/ble_rssi_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|start"
+                    android:layout_weight="2"/>
+                <ImageView
+                    android:id="@+id/ble_rssi_png"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|end"
+                    android:layout_weight="1"
+                    android:maxLevel="4"
+                    android:minLevel="0"
+                    android:src="@drawable/ic_rssi_level"/>
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
 
     <ImageView
+        android:id="@+id/ble_check_connected"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/ble_rssi_png"
-        android:layout_alignBottom="@+id/ble_rssi_value"
-        android:layout_toStartOf="@+id/ble_rssi_value"
-        android:src="@drawable/ic_rssi_level"
-        android:maxLevel="4"
-        android:minLevel="0"/>
-</RelativeLayout>
+        android:layout_gravity="top|end"
+        android:layout_margin="@dimen/pad_2dp"
+        android:src="@drawable/ic_check_circle_green_600_24dp"
+        android:visibility="gone"/>
+</android.support.v7.widget.CardView>

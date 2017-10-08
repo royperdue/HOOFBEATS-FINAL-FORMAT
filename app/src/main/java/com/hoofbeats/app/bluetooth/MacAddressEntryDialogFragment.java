@@ -22,39 +22,47 @@ public class MacAddressEntryDialogFragment extends DialogFragment
     private BleScannerFragment.ScannerCommunicationBus commBus;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
-        final Activity owner= getActivity();
-        if (!(owner instanceof BleScannerFragment.ScannerCommunicationBus)) {
+        final Activity owner = getActivity();
+        if (!(owner instanceof BleScannerFragment.ScannerCommunicationBus))
+        {
             throw new ClassCastException(String.format(Locale.US, "%s %s", owner.toString(),
-                    owner.getString(com.mbientlab.bletoolbox.scanner.R.string.error_scanner_listener)));
+                    owner.getString(R.string.error_scanner_listener)));
         }
 
-        commBus= (BleScannerFragment.ScannerCommunicationBus) owner;
+        commBus = (BleScannerFragment.ScannerCommunicationBus) owner;
     }
 
     @Override
-    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         return inflater.inflate(R.layout.mac_address_entry, container);
     }
 
     @Override
-    public void onViewCreated (View view, Bundle savedInstanceState) {
-        final EditText macAddressString= (EditText) view.findViewById(R.id.mac_address_string);
-        final TextView invalidMacAddressText= (TextView) view.findViewById(R.id.invalid_mac_address_text);
+    public void onViewCreated(View view, Bundle savedInstanceState)
+    {
+        final EditText macAddressString = (EditText) view.findViewById(R.id.mac_address_string);
+        final TextView invalidMacAddressText = (TextView) view.findViewById(R.id.invalid_mac_address_text);
 
-        view.findViewById(R.id.button_ok).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.button_ok).setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                final BluetoothManager btManager= (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
+            public void onClick(View v)
+            {
+                final BluetoothManager btManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
 
-                try {
-                    String macAddress= macAddressString.getText().toString().toUpperCase();
+                try
+                {
+                    String macAddress = macAddressString.getText().toString().toUpperCase();
                     BluetoothDevice remoteDevice = btManager.getAdapter().getRemoteDevice(macAddress);
                     commBus.onDeviceSelected(remoteDevice);
                     dismiss();
-                } catch (IllegalArgumentException ignored) {
+                } catch (IllegalArgumentException ignored)
+                {
                     invalidMacAddressText.setVisibility(View.VISIBLE);
                 }
             }

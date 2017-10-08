@@ -194,7 +194,7 @@ public class SensorFusionFragment extends SensorFragment {
 
     @Override
     protected void boardReady() throws UnsupportedModuleException {
-        sensorFusion = mwBoard.getModuleOrThrow(SensorFusionBosch.class);
+        //sensorFusion = mwBoard.getModuleOrThrow(SensorFusionBosch.class);
     }
 
     @Override

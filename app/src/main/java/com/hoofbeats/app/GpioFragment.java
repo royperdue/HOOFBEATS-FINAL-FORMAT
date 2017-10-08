@@ -188,8 +188,8 @@ public class GpioFragment extends SingleDataSensorFragment {
 
     @Override
     protected void boardReady() throws UnsupportedModuleException {
-        gpio = mwBoard.getModuleOrThrow(Gpio.class);
-        timer = mwBoard.getModuleOrThrow(Timer.class);
+        //gpio = mwBoard.getModuleOrThrow(Gpio.class);
+        //timer = mwBoard.getModuleOrThrow(Timer.class);
     }
 
     @Override

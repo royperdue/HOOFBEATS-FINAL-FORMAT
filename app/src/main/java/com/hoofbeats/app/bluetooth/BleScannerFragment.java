@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelUuid;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,16 +24,21 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.hoofbeats.app.Config;
+import com.hoofbeats.app.ModuleFragmentBase;
 import com.hoofbeats.app.R;
+import com.hoofbeats.app.help.HelpOptionAdapter;
+import com.mbientlab.metawear.UnsupportedModuleException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class BleScannerFragment extends Fragment
+public class BleScannerFragment extends ModuleFragmentBase
 {
     public interface ScannerCommunicationBus
     {
@@ -45,8 +49,8 @@ public class BleScannerFragment extends Fragment
         void onDeviceSelected(BluetoothDevice device);
     }
 
-    public static final long DEFAULT_SCAN_PERIOD = 5000L;
-    private static final int REQUEST_ENABLE_BT = 1, PERMISSION_REQUEST_COARSE_LOCATION = 2;
+    //public static final long DEFAULT_SCAN_PERIOD = 5000L;
+    //private static final int REQUEST_ENABLE_BT = 1, PERMISSION_REQUEST_COARSE_LOCATION = 2;
 
     private ScannedDeviceInfoAdapter scannedDevicesAdapter;
     private Button scanControl;
@@ -57,19 +61,23 @@ public class BleScannerFragment extends Fragment
     private HashSet<ParcelUuid> api21FilterServiceUuids;
     private boolean isScanReady;
     private ScannerCommunicationBus commBus = null;
-
-    private static BleScannerFragment bleScannerFragment;
-
-    public static BleScannerFragment newInstance()
-    {
-        if (bleScannerFragment == null)
-            bleScannerFragment = new BleScannerFragment();
-
-        return bleScannerFragment;
-    }
+    private List<String> macAddresses = null;
 
     public BleScannerFragment()
     {
+        super(R.string.navigation_fragment_assign);
+    }
+
+    @Override
+    protected void boardReady() throws UnsupportedModuleException
+    {
+
+    }
+
+    @Override
+    protected void fillHelpOptionAdapter(HelpOptionAdapter adapter)
+    {
+
     }
 
     @Override
@@ -105,7 +113,7 @@ public class BleScannerFragment extends Fragment
         } else if (!btAdapter.isEnabled())
         {
             final Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            startActivityForResult(enableIntent, Config.REQUEST_ENABLE_BT);
         } else
         {
             isScanReady = true;
@@ -117,7 +125,7 @@ public class BleScannerFragment extends Fragment
     {
         switch (requestCode)
         {
-            case REQUEST_ENABLE_BT:
+            case Config.REQUEST_ENABLE_BT:
                 if (resultCode == Activity.RESULT_CANCELED)
                 {
                     getActivity().finish();
@@ -165,17 +173,19 @@ public class BleScannerFragment extends Fragment
 
         ListView scannedDevices = (ListView) view.findViewById(R.id.blescan_devices);
         scannedDevices.setAdapter(scannedDevicesAdapter);
-        scannedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        if (macAddresses == null)
         {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            scannedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener()
             {
-                stopBleScan();
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+                {
+                    stopBleScan();
 
-                commBus.onDeviceSelected(scannedDevicesAdapter.getItem(i).btDevice);
-            }
-        });
-
+                    commBus.onDeviceSelected(scannedDevicesAdapter.getItem(i).btDevice);
+                }
+            });
+        }
         scanControl = (Button) view.findViewById(R.id.blescan_control);
         scanControl.setOnClickListener(new View.OnClickListener()
         {
@@ -243,7 +253,19 @@ public class BleScannerFragment extends Fragment
                         @Override
                         public void run()
                         {
-                            scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi));
+                            if (macAddresses != null)
+                            {
+                                for (int i = 0; i < macAddresses.size(); i++)
+                                {
+                                    if (btDevice.getAddress().equals(macAddresses.get(i)))
+                                    {
+                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi));
+                                    }
+                                }
+                            } else
+                            {
+                                scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi));
+                            }
                         }
                     });
                 }
@@ -327,7 +349,19 @@ public class BleScannerFragment extends Fragment
                                 @Override
                                 public void run()
                                 {
-                                    scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi()));
+                                    if (macAddresses != null)
+                                    {
+                                        for (int i = 0; i < macAddresses.size(); i++)
+                                        {
+                                            if (result.getDevice().getAddress().equals(macAddresses.get(i)))
+                                            {
+                                                scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi()));
+                                            }
+                                        }
+                                    } else
+                                    {
+                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi()));
+                                    }
                                 }
                             });
                         }
@@ -357,6 +391,14 @@ public class BleScannerFragment extends Fragment
 
             isScanning = false;
             scanControl.setText(R.string.ble_scan);
+
+            if (macAddresses != null)
+            {
+                for (int i = 0; i < scannedDevicesAdapter.getCount(); i++)
+                {
+                    commBus.onDeviceSelected(scannedDevicesAdapter.getItem(i).btDevice);
+                }
+            }
         }
     }
 
@@ -379,7 +421,7 @@ public class BleScannerFragment extends Fragment
                 @Override
                 public void onDismiss(DialogInterface dialog)
                 {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, Config.PERMISSION_REQUEST_COARSE_LOCATION);
                 }
             });
             builder.show();
@@ -395,7 +437,7 @@ public class BleScannerFragment extends Fragment
     {
         switch (requestCode)
         {
-            case PERMISSION_REQUEST_COARSE_LOCATION:
+            case Config.PERMISSION_REQUEST_COARSE_LOCATION:
             {
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
                 {
@@ -407,5 +449,15 @@ public class BleScannerFragment extends Fragment
                 }
             }
         }
+    }
+
+    public void setMacAddresses(List<String> macAddresses)
+    {
+        this.macAddresses = macAddresses;
+    }
+
+    public ScannedDeviceInfoAdapter getScannedDevicesAdapter()
+    {
+        return scannedDevicesAdapter;
     }
 }

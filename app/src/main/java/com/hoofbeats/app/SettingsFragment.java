@@ -39,8 +39,8 @@ public class SettingsFragment extends ModuleFragmentBase {
 
     @Override
     protected void boardReady() throws UnsupportedModuleException {
-        debugModule= mwBoard.getModuleOrThrow(Debug.class);
-        settingsModule= mwBoard.getModuleOrThrow(Settings.class);
+       // debugModule= mwBoard.getModuleOrThrow(Debug.class);
+        //settingsModule= mwBoard.getModuleOrThrow(Settings.class);
 
         settingsModule.readBleAdConfigAsync()
                 .continueWith(task -> {

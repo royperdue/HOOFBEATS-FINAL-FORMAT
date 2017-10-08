@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -46,6 +47,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hoofbeats.app.bluetooth.BleScannerFragment;
+import com.hoofbeats.app.model.Horse;
+import com.hoofbeats.app.utility.DatabaseUtility;
+import com.hoofbeats.app.utility.DialogUtility;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.android.BtleService;
 import com.mbientlab.metawear.module.Debug;
@@ -96,6 +100,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     static
     {
         Map<Integer, Class<? extends ModuleFragmentBase>> tempMap = new LinkedHashMap<>();
+        tempMap.put(R.id.nav_assign, BleScannerFragment.class);
         tempMap.put(R.id.nav_home, HomeFragment.class);
         tempMap.put(R.id.nav_accelerometer, AccelerometerFragment.class);
         tempMap.put(R.id.nav_gpio, GpioFragment.class);
@@ -486,7 +491,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         nestedScrollView = (NestedScrollView) findViewById(R.id.nested_scrollView);
         mProfileDetails = (LinearLayout) findViewById(R.id.wrapper_profile_details);
         mTextViewProfileName = (TextView) findViewById(R.id.text_view_profile_name);
-        mTextViewProfileDescription = (TextView) findViewById(R.id.text_view_profile_description);
+        connectButton = (Button) findViewById(R.id.ble_connect_control);
         mButtonProfile = findViewById(R.id.button_profile);
         mButtonProfile.post(new Runnable()
         {
@@ -518,19 +523,18 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null)
         {
-            onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_home));
+            onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_assign));
         } else
         {
             currentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_KEY);
         }
 
-        bluetoothDevices = getIntent().getParcelableArrayListExtra(EXTRA_BT_DEVICE);
-        getApplicationContext().bindService(new Intent(this, BtleService.class), this, BIND_AUTO_CREATE);
+        getApplicationContext().bindService(new Intent(NavigationActivity.this, BtleService.class), NavigationActivity.this, BIND_AUTO_CREATE);
 
         DfuServiceListenerHelper.registerProgressListener(this, dfuProgressListener);
     }
@@ -725,12 +729,16 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     {
         serviceBinder = (BtleService.LocalBinder) iBinder;
 
-        for (int i = 0; i < bluetoothDevices.size(); i++)
+        if (bluetoothDevices.size() > 0)
         {
-            MetaWearBoard metaWearBoard = ((BtleService.LocalBinder) iBinder).getMetaWearBoard(bluetoothDevices.get(i));
-            metaWearBoard.onUnexpectedDisconnect(status -> attemptReconnect());
-            metaWearBoards.add(metaWearBoard);
-        }
+            for (int i = 0; i < bluetoothDevices.size(); i++)
+            {
+                MetaWearBoard metaWearBoard = ((BtleService.LocalBinder) iBinder).getMetaWearBoard(bluetoothDevices.get(i));
+                metaWearBoard.onUnexpectedDisconnect(status -> attemptReconnect());
+                metaWearBoards.add(metaWearBoard);
+            }
+        } else if (bluetoothDevices.size() == 0)
+            DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.message_no_horseshoes_found_click_scan));
     }
 
     @Override
@@ -836,22 +844,38 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         Map<String, Object> profileMap;
         List<Map<String, Object>> profilesList = new ArrayList<>();
 
-        int[] avatars = {
-                R.drawable.horse1,
-                R.drawable.horse2,
-                R.drawable.horse3,
-                R.drawable.horse4,
-                R.drawable.horse5};
-        String[] names = getResources().getStringArray(R.array.array_names);
+        List<Horse> horses = DatabaseUtility.retrieveHorses(NavigationActivity.this);
 
-        for (int i = 0; i < avatars.length; i++)
+        if (horses.size() > 0)
         {
-            profileMap = new HashMap<>();
-            profileMap.put(CustomListAdapter.KEY_AVATAR, avatars[i]);
-            profileMap.put(CustomListAdapter.KEY_NAME, names[i]);
-            profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, getString(R.string.lorem_ipsum_short));
-            profileMap.put(CustomListAdapter.KEY_DESCRIPTION_FULL, getString(R.string.lorem_ipsum_long));
-            profilesList.add(profileMap);
+            for (int i = 0; i < horses.size(); i++)
+            {
+                profileMap = new HashMap<>();
+                profileMap.put(CustomListAdapter.KEY_AVATAR, DatabaseUtility.bytes2Bitmap(horses.get(i).getProfilePicture()));
+                profileMap.put(CustomListAdapter.KEY_NAME, horses.get(i).getHorseName());
+                profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, getString(R.string.lorem_ipsum_short));
+                profileMap.put(CustomListAdapter.KEY_DESCRIPTION_FULL, getString(R.string.lorem_ipsum_long));
+                profilesList.add(profileMap);
+            }
+        } else
+        {
+            int[] avatars = {
+                    R.drawable.horse1,
+                    R.drawable.horse2,
+                    R.drawable.horse3,
+                    R.drawable.horse4,
+                    R.drawable.horse5};
+            String[] names = getResources().getStringArray(R.array.array_names);
+
+            for (int i = 0; i < avatars.length; i++)
+            {
+                profileMap = new HashMap<>();
+                profileMap.put(CustomListAdapter.KEY_AVATAR, avatars[i]);
+                profileMap.put(CustomListAdapter.KEY_NAME, names[i]);
+                profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, getString(R.string.lorem_ipsum_short));
+                profileMap.put(CustomListAdapter.KEY_DESCRIPTION_FULL, getString(R.string.lorem_ipsum_long));
+                profilesList.add(profileMap);
+            }
         }
 
         return new CustomListAdapter(this, R.layout.list_item, profilesList);

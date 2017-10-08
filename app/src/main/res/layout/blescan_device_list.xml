@@ -10,10 +10,27 @@
         android:id="@+id/blescan_devices"
         android:choiceMode="singleChoice" />
 
-    <Button
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/ble_scan_cancel"
-        style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/blescan_control" />
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/ble_scan_cancel"
+            android:textColor="@android:color/holo_green_dark"
+            style="?android:attr/buttonBarButtonStyle"
+            android:id="@+id/blescan_control" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_connect"
+            style="?android:attr/buttonBarButtonStyle"
+            android:textColor="@android:color/holo_blue_dark"
+            android:layout_weight="1"
+            android:id="@+id/ble_connect_control" />
+    </LinearLayout>
 </LinearLayout>
