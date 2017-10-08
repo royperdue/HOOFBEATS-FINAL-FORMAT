@@ -24,12 +24,10 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.hoofbeats.app.Config;
+import com.hoofbeats.app.R;
 import com.hoofbeats.app.adapter.ScannedDeviceInfoAdapter;
 import com.hoofbeats.app.fragment.ModuleFragmentBase;
-import com.hoofbeats.app.NavigationActivity;
-import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOptionAdapter;
-import com.hoofbeats.app.model.Wrapper;
 import com.mbientlab.metawear.UnsupportedModuleException;
 
 import java.nio.ByteBuffer;
@@ -47,8 +45,6 @@ public class BleScannerFragment extends ModuleFragmentBase
         UUID[] getFilterServiceUuids();
 
         long getScanDuration();
-
-        void onDeviceSelected(BluetoothDevice device);
     }
 
     //public static final long DEFAULT_SCAN_PERIOD = 5000L;
@@ -64,7 +60,7 @@ public class BleScannerFragment extends ModuleFragmentBase
     private HashSet<ParcelUuid> api21FilterServiceUuids;
     private boolean isScanReady;
     private ScannerCommunicationBus commBus = null;
-    private List<Wrapper> macAddresses = null;
+    private List<String> macAddresses = null;
 
     public BleScannerFragment()
     {
@@ -216,12 +212,7 @@ public class BleScannerFragment extends ModuleFragmentBase
                     stopBleScan();
                 }
 
-                for (int i = 0; i < scannedDevicesAdapter.getCount(); i++)
-                {
-                    commBus.onDeviceSelected(scannedDevicesAdapter.getItem(i).btDevice);
-                }
-
-                ((NavigationActivity) getActivity()).createMetaWearBoards();
+                scannedDevicesAdapter.connectAssignedDevices();
             }
         });
 
@@ -280,9 +271,9 @@ public class BleScannerFragment extends ModuleFragmentBase
                             {
                                 for (int i = 0; i < macAddresses.size(); i++)
                                 {
-                                    if (btDevice.getAddress().equals(macAddresses.get(i).getMacAddress()))
+                                    if (btDevice.getAddress().equals(macAddresses.get(i)))
                                     {
-                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi, macAddresses.get(i).getHoof()));
+                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi, null));
                                     }
                                 }
                             } else
@@ -376,9 +367,9 @@ public class BleScannerFragment extends ModuleFragmentBase
                                     {
                                         for (int i = 0; i < macAddresses.size(); i++)
                                         {
-                                            if (result.getDevice().getAddress().equals(macAddresses.get(i).getMacAddress()))
+                                            if (result.getDevice().getAddress().equals(macAddresses.get(i)))
                                             {
-                                                scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), macAddresses.get(i).getHoof()));
+                                                scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null));
                                             }
                                         }
                                     } else
@@ -414,14 +405,6 @@ public class BleScannerFragment extends ModuleFragmentBase
 
             isScanning = false;
             scanControl.setText(R.string.ble_scan);
-
-            if (macAddresses != null)
-            {
-                for (int i = 0; i < scannedDevicesAdapter.getCount(); i++)
-                {
-                    commBus.onDeviceSelected(scannedDevicesAdapter.getItem(i).btDevice);
-                }
-            }
         }
     }
 
@@ -474,7 +457,7 @@ public class BleScannerFragment extends ModuleFragmentBase
         }
     }
 
-    public void setMacAddresses(List<Wrapper> macAddresses)
+    public void setMacAddresses(List<String> macAddresses)
     {
         this.macAddresses = macAddresses;
     }

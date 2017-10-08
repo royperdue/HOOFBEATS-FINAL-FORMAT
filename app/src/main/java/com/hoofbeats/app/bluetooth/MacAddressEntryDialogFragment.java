@@ -59,7 +59,7 @@ public class MacAddressEntryDialogFragment extends DialogFragment
                 {
                     String macAddress = macAddressString.getText().toString().toUpperCase();
                     BluetoothDevice remoteDevice = btManager.getAdapter().getRemoteDevice(macAddress);
-                    commBus.onDeviceSelected(remoteDevice);
+                    //commBus.onDeviceSelected(remoteDevice);
                     dismiss();
                 } catch (IllegalArgumentException ignored)
                 {

@@ -41,13 +41,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hoofbeats.app.adapter.CustomListAdapter;
+import com.hoofbeats.app.adapter.ScannedDeviceInfoAdapter;
 import com.hoofbeats.app.bluetooth.BleScannerFragment;
+import com.hoofbeats.app.bluetooth.ScannedDeviceInfo;
 import com.hoofbeats.app.fragment.AccelerometerFragment;
 import com.hoofbeats.app.fragment.GpioFragment;
 import com.hoofbeats.app.fragment.GyroFragment;
@@ -82,7 +85,8 @@ import no.nordicsemi.android.dfu.DfuServiceInitiator;
 import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 
 public class NavigationActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,
-        ServiceConnection, BleScannerFragment.ScannerCommunicationBus, ModuleFragmentBase.FragmentBus, LoaderManager.LoaderCallbacks<Cursor>
+        ServiceConnection, BleScannerFragment.ScannerCommunicationBus, ModuleFragmentBase.FragmentBus, LoaderManager.LoaderCallbacks<Cursor>,
+        ScannedDeviceInfoAdapter.OnDeviceConfiguredListener
 {
     public final static String EXTRA_BT_DEVICE = "NavigationActivity.EXTRA_BT_DEVICE";
 
@@ -133,44 +137,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     public long getScanDuration()
     {
         return 10000L;
-    }
-
-    @Override
-    public void onDeviceSelected(BluetoothDevice bluetoothDevice)
-    {
-        serviceBinder.removeMetaWearBoard(bluetoothDevice);
-        MetaWearBoard metaWearBoard = serviceBinder.getMetaWearBoard(bluetoothDevice);
-        bluetoothDevices.add(bluetoothDevice);
-
-        final ProgressDialog connectDialog = new ProgressDialog(this);
-        connectDialog.setTitle(getString(R.string.title_connecting));
-        connectDialog.setMessage(getString(R.string.message_wait));
-        connectDialog.setCancelable(false);
-        connectDialog.setCanceledOnTouchOutside(false);
-        connectDialog.setIndeterminate(true);
-        connectDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.label_cancel), (dialogInterface, i) -> metaWearBoard.disconnectAsync());
-        connectDialog.show();
-
-        metaWearBoard.connectAsync()
-                .continueWithTask(task ->
-                {
-                    if (task.isCancelled())
-                    {
-                        return task;
-                    }
-                    return task.isFaulted() ? reconnect(metaWearBoard) : Task.forResult(null);
-                })
-                .continueWith(task ->
-                {
-                    if (!task.isCancelled())
-                    {
-                        setConnInterval(metaWearBoard.getModule(Settings.class));
-                        runOnUiThread(connectDialog::dismiss);
-
-                        metaWearBoards.add(metaWearBoard);
-                    }
-                    return null;
-                });
     }
 
     public static class ReconnectDialogFragment extends DialogFragment implements ServiceConnection
@@ -871,7 +837,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         Map<String, Object> profileMap;
         List<Map<String, Object>> profilesList = new ArrayList<>();
 
-        List<Horse> horses = DatabaseUtility.retrieveHorses(NavigationActivity.this);
+        List<Horse> horses = DatabaseUtility.retrieveHorses();
 
         if (horses.size() > 0)
         {
@@ -922,8 +888,17 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         }
     }
 
-    public static Task<Void> reconnect(final MetaWearBoard board)
+    public Task<Void> reconnect(final MetaWearBoard board)
     {
+        for (final Map.Entry<String, ImageView> entry : connectedCheckMarks.entrySet())
+        {
+            if (entry.getKey().equals(board.getMacAddress()))
+            {
+                entry.getValue().setImageDrawable(getDrawable(R.drawable.ic_check_circle_red_700_36dp));
+                break;
+            }
+        }
+
         return board.connectAsync()
                 .continueWithTask(task ->
                 {
@@ -935,6 +910,54 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                         return task;
                     }
                     return Task.forResult(null);
+                });
+    }
+
+    //********************Interface from ScannedInfoAdapter******************
+
+    @Override
+    public void onDeviceConfigured(View convertView, ScannedDeviceInfo scannedDeviceInfo)
+    {
+        ImageView connectedCheck = (ImageView) convertView.findViewById(R.id.ble_check_connected);
+
+        BluetoothDevice bluetoothDevice = scannedDeviceInfo.btDevice;
+        serviceBinder.removeMetaWearBoard(bluetoothDevice);
+        MetaWearBoard metaWearBoard = serviceBinder.getMetaWearBoard(bluetoothDevice);
+        bluetoothDevices.add(bluetoothDevice);
+
+        final ProgressDialog connectDialog = new ProgressDialog(this);
+        connectDialog.setTitle(getString(R.string.title_connecting));
+        connectDialog.setMessage(getString(R.string.message_wait));
+        connectDialog.setCancelable(false);
+        connectDialog.setCanceledOnTouchOutside(false);
+        connectDialog.setIndeterminate(true);
+        connectDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.label_cancel), (dialogInterface, i) -> metaWearBoard.disconnectAsync());
+        connectDialog.show();
+
+        metaWearBoard.connectAsync()
+                .continueWithTask(task ->
+                {
+                    if (task.isCancelled())
+                    {
+                        return task;
+                    }
+                    return task.isFaulted() ? reconnect(metaWearBoard) : Task.forResult(null);
+                })
+                .continueWith(task ->
+                {
+                    if (!task.isCancelled())
+                    {
+                        metaWearBoard.onUnexpectedDisconnect(status -> attemptReconnect());
+                        setConnInterval(metaWearBoard.getModule(Settings.class));
+                        runOnUiThread(connectDialog::dismiss);
+
+                        connectedCheckMarks.put(scannedDeviceInfo.btDevice.getAddress(), connectedCheck);
+
+                        metaWearBoards.add(metaWearBoard);
+
+                        connectedCheck.setVisibility(View.VISIBLE);
+                    }
+                    return null;
                 });
     }
 }

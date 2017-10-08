@@ -30,7 +30,6 @@ import android.widget.TextView;
 import com.hoofbeats.app.adapter.CustomListAdapter;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.model.Horseshoe;
-import com.hoofbeats.app.model.Wrapper;
 import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.DialogUtility;
 import com.hoofbeats.app.utility.LittleDB;
@@ -39,6 +38,7 @@ import com.nhaarman.listviewanimations.appearance.simple.SwingLeftInAnimationAda
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +67,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected Button connectButton;
     protected NavigationView navigationView;
     protected Bundle savedInstanceState;
+    protected Map<String, ImageView> connectedCheckMarks = new HashMap<>();
 
     public static ShapeDrawable sOverlayShape;
     public static int sScreenWidth;
@@ -97,19 +98,25 @@ public abstract class BaseActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<String, Object> profileMap = (Map<String, Object>) parent.getItemAtPosition(position);
-                List<Horse> horses = DatabaseUtility.retrieveHorses(BaseActivity.this);
+                List<Horse> horses = DatabaseUtility.retrieveHorses();
+                List<Horseshoe> horseshoes = null;
 
                 if (horses.size() > 0)
                 {
                     LittleDB.get().putLong(Config.SELECTED_HORSE_ID, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
-                    List<Horse> horseList = DatabaseUtility.retrieveHorseForId(BaseActivity.this, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
-                    List<Horseshoe> horseshoes = horseList.get(0).getHorseshoes();
-                    List<Wrapper> macAddresses = new ArrayList<>();
+                    Horse horse = DatabaseUtility.retrieveHorseForId((Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
+
+                    if (horse != null)
+                        horseshoes = horse.getHorseshoes();
+                    else
+                        DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horse_found));
+
+                    List<String> macAddresses = new ArrayList<>();
                     if (horseshoes.size() > 0)
                     {
                         for (int i = 0; i < horseshoes.size(); i++)
                         {
-                            macAddresses.add(new Wrapper(horseshoes.get(i).getMacAddress(), horseshoes.get(i).getHoof()));
+                            macAddresses.add(horseshoes.get(i).getMacAddress());
                         }
                     } else if (horseshoes.size() == 0)
                         DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horseshoes_assigned));

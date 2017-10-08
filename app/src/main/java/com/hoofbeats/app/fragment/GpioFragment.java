@@ -450,13 +450,13 @@ public class GpioFragment extends SingleDataSensorFragment
                     return;
                 }
 
-                List<Horse> horseList = DatabaseUtility.retrieveHorseForId(getActivity(), LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
+                Horse horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
 
-                if (horseList.size() > 0)
+                if (horse != null)
                 {
                     long workoutId = -1;
                     List<Track> tracks = null;
-                    List<Workout> workouts = horseList.get(0).getWorkouts();
+                    List<Workout> workouts = horse.getWorkouts();
 
                     for (int i = 0; i < workouts.size(); i++)
                     {

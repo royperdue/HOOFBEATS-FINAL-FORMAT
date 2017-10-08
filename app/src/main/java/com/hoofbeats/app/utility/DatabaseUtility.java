@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public final class DatabaseUtility
 {
-    public static List<Workout> retrieveWorkouts(Activity activity, long horseId)
+    public static List<Workout> retrieveWorkouts(long horseId)
     {
         List<Workout> workouts = null;
 
@@ -44,7 +44,7 @@ public final class DatabaseUtility
         return workouts;
     }
 
-    public static List<Workout> retrieveWorkoutsForDate(Activity activity, String date, long horseId)
+    public static List<Workout> retrieveWorkoutsForDate(String date, long horseId)
     {
         List<Workout> workouts = null;
 
@@ -57,7 +57,7 @@ public final class DatabaseUtility
         return workouts;
     }
 
-    public static List<Horse> retrieveHorses(Activity activity)
+    public static List<Horse> retrieveHorses()
     {
         List<Horse> horses = null;
 
@@ -68,7 +68,7 @@ public final class DatabaseUtility
         return horses;
     }
 
-    public static List<Horse> retrieveHorse(Activity activity, String horseName)
+    public static Horse retrieveHorse(String horseName)
     {
         List<Horse> horses = null;
 
@@ -77,10 +77,13 @@ public final class DatabaseUtility
 
         clearSession();
 
-        return horses;
+        if (horses.size() > 0)
+            return horses.get(0);
+        else
+            return null;
     }
 
-    public static List<Horseshoe> retrieveHorseShoes(Activity activity, String macAddress)
+    public static Horseshoe retrieveHorseShoeForMacAddress(String macAddress)
     {
         List<Horseshoe> horseshoes = null;
 
@@ -89,10 +92,13 @@ public final class DatabaseUtility
 
         clearSession();
 
-        return horseshoes;
+        if (horseshoes.size() > 0)
+            return horseshoes.get(0);
+        else
+            return null;
     }
 
-    public static List<Horse> retrieveHorseForId(Activity activity, long horseId)
+    public static Horse retrieveHorseForId(long horseId)
     {
         List<Horse> horses = null;
 
@@ -101,10 +107,13 @@ public final class DatabaseUtility
 
         clearSession();
 
-        return horses;
+        if (horses.size() > 0)
+            return horses.get(0);
+        else
+            return null;
     }
 
-    public static List<Track> retrieveTracksForId(Activity activity, long trackId)
+    public static List<Track> retrieveTracksForId(long trackId)
     {
         List<Track> tracks = null;
 
@@ -269,7 +278,7 @@ public final class DatabaseUtility
                 && !LittleDB.get().getString(Config.WORKOUT_START_DATE).equals(""))
         {
             System.out.println("-CALLED-1");
-            List<Workout> workouts = retrieveWorkoutsForDate(activity, LittleDB.get().getString(Config.WORKOUT_START_DATE),
+            List<Workout> workouts = retrieveWorkoutsForDate(LittleDB.get().getString(Config.WORKOUT_START_DATE),
                     LittleDB.get().getLong(Config.HORSE_ID, -1L));
 
             if (workouts.size() == 1)
@@ -281,7 +290,7 @@ public final class DatabaseUtility
 
     public static String[] createHorsesArray(Activity activity, Map horsesMap)
     {
-        List<Horse> horses = DatabaseUtility.retrieveHorses(activity);
+        List<Horse> horses = DatabaseUtility.retrieveHorses();
         List<String> horseNames = new ArrayList<>();
 
         if (horses.size() > 0)
@@ -301,7 +310,7 @@ public final class DatabaseUtility
 
     public static Calendar[] createDateArray(Activity activity)
     {
-        List<Workout> workouts = DatabaseUtility.retrieveWorkouts(activity, LittleDB.get().getLong(Config.HORSE_ID, -1L));
+        List<Workout> workouts = DatabaseUtility.retrieveWorkouts(LittleDB.get().getLong(Config.HORSE_ID, -1L));
         List<Calendar> calendars = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("d-M-yyyy");
 

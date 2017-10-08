@@ -401,7 +401,8 @@
     <string name="label_add_note">Add note...</string>
     <string name="label_horse_weight">Weight(lbs).</string>
 
-
+    <string name="label_horseshoe_assign">Assign</string>
+    <string name="label_horseshoe_remove">Remove</string>
     <string name="navigation_fragment_assign">Assign</string>
 
 
@@ -490,6 +491,8 @@
     <string name="message_select_horse_sex">Select horse sex...</string>
     <string name="message_unknown_breed">Breed unknown...</string>
 
+    <string name="message_convertView_null">Error...convertView null in ScannedInfoAdapter.</string>
+
     <string name="message_updating">Updating...</string>
     <string name="message_configuration_proceed">Update configuration...</string>
     <string name="message_configuration_update_success">Configurations updated...</string>
@@ -539,6 +542,9 @@
     <string name="message_no_horseshoes_found_click_scan">No horseshoes found. Click scan to try
         again.
     </string>
+
+
+    <string name="error_scanned_device_info_adapter">Error NavigationActivity must implement OnDeviceConfiguredListener.</string>
 
     <string name="title_navigation">Menu</string>
     <string name="title_connecting">Connecting</string>
