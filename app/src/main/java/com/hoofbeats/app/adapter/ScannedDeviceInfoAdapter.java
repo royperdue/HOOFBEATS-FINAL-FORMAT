@@ -12,11 +12,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.hoofbeats.app.MyApplication;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.bluetooth.ScannedDeviceInfo;
 import com.hoofbeats.app.model.Horse;
-import com.hoofbeats.app.model.Horseshoe;
 import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.DialogUtility;
 
@@ -62,6 +60,8 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
             this.convertView = convertView;
             viewHolder = new ViewHolder();
             viewHolder.deviceName = (TextView) convertView.findViewById(R.id.ble_device);
+            viewHolder.deviceName.setText(R.string.app_name);
+
             viewHolder.deviceRSSI = (TextView) convertView.findViewById(R.id.ble_rssi_value);
             viewHolder.rssiChart = (ImageView) convertView.findViewById(R.id.ble_rssi_png);
             viewHolder.connectedCheck = (ImageView) convertView.findViewById(R.id.ble_check_connected);
@@ -90,115 +90,116 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
                 }
             });
 
-                viewHolder.configureButton.setOnClickListener(new View.OnClickListener()
+            ScannedDeviceInfo scannedDeviceInfo = getItem(position);
+
+            viewHolder.deviceRSSI.setText(String.format(Locale.US, "%d dBm", scannedDeviceInfo.rssi));
+            viewHolder.rssiChart.setImageLevel(Math.min(RSSI_BAR_LEVELS - 1, (127 + scannedDeviceInfo.rssi + 5) / RSSI_BAR_SCALE));
+
+            viewHolder.configureButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
                 {
-                    @Override
-                    public void onClick(View v)
+                    ScannedDeviceInfo deviceInfo = getItem(position);
+
+                    if (hoof != null)
+                        deviceInfo.setHoof(hoof);
+
+                    viewHolder.deviceRSSI.setText(String.format(Locale.US, "%d dBm", deviceInfo.rssi));
+                    viewHolder.rssiChart.setImageLevel(Math.min(RSSI_BAR_LEVELS - 1, (127 + deviceInfo.rssi + 5) / RSSI_BAR_SCALE));
+
+                    Horse horse = DatabaseUtility.retrieveHorseForMacAddress(deviceInfo.btDevice.getAddress());
+
+                    if (horse != null)
                     {
-                        ScannedDeviceInfo deviceInfo = getItem(position);
-
-                        if (hoof != null)
-                            deviceInfo.setHoof(hoof);
-
-                        viewHolder.deviceRSSI.setText(String.format(Locale.US, "%d dBm", deviceInfo.rssi));
-                        viewHolder.rssiChart.setImageLevel(Math.min(RSSI_BAR_LEVELS - 1, (127 + deviceInfo.rssi + 5) / RSSI_BAR_SCALE));
-
                         String buttonText = ((Button) v).getText().toString();
-                        Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(deviceInfo.btDevice.getAddress());
 
-                        if (horseshoe != null)
+                        if (buttonText.equals(activity.getString(R.string.label_horseshoe_assign)))
                         {
-                            Horse horse = DatabaseUtility.retrieveHorseForId(horseshoe.getHorseId());
-
-                            if (horse != null)
+                            if (deviceInfo.getHoof().equals("Left Hind"))
                             {
-                                if (buttonText.equals(activity.getString(R.string.label_horseshoe_assign)))
-                                {
-                                    DatabaseUtility.addHorseshoeToHorse(horse, deviceInfo.getHoof(), deviceInfo.btDevice.getAddress());
-                                    ((Button) v).setText(activity.getString(R.string.label_horseshoe_remove));
-
-                                    if (deviceInfo.getHoof().equals("Left Hind"))
-                                    {
-                                        viewHolder.deviceName.setText(R.string.label_left_hind);
-                                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_hind);
-                                        radioButton.setChecked(true);
-                                        radioButton.setClickable(false);
-                                        radioButton.setEnabled(false);
-                                        viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
-                                    } else if (deviceInfo.getHoof().equals("Left Front"))
-                                    {
-                                        viewHolder.deviceName.setText(R.string.label_left_front);
-                                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_front);
-                                        radioButton.setChecked(true);
-                                        radioButton.setClickable(false);
-                                        radioButton.setEnabled(false);
-                                        viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
-                                    } else if (deviceInfo.getHoof().equals("Right Hind"))
-                                    {
-                                        viewHolder.deviceName.setText(R.string.label_right_hind);
-                                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_hind);
-                                        radioButton.setChecked(true);
-                                        radioButton.setClickable(false);
-                                        radioButton.setEnabled(false);
-                                        viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
-                                    } else if (deviceInfo.getHoof().equals("Right Front"))
-                                    {
-                                        viewHolder.deviceName.setText(R.string.label_right_front);
-                                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_front);
-                                        radioButton.setChecked(true);
-                                        radioButton.setClickable(false);
-                                        radioButton.setEnabled(false);
-                                        viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
-                                    }
-                                } else if (buttonText.equals(activity.getString(R.string.label_horseshoe_remove)))
-                                {
-                                    MyApplication.getInstance().getDaoSession().getHorseshoeDao().delete(horseshoe);
-                                    horse.getHorseshoes().remove(horseshoe);
-                                    horse.update();
-
-                                    ((Button) v).setText(activity.getString(R.string.label_horseshoe_assign));
-
-                                    if (deviceInfo.getHoof().equals("Left Hind"))
-                                    {
-                                        viewHolder.deviceName.setText(R.string.label_left_hind);
-                                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_hind);
-                                        radioButton.setChecked(false);
-                                        radioButton.setClickable(true);
-                                        radioButton.setEnabled(true);
-                                        viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
-                                    } else if (deviceInfo.getHoof().equals("Left Front"))
-                                    {
-                                        viewHolder.deviceName.setText(R.string.label_left_front);
-                                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_front);
-                                        radioButton.setChecked(false);
-                                        radioButton.setClickable(true);
-                                        radioButton.setEnabled(true);
-                                        viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
-                                    } else if (deviceInfo.getHoof().equals("Right Hind"))
-                                    {
-                                        viewHolder.deviceName.setText(R.string.label_right_hind);
-                                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_hind);
-                                        radioButton.setChecked(false);
-                                        radioButton.setClickable(true);
-                                        radioButton.setEnabled(true);
-                                        viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
-                                    } else if (deviceInfo.getHoof().equals("Right Front"))
-                                    {
-                                        viewHolder.deviceName.setText(R.string.label_right_front);
-                                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_front);
-                                        radioButton.setChecked(false);
-                                        radioButton.setClickable(true);
-                                        radioButton.setEnabled(true);
-                                        viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
-                                    }
-                                }
-
-                                //notifyDataSetChanged();
+                                System.out.println("----Two---");
+                                DatabaseUtility.addHorseshoeToHorse(horse, deviceInfo.getHoof(), deviceInfo.btDevice.getAddress());
+                                viewHolder.deviceName.setText(R.string.label_left_hind);
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_hind);
+                                radioButton.setChecked(true);
+                                radioButton.setClickable(false);
+                                radioButton.setEnabled(false);
+                                viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
+                            } else if (deviceInfo.getHoof().equals("Left Front"))
+                            {
+                                DatabaseUtility.addHorseshoeToHorse(horse, deviceInfo.getHoof(), deviceInfo.btDevice.getAddress());
+                                viewHolder.deviceName.setText(R.string.label_left_front);
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_front);
+                                radioButton.setChecked(true);
+                                radioButton.setClickable(false);
+                                radioButton.setEnabled(false);
+                                viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
+                            } else if (deviceInfo.getHoof().equals("Right Hind"))
+                            {
+                                DatabaseUtility.addHorseshoeToHorse(horse, deviceInfo.getHoof(), deviceInfo.btDevice.getAddress());
+                                viewHolder.deviceName.setText(R.string.label_right_hind);
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_hind);
+                                radioButton.setChecked(true);
+                                radioButton.setClickable(false);
+                                radioButton.setEnabled(false);
+                                viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
+                            } else if (deviceInfo.getHoof().equals("Right Front"))
+                            {
+                                DatabaseUtility.addHorseshoeToHorse(horse, deviceInfo.getHoof(), deviceInfo.btDevice.getAddress());
+                                viewHolder.deviceName.setText(R.string.label_right_front);
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_front);
+                                radioButton.setChecked(true);
+                                radioButton.setClickable(false);
+                                radioButton.setEnabled(false);
+                                viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
                             }
-                        } else
-                            DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_no_horseshoes_assigned));
+                        } else if (buttonText.equals(activity.getString(R.string.label_horseshoe_remove)))
+                        {
+                            if (deviceInfo.getHoof().equals("Left Hind"))
+                            {
+                                System.out.println("----Four---");
+                                DatabaseUtility.removeHorseshoeMacAddress(deviceInfo.btDevice.getAddress());
+                                viewHolder.deviceName.setText(R.string.app_name);
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_hind);
+                                radioButton.setChecked(false);
+                                radioButton.setClickable(true);
+                                radioButton.setEnabled(true);
+                                viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
+                            } else if (deviceInfo.getHoof().equals("Left Front"))
+                            {
+                                DatabaseUtility.removeHorseshoeMacAddress(deviceInfo.btDevice.getAddress());
+                                viewHolder.deviceName.setText(R.string.app_name);
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_front);
+                                radioButton.setChecked(false);
+                                radioButton.setClickable(true);
+                                radioButton.setEnabled(true);
+                                viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
+                            } else if (deviceInfo.getHoof().equals("Right Hind"))
+                            {
+                                DatabaseUtility.removeHorseshoeMacAddress(deviceInfo.btDevice.getAddress());
+                                viewHolder.deviceName.setText(R.string.app_name);
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_hind);
+                                radioButton.setChecked(false);
+                                radioButton.setClickable(true);
+                                radioButton.setEnabled(true);
+                                viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
+                            } else if (deviceInfo.getHoof().equals("Right Front"))
+                            {
+                                DatabaseUtility.removeHorseshoeMacAddress(deviceInfo.btDevice.getAddress());
+                                viewHolder.deviceName.setText(R.string.app_name);
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_front);
+                                radioButton.setChecked(false);
+                                radioButton.setClickable(true);
+                                radioButton.setEnabled(true);
+                                viewHolder.configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
+                            }
+                        }
+
+                        notifyDataSetChanged();
                     }
-                });
+                }
+            });
 
             convertView.setTag(viewHolder);
         } else

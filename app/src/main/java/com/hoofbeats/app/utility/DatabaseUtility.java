@@ -98,6 +98,37 @@ public final class DatabaseUtility
             return null;
     }
 
+    public static Horse retrieveHorseForMacAddress(String macAddress)
+    {
+        System.out.println("----Five---");
+        List<Horseshoe> horseshoes = null;
+
+        horseshoes = MyApplication.getInstance().getDaoSession().getHorseshoeDao().queryBuilder()
+                .where(HorseshoeDao.Properties.MacAddress.eq(macAddress)).list();
+
+        clearSession();
+
+        if (horseshoes.size() > 0)
+            return horseshoes.get(0).getHorse();
+        else
+            return null;
+    }
+
+    public static void removeHorseshoeMacAddress(String macAddress)
+    {
+        List<Horseshoe> horseshoes = null;
+
+        horseshoes = MyApplication.getInstance().getDaoSession().getHorseshoeDao().queryBuilder()
+                .where(HorseshoeDao.Properties.MacAddress.eq(macAddress)).list();
+
+        MyApplication.getInstance().getDaoSession().getHorseshoeDao().delete(horseshoes.get(0));
+        horseshoes.get(0).getHorse().getHorseshoes().remove(horseshoes.get(0));
+        horseshoes.get(0).getHorse().update();
+        horseshoes.get(0).getHorse().resetHorseshoes();
+
+        clearSession();
+    }
+
     public static Horse retrieveHorseForId(long horseId)
     {
         List<Horse> horses = null;
@@ -203,6 +234,10 @@ public final class DatabaseUtility
         horseshoes.add(horseshoe);
 
         horse.resetHorseshoes();
+
+        System.out.println("----Three---");
+
+        clearSession();
     }
 
    /* public static List<LatLng> retrieveLatLngList(Activity activity, long trackId, long startNumber, long endNumber)
