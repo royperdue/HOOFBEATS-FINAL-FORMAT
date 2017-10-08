@@ -1,4 +1,4 @@
-package com.hoofbeats.app;
+package com.hoofbeats.app.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hoofbeats.app.BaseActivity;
+import com.hoofbeats.app.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

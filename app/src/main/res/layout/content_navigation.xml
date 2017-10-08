@@ -8,28 +8,18 @@
                 tools:context="com.hoofbeats.app.NavigationActivity"
                 tools:showIn="@layout/app_bar_navigation">
 
-    <FrameLayout
-        android:id="@+id/toolbar_list"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/height_toolbar"
-        android:background="@color/orange">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:fontFamily="sans-serif-bold"
-            android:text="@string/title_following"
-            android:textColor="@color/black"
-            android:textSize="@dimen/text_size_toolbar_title"/>
-
-    </FrameLayout>
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar_list"
+        android:layout_below="@+id/toolbar"
         android:background="@color/gray"
         android:divider="@drawable/list_divider"
         tools:listitem="@layout/list_item"/>

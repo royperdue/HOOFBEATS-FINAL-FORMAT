@@ -29,7 +29,7 @@
  * contact MbientLab Inc, at www.mbientlab.com.
  */
 
-package com.hoofbeats.app;
+package com.hoofbeats.app.fragment;
 
 import android.os.Bundle;
 import android.view.View;
@@ -40,6 +40,7 @@ import android.widget.TextView;
 
 import com.github.mikephil.charting.components.YAxis;
 
+import com.hoofbeats.app.R;
 import com.mbientlab.metawear.AsyncDataProducer;
 import com.mbientlab.metawear.UnsupportedModuleException;
 import com.hoofbeats.app.help.HelpOption;
@@ -51,7 +52,8 @@ import com.mbientlab.metawear.module.GyroBmi160.*;
 /**
  * Created by etsai on 8/19/2015.
  */
-public class GyroFragment extends ThreeAxisChartFragment {
+public class GyroFragment extends ThreeAxisChartFragment
+{
     private static final float[] AVAILABLE_RANGES= {125.f, 250.f, 500.f, 1000.f, 2000.f};
     private static final float INITIAL_RANGE= 125.f, GYR_ODR= 25.f;
 

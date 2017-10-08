@@ -1,4 +1,4 @@
-package com.hoofbeats.app;
+package com.hoofbeats.app.fragment;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOptionAdapter;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.UnsupportedModuleException;
@@ -45,7 +46,7 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
 
     protected abstract void fillHelpOptionAdapter(HelpOptionAdapter adapter);
 
-    protected void showHelpDialog()
+    public void showHelpDialog()
     {
         HelpOptionAdapter adapter = new HelpOptionAdapter(getContext(), R.id.config_help_list);
         fillHelpOptionAdapter(adapter);

@@ -1,4 +1,4 @@
-package com.hoofbeats.app;
+package com.hoofbeats.app.fragment;
 
 import android.os.Bundle;
 import android.view.View;
@@ -8,6 +8,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.components.YAxis;
+import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOption;
 import com.hoofbeats.app.help.HelpOptionAdapter;
 import com.mbientlab.metawear.AsyncDataProducer;
@@ -17,7 +18,8 @@ import com.mbientlab.metawear.module.Accelerometer;
 import com.mbientlab.metawear.module.AccelerometerBosch;
 import com.mbientlab.metawear.module.AccelerometerMma8452q;
 
-public class AccelerometerFragment extends ThreeAxisChartFragment {
+public class AccelerometerFragment extends ThreeAxisChartFragment
+{
     private static final float[] MMA845Q_RANGES= {2.f, 4.f, 8.f}, BOSCH_RANGES = {2.f, 4.f, 8.f, 16.f};
     private static final float INITIAL_RANGE= 2.f, ACC_FREQ= 50.f;
 

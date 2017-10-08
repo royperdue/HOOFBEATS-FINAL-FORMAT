@@ -1,4 +1,4 @@
-package com.hoofbeats.app;
+package com.hoofbeats.app.fragment;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -14,13 +14,15 @@ import android.widget.Switch;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
+import com.hoofbeats.app.R;
 import com.mbientlab.metawear.Route;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public abstract class SensorFragment extends ModuleFragmentBase {
+public abstract class SensorFragment extends ModuleFragmentBase
+{
     protected final ArrayList<String> chartXValues= new ArrayList<>();
     protected LineChart chart;
     protected int sampleCount;

@@ -1,4 +1,4 @@
-package com.hoofbeats.app;
+package com.hoofbeats.app.fragment;
 
 import android.content.Context;
 import android.graphics.Color;

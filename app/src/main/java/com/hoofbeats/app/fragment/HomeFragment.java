@@ -1,4 +1,4 @@
-package com.hoofbeats.app;
+package com.hoofbeats.app.fragment;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOptionAdapter;
 import com.mbientlab.metawear.UnsupportedModuleException;
 import com.mbientlab.metawear.module.Led;

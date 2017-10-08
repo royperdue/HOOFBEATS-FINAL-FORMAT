@@ -1,4 +1,4 @@
-package com.hoofbeats.app;
+package com.hoofbeats.app.fragment;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -13,6 +13,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOption;
 import com.hoofbeats.app.help.HelpOptionAdapter;
 import com.mbientlab.metawear.UnsupportedModuleException;

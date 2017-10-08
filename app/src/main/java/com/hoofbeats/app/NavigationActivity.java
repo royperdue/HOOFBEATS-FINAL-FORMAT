@@ -35,18 +35,26 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.hoofbeats.app.adapter.CustomListAdapter;
 import com.hoofbeats.app.bluetooth.BleScannerFragment;
+import com.hoofbeats.app.fragment.AccelerometerFragment;
+import com.hoofbeats.app.fragment.GpioFragment;
+import com.hoofbeats.app.fragment.GyroFragment;
+import com.hoofbeats.app.fragment.HomeFragment;
+import com.hoofbeats.app.fragment.ModuleFragmentBase;
+import com.hoofbeats.app.fragment.SensorFusionFragment;
+import com.hoofbeats.app.fragment.SettingsFragment;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.DialogUtility;
@@ -486,7 +494,20 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         mWrapper = (RelativeLayout) findViewById(R.id.wrapper);
         mListView = (ListView) findViewById(R.id.list_view);
-        mToolbar = (FrameLayout) findViewById(R.id.toolbar_list);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+        {
+            actionBar.setDisplayHomeAsUpEnabled(false);
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayUseLogoEnabled(false);
+            actionBar.setHomeButtonEnabled(false);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_36dp);
+        }
+
         mToolbarProfile = (RelativeLayout) findViewById(R.id.toolbar_profile);
         nestedScrollView = (NestedScrollView) findViewById(R.id.nested_scrollView);
         mProfileDetails = (LinearLayout) findViewById(R.id.wrapper_profile_details);
@@ -674,6 +695,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 {
                     startContentSelectionIntent();
                 }
+                break;
+            case R.id.action_new_horse:
+                startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
                 break;
         }
 
@@ -863,8 +887,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             }
         } else
         {
-            startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
-            /*int[] avatars = {
+            int[] avatars = {
                     R.drawable.horse1,
                     R.drawable.horse2,
                     R.drawable.horse3,
@@ -880,7 +903,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, getString(R.string.lorem_ipsum_short));
                 profileMap.put(CustomListAdapter.KEY_DESCRIPTION_FULL, getString(R.string.lorem_ipsum_long));
                 profilesList.add(profileMap);
-            }*/
+            }
         }
 
         return new CustomListAdapter(this, R.layout.list_item, profilesList);

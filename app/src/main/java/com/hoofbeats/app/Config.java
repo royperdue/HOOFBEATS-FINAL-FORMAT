@@ -23,6 +23,7 @@ public final class Config
     public static final String FRAGMENT_ARGUMENTS = "fragmentArguments";
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
     public static final String SELECTED_HORSE_ID = "*****horseSelectedId**";
+    public static final String CURRENT_TRACK_ID = "*****currentTrackId**";
 
     public static final String EXTRA_BLE_DEVICE= "com.mbientlab.bletoolbox.examples.MainActivity.EXTRA_BLE_DEVICE";
     public static final int SCAN_DEVICE = 100;

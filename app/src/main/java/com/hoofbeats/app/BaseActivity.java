@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -20,13 +21,13 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.hoofbeats.app.adapter.CustomListAdapter;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.model.Horseshoe;
 import com.hoofbeats.app.utility.DatabaseUtility;
@@ -55,7 +56,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected RelativeLayout mWrapper;
     protected ListView mListView;
-    protected FrameLayout mToolbar;
+    protected Toolbar mToolbar;
     protected RelativeLayout mToolbarProfile;
     protected LinearLayout mProfileDetails;
     protected TextView mTextViewProfileName;
@@ -67,8 +68,8 @@ public abstract class BaseActivity extends AppCompatActivity
     protected Bundle savedInstanceState;
 
     public static ShapeDrawable sOverlayShape;
-    static int sScreenWidth;
-    static int sProfileImageHeight;
+    public static int sScreenWidth;
+    public static int sProfileImageHeight;
 
     private SwingLeftInAnimationAdapter mListViewAnimationAdapter;
     private ViewAnimator mListViewAnimator;

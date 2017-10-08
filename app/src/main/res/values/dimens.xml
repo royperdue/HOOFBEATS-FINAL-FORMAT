@@ -114,4 +114,7 @@
 
     <dimen name="cardMarginHorizontal">10dp</dimen>
     <dimen name="cardMarginVertical">8dp</dimen>
+
+    <dimen name="label_font_size">18sp</dimen>
+    <dimen name="status_indent">22dp</dimen>
 </resources>

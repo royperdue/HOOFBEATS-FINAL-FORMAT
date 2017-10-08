@@ -116,6 +116,18 @@ public final class DatabaseUtility
         return tracks;
     }
 
+    public static String retrieveTrackNameForId(long trackId)
+    {
+        List<Track> tracks = null;
+
+        tracks = MyApplication.getInstance().getDaoSession().getTrackDao().queryBuilder()
+                .where(TrackDao.Properties.Id.eq(trackId)).list();
+
+        clearSession();
+
+        return tracks.get(0).getTrackName();
+    }
+
     public static List<Track> retrieveTracks(Activity activity)
     {
         List<Track> tracks = null;
@@ -137,6 +149,37 @@ public final class DatabaseUtility
 
         return tracks.get(0);
     }
+
+   /* public static TrackSummary getTrackSummary() {
+
+        double startLon, startLat, endLon, endLat;
+        long startTime, endTime;
+        long distance = 0;
+        TrackSummary summary = null;
+
+        if (positions.moveToFirst()) {
+            long count = 1;
+            startLon = positions.getDouble(positions.getColumnIndex(DbContract.Positions.COLUMN_LONGITUDE));
+            startLat = positions.getDouble(positions.getColumnIndex(DbContract.Positions.COLUMN_LATITUDE));
+            startTime = positions.getLong(positions.getColumnIndex(DbContract.Positions.COLUMN_TIME));
+            endTime = startTime;
+            while (positions.moveToNext()) {
+                count++;
+                endLon = positions.getDouble(positions.getColumnIndex(DbContract.Positions.COLUMN_LONGITUDE));
+                endLat = positions.getDouble(positions.getColumnIndex(DbContract.Positions.COLUMN_LATITUDE));
+                endTime = positions.getLong(positions.getColumnIndex(DbContract.Positions.COLUMN_TIME));
+                float[] results = new float[1];
+                Location.distanceBetween(startLat, startLon, endLat, endLon, results);
+                distance += results[0];
+                startLon = endLon;
+                startLat = endLat;
+            }
+            long duration = endTime - startTime;
+            summary = new TrackSummary(distance, duration, count);
+        }
+        positions.close();
+        return summary;
+    }*/
 
     public static void addHorseshoeToHorse(Horse horse, String hoof, String macAddress)
     {
@@ -161,7 +204,7 @@ public final class DatabaseUtility
         tracks = MyApplication.getInstance().getDaoSession().getTrackDao().queryBuilder()
                 .where(TrackDao.Properties.Id.eq(trackId)).list();
 
-        List<Location> locations = tracks.get(0).getLocations();
+        List<Position> locations = tracks.get(0).getLocations();
 
         for (int i = 0; i < locations.size(); i++)
         {
@@ -284,95 +327,6 @@ public final class DatabaseUtility
         } else
             return null;
     }
-    
-    /*public static Track convertTrack(com.hoofbeats.custom.gpslogger.Track track)
-    {
-        Track trackObject = new Track();
-
-        trackObject.setTrackName(track.getName());
-        trackObject.setTrackStartAltitude((float) track.getStart_Altitude());
-        trackObject.setTrackStartLatitude((float) track.getStart_Latitude());
-        trackObject.setTrackStartLongitude((float) track.getStart_Longitude());
-        trackObject.setTrackStartAccuracy((float) track.getStart_Accuracy());
-        trackObject.setTrackStartSpeed((float) track.getStart_Speed());
-        trackObject.setTrackStartTime((float) track.getStart_Time());
-        trackObject.setTrackLastFixTime((float) track.getLastFix_Time());
-        trackObject.setTrackEndAltitude((float) track.getEnd_Altitude());
-        trackObject.setTrackEndLatitude((float) track.getEnd_Latitude());
-        trackObject.setTrackEndLongitude((float) track.getEnd_Longitude());
-        trackObject.setTrackEndAccuracy((float) track.getEnd_Accuracy());
-        trackObject.setTrackEndSpeed((float) track.getEnd_Speed());
-        trackObject.setTrackEndTime((float) track.getEnd_Time());
-
-        trackObject.setTrackLastStepDistAltitude((float) track.getLastStepAltitude_Altitude());
-        trackObject.setTrackLastStepDistLatitude((float) track.getLastStepDistance_Latitude());
-        trackObject.setTrackLastStepDistLongitude((float) track.getLastStepDistance_Longitude());
-        trackObject.setTrackLastStepDistAccuracy((float) track.getLastStepDistance_Accuracy());
-
-        trackObject.setTrackMinLatitude((float) track.getMin_Latitude());
-        trackObject.setTrackMinLongitude((float) track.getMin_Longitude());
-
-        trackObject.setTrackMaxLatitude((float) track.getMax_Latitude());
-        trackObject.setTrackMaxLongitude((float) track.getMax_Longitude());
-
-        trackObject.setTrackDuration((float) track.getDuration());
-        trackObject.setTrackDurationMoving((float) track.getDuration_Moving());
-
-        trackObject.setTrackDistance((float) track.getDistance());
-        trackObject.setTrackDistanceInProgress((float) track.getDistanceInProgress());
-        trackObject.setTrackDistanceLastAltitude((float) track.getDistanceLastAltitude());
-
-        trackObject.setTrackAltitudeUp((float) track.getAltitude_Up());
-        trackObject.setTrackAltitudeDown((float) track.getAltitude_Down());
-        trackObject.setTrackAltitudeInProgress((float) track.getAltitude_InProgress());
-
-        trackObject.setTrackSpeedMax((float) track.getSpeedMax());
-        trackObject.setTrackSpeedAverageMoving((float) track.getSpeedAverageMoving());
-        trackObject.setTrackSpeedAverage((float) track.getSpeedAverage());
-
-        trackObject.setTrackNumberLocations((int) track.getNumberOfLocations());
-        trackObject.setTrackNumberPlaceMarks((int) track.getNumberOfPlacemarks());
-        trackObject.setTrackValidMap((int) track.getValidMap());
-        trackObject.setTrackType((int) track.getTrackType());
-
-        return trackObject;
-    }
-
-    public static Location addLocationToTrack(LocationExtended locationExtended)
-    {
-        Location location = new Location();
-
-        location.setLocationLatitude((float) locationExtended.getLatitude());
-        location.setLocationLongitude((float) locationExtended.getLongitude());
-        location.setLocationAltitude((float) locationExtended.getAltitude());
-        location.setLocationSpeed(locationExtended.getSpeed());
-        location.setLocationAccuracy(locationExtended.getAccuracy());
-        location.setLocationBearing(locationExtended.getBearing());
-        location.setLocationTime(locationExtended.getTime());
-        location.setLocationNumberSatellites(locationExtended.getNumberOfSatellites());
-        //location.setLocationType(LOCATION_TYPE_LOCATION);
-        location.setLocationNumberSatellitesUsedFix(locationExtended.getNumberOfSatellitesUsedInFix());
-
-        return location;
-    }
-
-    public static PlaceMark addPlaceMarkToTrack(LocationExtended locationExtended)
-    {
-        PlaceMark placeMark = new PlaceMark();
-
-        placeMark.setLocationLatitude((float) locationExtended.getLatitude());
-        placeMark.setLocationLongitude((float) locationExtended.getLongitude());
-        placeMark.setLocationAltitude((float) locationExtended.getAltitude());
-        placeMark.setLocationSpeed(locationExtended.getSpeed());
-        placeMark.setLocationAccuracy(locationExtended.getAccuracy());
-        placeMark.setLocationBearing(locationExtended.getBearing());
-        placeMark.setLocationTime(locationExtended.getTime());
-        placeMark.setLocationNumberSatellites(locationExtended.getNumberOfSatellites());
-        //placeMark.setLocationType(LOCATION_TYPE_LOCATION);
-        placeMark.setLocationNumberSatellitesUsedFix(locationExtended.getNumberOfSatellitesUsedInFix());
-
-        return placeMark;
-    }*/
 
     public static byte[] bitmap2bytes(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

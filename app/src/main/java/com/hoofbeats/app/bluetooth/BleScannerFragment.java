@@ -24,7 +24,8 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.hoofbeats.app.Config;
-import com.hoofbeats.app.ModuleFragmentBase;
+import com.hoofbeats.app.adapter.ScannedDeviceInfoAdapter;
+import com.hoofbeats.app.fragment.ModuleFragmentBase;
 import com.hoofbeats.app.NavigationActivity;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOptionAdapter;

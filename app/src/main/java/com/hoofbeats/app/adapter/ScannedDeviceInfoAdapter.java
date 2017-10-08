@@ -1,4 +1,4 @@
-package com.hoofbeats.app.bluetooth;
+package com.hoofbeats.app.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.hoofbeats.app.Config;
 import com.hoofbeats.app.R;
+import com.hoofbeats.app.bluetooth.ScannedDeviceInfo;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.model.Horseshoe;
 import com.hoofbeats.app.utility.DatabaseUtility;

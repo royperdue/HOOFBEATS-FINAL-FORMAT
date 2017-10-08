@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Hoofbeats</string>
 
     <string name="action_reset">Reset</string>
@@ -653,81 +653,115 @@
     <string name="cancel">Cancel</string>
     <string name="export_unable_to_write_file">Unable to write the file</string>
 
-    <!-- Preferences -->
-    <string name="pref_category_interface">INTERFACE</string>
-    <string name="pref_keep_screen_on">Keep Screen On</string>
-    <string name="pref_keep_screen_on_summary">Battery drains faster</string>
-    <string name="pref_show_decimal_coordinates">Show Decimal Coordinates</string>
-    <string name="pref_show_decimal_coordinates_summary">Fractional part in decimal notation
-    </string>
-    <string name="pref_show_directions">Show Directions using</string>
-    <string name="pref_show_directions_angle">Degrees East of North</string>
-    <string name="pref_show_directions_cardinal">Cardinal Points</string>
-    <string name="pref_unit_of_measurement">System of Measurement</string>
-    <string name="pref_unit_of_measurement_metric">Metric</string>
-    <string name="pref_unit_of_measurement_imperial">Imperial</string>
-    <string name="pref_unit_of_measurement_aerial_nautical">Aerial / Nautical</string>
-    <string name="pref_unit_of_measurement_speed">Show Speeds in</string>
-
-    <string name="pref_category_tracking">TRACKING</string>
-    <string name="pref_GPS_distance">Collecting Density</string>
-    <string name="pref_GPS_distance_max">Maximum</string>
-    <string name="pref_GPS_distance_1m">1 meter</string>
-    <string name="pref_GPS_distance_2m">2 meters</string>
-    <string name="pref_GPS_distance_5m">5 meters</string>
-    <string name="pref_GPS_distance_10m">10 meters</string>
-    <string name="pref_GPS_distance_20m">20 meters</string>
-    <string name="pref_GPS_distance_3ft">3 feet</string>
-    <string name="pref_GPS_distance_6ft">6 feet</string>
-    <string name="pref_GPS_distance_16ft">16 feet</string>
-    <string name="pref_GPS_distance_33ft">33 feet</string>
-    <string name="pref_GPS_distance_66ft">66 feet</string>
-
-    <string name="pref_GPS_update_frequency">GPS Update Interval</string>
-    <string name="pref_GPS_update_frequency_1s">1 second (best accuracy)</string>
-    <string name="pref_GPS_update_frequency_2s">2 seconds</string>
-    <string name="pref_GPS_update_frequency_3s">3 seconds (less accurate)</string>
-
-    <string name="pref_category_altitude_corrections">ALTITUDE CORRECTIONS</string>
-    <string name="pref_EGM96AltitudeCorrection">EGM96 Correction</string>
-    <string name="pref_EGM96AltitudeCorrection_summary">Automatic altitude correction, based on NGA
-        Earth Geoid Model
-    </string>
-    <string name="pref_EGM96AltitudeCorrection_download_progress">Downloading 2028kB file:\nEGM96
-        Geoid Heights..
-    </string>
-    <string name="pref_AltitudeCorrection">Manual Correction</string>
-    <string name="pref_AltitudeCorrection_summary_offset">Offset</string>
-    <string name="pref_AltitudeCorrection_summary_not_defined">No offset defined</string>
-
-    <string name="pref_category_exporting">EXPORTATION</string>
-    <string name="pref_export_TXT">Export Tracks in TXT</string>
-    <string name="pref_export_TXT_summary">Plain text, comma-separated values</string>
-    <string name="pref_TXT_system_of_measurement">TXT Units of measurement</string>
-    <string name="pref_TXT_system_of_measurement_follows_app_settings">Follow interface settings
-    </string>
-    <string name="pref_export_KML">Export Tracks in KML</string>
-    <string name="pref_export_KML_summary">Google Keyhole Markup Language (v.2.2)</string>
-    <string name="pref_export_GPX">Export Tracks in GPX</string>
-    <string name="pref_export_GPX_summary">Standard GPS eXchange Format (v.1.0)</string>
-    <string name="pref_KML_altitude_mode">KML Altitude mode</string>
-    <string name="pref_KML_altitude_mode_absolute">Absolute</string>
-    <string name="pref_KML_altitude_mode_projected">Projected to Ground</string>
-    <string name="pref_track_stats">Track Stats based on</string>
-    <string name="pref_track_stats_totaltime">Total time</string>
-    <string name="pref_track_stats_movingtime">Moving time</string>
-
-    <!-- Preferences messages -->
-    <string name="pref_message_switch_to_absolute_altitude_mode">We suggest to switch to Absolute
-        Altitude Mode, to view your tracks in 3D in Google Earth. \n\nYou can switch anytime between
-        Absolute and Projected to ground in the Exporting section of Settings.
-    </string>
-
-    <!-- Preferences toasts -->
-    <string name="toast_download_error">Download error</string>
-    <string name="toast_download_completed">Download completed</string>
-    <string name="toast_download_failed">Download failed. Try again later</string>
-
+    <!-- GPS -->
+    <string name="app_name_ascii" translatable="false">ulogger</string>
+    <string name="button_start">Start</string>
+    <string name="button_stop">Stop</string>
+    <string name="button_newtrack">New track</string>
+    <string name="button_upload">Upload</string>
+    <string name="is_running" comment="substituted app_name">%s is running</string>
+    <string name="title_newtrack">New track</string>
+    <string name="label_track">Current track</string>
+    <string name="label_newtrack_name">New track name</string>
+    <string name="label_name">Name</string>
+    <string name="label_last_update">Last update: %s</string>
+    <string name="label_synchronized">Synchronized</string>
+    <string name="submit">Submit</string>
+    <string name="ok">OK</string>
+    <string name="settings">Settings</string>
+    <string name="pref_username_title">User name</string>
+    <string name="pref_username_summary">User login on remote server</string>
+    <string name="pref_pass_title">Password</string>
+    <string name="pref_pass_summary">User password on remote server</string>
+    <string name="pref_host_title">Server URL</string>
+    <string name="pref_host_summary">Base URL of the remote server</string>
+    <string name="pref_mintime_title">Minimum time</string>
+    <string name="pref_mintime_summary">Minimum time between location updates</string>
+    <string name="pref_mintime_default" translatable="false">30</string>
+    <string name="pref_mindistance_title">Minimum distance</string>
+    <string name="pref_mindistance_summary">Minimum distance between location updates</string>
+    <string name="pref_mindistance_default" translatable="false">100</string>
+    <string name="pref_minaccuracy_title">Minimum accuracy</string>
+    <string name="pref_minaccuracy_summary">Minimum accuracy of position</string>
+    <string name="pref_minaccuracy_default" translatable="false">100</string>
+    <string name="pref_livesync_title">Live synchronization</string>
+    <string name="pref_livesync_summary">Live uploading of positions to the server. Requires valid user name, password and server url.</string>
+    <string name="pref_livesync_default" translatable="false">false</string>
+    <string name="pref_autostart_title">Auto start</string>
+    <string name="pref_autostart_summary">Application will start on system boot</string>
+    <string name="pref_autostart_default" translatable="false">false</string>
+    <string name="pref_provider_title">Location provider</string>
+    <string name="pref_provider_summary">Location may be supplied by gps provider, by network or by both. Both providers will give best results, but use more battery.</string>
+    <string name="pref_units_title">Units</string>
+    <string name="pref_units_summary">Preferred units for displaying track summary</string>
+    <string name="pref_units_default" translatable="false">metric</string>
+    <string name="pref_units_metric">Metric</string>
+    <string name="pref_units_imperial">Imperial</string>
+    <string name="label_status">Status</string>
+    <string name="label_location">Location</string>
+    <string name="label_synchronization">Synchronization</string>
+    <string name="dash" translatable="false">-</string>
+    <string name="tracking_stopped">Tracking stopped</string>
+    <string name="tracking_started">Tracking started</string>
+    <string name="uploading_started">Uploading started</string>
+    <string name="nothing_to_synchronize">Nothing to synchronize</string>
+    <string name="no_positions">Current track has no positions</string>
+    <string name="warning">Warning</string>
+    <string name="notsync_warning">Current track contains not synchronized positions. Setting new track will delete all this data.</string>
+    <string name="empty_trackname_warning">Please set up new track first</string>
+    <string name="logger_running_warning">Please stop current tracking first</string>
+    <string name="about">About</string>
+    <string name="uploading_failed">Uploading failed:</string>
+    <string name="uploading_done">Uploading done</string>
+    <string name="track_summary">Track summary</string>
+    <string name="summary_distance" comment="1-distance, 2-unit name">%1$s %2$s</string>
+    <plurals name="summary_positions">
+        <item quantity="one">%d position</item>
+        <item quantity="few">%d positions</item>
+        <item quantity="many">%d positions</item>
+        <item quantity="other">%d positions</item>
+    </plurals>
+    <!-- hack for api <= 10 and missing "few" plurals, currently used only for Polish locale -->
+    <string name="summary_positions_few" comment="few positions hack" tools:ignore="PluralsCandidate">%d positions</string>
+    <string name="summary_duration">%1$d h %2$d min</string>
+    <string name="unit_kilometer">km</string>
+    <string name="unit_mile">mi.</string>
+    <string name="provide_valid_url">Please provide valid server url</string>
+    <string name="provide_user_pass_url">Please enter user, password and server url first</string>
+    <string name="e_illegal_redirect">Illegal redirect: %d</string>
+    <string name="e_auth_failure">Authorization failure: %d</string>
+    <string name="e_http_code">HTTP error code: %d</string>
+    <string name="e_server_response">Server response error</string>
+    <string name="e_unknown_host">Unknown host: %s</string>
+    <string name="e_bad_url">Bad URL: %s</string>
+    <string name="e_connect">Connection error: %s</string>
+    <string name="gps_disabled_warning">Warning: gps provider is disabled</string>
+    <string name="net_disabled_warning">Warning: network provider is disabled</string>
+    <string name="location_disabled">You must enable at least one location provider</string>
+    <string name="location_permission_denied">You must accept permission for location updates</string>
+    <string name="write_permission_denied">You must accept permission for writing to external storage</string>
+    <string name="using_network">Using network provider</string>
+    <string name="using_gps">Using gps provider</string>
+    <string name="export">Export to GPX</string>
+    <string name="nothing_to_export">Nothing to export</string>
+    <string name="export_done">Track successfully saved to downloads folder</string>
+    <string name="export_failed">Export failed</string>
+    <string name="e_output_dir">Failed to create output folder</string>
+    <string name="e_external_not_writable">External storage not writable</string>
+    <string name="unknown_track">Unknown track</string>
+    <string name="export_started">Export started</string>
+    <plurals name="label_positions_behind">
+        <item quantity="one">%d position behind</item>
+        <item quantity="few">%d positions behind</item>
+        <item quantity="many">%d positions behind</item>
+        <item quantity="other">%d positions behind</item>
+    </plurals>
+    <!-- hack for api <= 10 and missing "few" plurals, currently used only for Polish locale -->
+    <string name="label_positions_behind_few" comment="few positions hack" tools:ignore="PluralsCandidate">%d positions behind</string>
+    <string name="track_server_setup_warning">If you change server setup you may not be able to synchronize current track.</string>
+    <string name="pref_mintime_other">Minimum time interval in seconds</string>
+    <string name="pref_mindistance_other">Minimum distance in meters</string>
+    <string name="pref_minaccuracy_other">Minimum accuracy in meters</string>
     <!-- About Dialog -->
     <string name="about_version">ver.</string>
     <string name="about_description">Copyright (C) 2016

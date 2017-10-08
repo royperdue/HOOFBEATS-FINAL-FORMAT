@@ -1,4 +1,4 @@
-package com.hoofbeats.app;
+package com.hoofbeats.app.fragment;
 
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOption;
 import com.hoofbeats.app.help.HelpOptionAdapter;
 import com.mbientlab.metawear.UnsupportedModuleException;
@@ -16,7 +17,8 @@ import com.mbientlab.metawear.module.Settings;
 
 import bolts.Task;
 
-public class SettingsFragment extends ModuleFragmentBase {
+public class SettingsFragment extends ModuleFragmentBase
+{
     private final static int[] CONFIG_WRAPPERS;
 
     static {
