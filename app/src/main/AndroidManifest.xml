@@ -48,8 +48,7 @@
         <activity
             android:name=".HorseProfileActivity"
             android:label="@string/title_activity_horse_profile"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:noHistory="true">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name="com.yongchun.library.view.ImageSelectorActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>

@@ -854,7 +854,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             for (int i = 0; i < horses.size(); i++)
             {
                 profileMap = new HashMap<>();
-                profileMap.put(CustomListAdapter.KEY_AVATAR, DatabaseUtility.bytes2Bitmap(horses.get(i).getProfilePicture()));
+                profileMap.put(CustomListAdapter.KEY_HORSE_ID, horses.get(i).getId());
+                profileMap.put(CustomListAdapter.KEY_AVATAR, horses.get(i).getProfilePictureURI());
                 profileMap.put(CustomListAdapter.KEY_NAME, horses.get(i).getHorseName());
                 profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, getString(R.string.lorem_ipsum_short));
                 profileMap.put(CustomListAdapter.KEY_DESCRIPTION_FULL, getString(R.string.lorem_ipsum_long));

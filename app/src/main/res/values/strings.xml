@@ -398,8 +398,12 @@
     <string name="label_settings">Settings</string>
     <string name="label_cloud_button">Cloud</string>
     <string name="label_horseshoe_modules_section">Horseshoe Modules</string>
+    <string name="label_add_note">Add note...</string>
+    <string name="label_horse_weight">Weight(lbs).</string>
+
 
     <string name="navigation_fragment_assign">Assign</string>
+
 
     <string name="config_main_page_header_one">Instructions one</string>
     <string name="config_main_page_paragraph_one">Instructions two</string>
@@ -477,6 +481,15 @@
     <string name="message_connect_first">Must connect first...</string>
     <string name="message_download_complete">Download complete!</string>
     <string name="message_enter_horse_name">Enter horse name...</string>
+    <string name="message_enter_horse_age">Enter horse age...</string>
+    <string name="message_enter_horse_weight">Enter horse weight...</string>
+    <string name="message_select_horse_height">Select horse height...</string>
+    <string name="message_select_horse_breed">Select horse breed...</string>
+    <string name="message_select_horse_discipline">Select horse discipline...</string>
+    <string name="message_select_horse_color">Select horse color...</string>
+    <string name="message_select_horse_sex">Select horse sex...</string>
+    <string name="message_unknown_breed">Breed unknown...</string>
+
     <string name="message_updating">Updating...</string>
     <string name="message_configuration_proceed">Update configuration...</string>
     <string name="message_configuration_update_success">Configurations updated...</string>

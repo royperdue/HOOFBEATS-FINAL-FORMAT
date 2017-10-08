@@ -29,7 +29,7 @@ android {
 }
 
 greendao {
-    schemaVersion 5
+    schemaVersion 7
 }
 
 dependencies {
@@ -54,4 +54,6 @@ dependencies {
     compile 'com.commit451:PhotoView:1.2.4'
     compile 'com.isseiaoki:simplecropview:1.0.13'
     compile 'com.yongchun:com.yongchun.imageselector:1.1.0'
+    compile 'com.jaredrummler:material-spinner:1.2.1'
+    compile 'com.github.yalantis:todolist:v1.0.1'
 }

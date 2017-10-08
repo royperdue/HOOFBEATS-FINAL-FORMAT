@@ -22,7 +22,9 @@ public class Horse {
     private double horseWeight;
     private String discipline;
     private String horseColor;
-    private byte[] profilePicture;
+    private String horseBreed;
+    private String horseSex;
+    private String profilePictureURI;
 
     @ToMany(referencedJoinProperty = "horseId")
     private List<Horseshoe> horseshoes;
@@ -44,10 +46,10 @@ public class Horse {
     @Generated(hash = 310510713)
     private transient HorseDao myDao;
 
-    @Generated(hash = 1917371873)
+    @Generated(hash = 1644312935)
     public Horse(Long id, String horseName, double horseAge, double horseHeight,
             double horseWeight, String discipline, String horseColor,
-            byte[] profilePicture) {
+            String horseBreed, String horseSex, String profilePictureURI) {
         this.id = id;
         this.horseName = horseName;
         this.horseAge = horseAge;
@@ -55,7 +57,9 @@ public class Horse {
         this.horseWeight = horseWeight;
         this.discipline = discipline;
         this.horseColor = horseColor;
-        this.profilePicture = profilePicture;
+        this.horseBreed = horseBreed;
+        this.horseSex = horseSex;
+        this.profilePictureURI = profilePictureURI;
     }
 
     @Generated(hash = 1301553216)
@@ -118,12 +122,28 @@ public class Horse {
         this.horseColor = horseColor;
     }
 
-    public byte[] getProfilePicture() {
-        return this.profilePicture;
+    public String getHorseBreed() {
+        return this.horseBreed;
     }
 
-    public void setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
+    public void setHorseBreed(String horseBreed) {
+        this.horseBreed = horseBreed;
+    }
+
+    public String getHorseSex() {
+        return this.horseSex;
+    }
+
+    public void setHorseSex(String horseSex) {
+        this.horseSex = horseSex;
+    }
+
+    public String getProfilePictureURI() {
+        return this.profilePictureURI;
+    }
+
+    public void setProfilePictureURI(String profilePictureURI) {
+        this.profilePictureURI = profilePictureURI;
     }
 
     /**

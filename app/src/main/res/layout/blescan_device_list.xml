@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/blescan_devices"
-        android:choiceMode="singleChoice" />
-
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:orientation="horizontal">
 
         <Button
+            android:id="@+id/blescan_control"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/ble_scan_cancel"
-            android:textColor="@android:color/holo_green_dark"
-            style="?android:attr/buttonBarButtonStyle"
-            android:id="@+id/blescan_control" />
+            android:textColor="@android:color/holo_green_dark"/>
 
         <Button
+            android:id="@+id/ble_connect_control"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_connect"
-            style="?android:attr/buttonBarButtonStyle"
-            android:textColor="@android:color/holo_blue_dark"
             android:layout_weight="1"
-            android:id="@+id/ble_connect_control" />
+            android:text="@string/label_connect"
+            android:textColor="@android:color/holo_blue_dark"/>
     </LinearLayout>
+    <ListView
+        android:id="@+id/blescan_devices"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pad_400dp"
+        android:layout_weight="1"
+        android:choiceMode="singleChoice"/>
 </LinearLayout>

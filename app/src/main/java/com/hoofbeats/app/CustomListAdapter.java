@@ -46,7 +46,9 @@ public class CustomListAdapter extends ArrayAdapter<Map<String, Object>> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Picasso.with(getContext()).load((Integer) mData.get(position).get(KEY_AVATAR))
+        System.out.println(String.valueOf(mData.get(position).get(KEY_AVATAR)));
+
+        Picasso.with(getContext()).load(String.valueOf(mData.get(position).get(KEY_AVATAR)))
                 .resize(BaseActivity.sScreenWidth, BaseActivity.sProfileImageHeight).centerCrop()
                 .placeholder(R.color.blue)
                 .into(viewHolder.mListItemAvatar);

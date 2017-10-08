@@ -100,7 +100,6 @@ public abstract class BaseActivity extends AppCompatActivity
                 if (horses.size() > 0)
                 {
                     LittleDB.get().putLong(Config.SELECTED_HORSE_ID, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
-
                     List<Horse> horseList = DatabaseUtility.retrieveHorseForId(BaseActivity.this, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
                     List<Horseshoe> horseshoes = horseList.get(0).getHorseshoes();
                     List<String> macAddresses = new ArrayList<>();
@@ -154,11 +153,11 @@ public abstract class BaseActivity extends AppCompatActivity
 
         mOverlayListItemView.findViewById(R.id.view_avatar_overlay).setBackground(sOverlayShape);
 
-        Picasso.with(BaseActivity.this).load((Integer) item.get(CustomListAdapter.KEY_AVATAR))
+        Picasso.with(BaseActivity.this).load(String.valueOf(item.get(CustomListAdapter.KEY_AVATAR)))
                 .resize(sScreenWidth, sProfileImageHeight).centerCrop()
                 .placeholder(R.color.blue)
                 .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_reveal_avatar));
-        Picasso.with(BaseActivity.this).load((Integer) item.get(CustomListAdapter.KEY_AVATAR))
+        Picasso.with(BaseActivity.this).load(String.valueOf(item.get(CustomListAdapter.KEY_AVATAR)))
                 .resize(sScreenWidth, sProfileImageHeight).centerCrop()
                 .placeholder(R.color.blue)
                 .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_avatar));

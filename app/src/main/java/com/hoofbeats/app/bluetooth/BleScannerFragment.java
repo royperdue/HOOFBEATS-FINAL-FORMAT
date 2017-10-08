@@ -20,7 +20,6 @@ import android.os.ParcelUuid;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -175,7 +174,7 @@ public class BleScannerFragment extends ModuleFragmentBase
 
         ListView scannedDevices = (ListView) view.findViewById(R.id.blescan_devices);
         scannedDevices.setAdapter(scannedDevicesAdapter);
-        if (macAddresses == null)
+        /*if (macAddresses == null)
         {
             scannedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener()
             {
@@ -187,7 +186,7 @@ public class BleScannerFragment extends ModuleFragmentBase
                     commBus.onDeviceSelected(scannedDevicesAdapter.getItem(i).btDevice);
                 }
             });
-        }
+        }*/
         scanControl = (Button) view.findViewById(R.id.blescan_control);
         scanControl.setOnClickListener(new View.OnClickListener()
         {
@@ -213,6 +212,11 @@ public class BleScannerFragment extends ModuleFragmentBase
                 if (isScanning)
                 {
                     stopBleScan();
+                }
+
+                for (int i = 0; i < scannedDevicesAdapter.getCount(); i++)
+                {
+                    commBus.onDeviceSelected(scannedDevicesAdapter.getItem(i).btDevice);
                 }
 
                 ((NavigationActivity) getActivity()).createMetaWearBoards();

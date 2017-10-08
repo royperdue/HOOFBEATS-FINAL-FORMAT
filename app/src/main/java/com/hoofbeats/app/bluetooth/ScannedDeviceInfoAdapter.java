@@ -98,24 +98,25 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
                             {
                                 RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(checkedId);
                                 radioButton.setChecked(true);
-                                viewHolder.radioGroupHooves.setClickable(false);
+                                radioButton.setClickable(false);
+                                radioButton.setEnabled(false);
                             }
                         }
                     }
                 }
+
+                viewHolder.configureButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        DatabaseUtility.addHorseshoeToHorse(horses.get(0), hoof, deviceInfo.btDevice.getAddress());
+                    }
+                });
             } else
             {
                 viewHolder.deviceName.setText(R.string.app_name);
             }
-
-            viewHolder.configureButton.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    DatabaseUtility.addHorseshoeToHorse(horses.get(0), hoof, deviceInfo.btDevice.getAddress());
-                }
-            });
 
             viewHolder.deviceAddress.setText(deviceInfo.btDevice.getAddress());
             viewHolder.deviceRSSI.setText(String.format(Locale.US, "%d dBm", deviceInfo.rssi));

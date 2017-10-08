@@ -1,8 +1,11 @@
 package com.hoofbeats.app.utility;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 import com.hoofbeats.app.Config;
 import com.hoofbeats.app.MyApplication;
@@ -379,5 +382,12 @@ public final class DatabaseUtility
 
     public static Bitmap bytes2Bitmap(byte[] byteArray) {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+    }
+
+    public static Uri getImageUri(Context inContext, Bitmap inImage, String horseName) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, horseName, null);
+        return Uri.parse(path);
     }
 }
