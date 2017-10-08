@@ -26,6 +26,7 @@ import android.widget.ListView;
 
 import com.hoofbeats.app.Config;
 import com.hoofbeats.app.ModuleFragmentBase;
+import com.hoofbeats.app.NavigationActivity;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOptionAdapter;
 import com.mbientlab.metawear.UnsupportedModuleException;
@@ -54,6 +55,7 @@ public class BleScannerFragment extends ModuleFragmentBase
 
     private ScannedDeviceInfoAdapter scannedDevicesAdapter;
     private Button scanControl;
+    private Button connectControl;
     private Handler mHandler;
     private boolean isScanning = false;
     private BluetoothAdapter btAdapter = null;
@@ -199,6 +201,21 @@ public class BleScannerFragment extends ModuleFragmentBase
                 {
                     startBleScan();
                 }
+            }
+        });
+
+        connectControl = (Button) view.findViewById(R.id.ble_connect_control);
+        connectControl.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                if (isScanning)
+                {
+                    stopBleScan();
+                }
+
+                ((NavigationActivity) getActivity()).createMetaWearBoards();
             }
         });
 

@@ -70,6 +70,7 @@
                         android:id="@+id/ble_device"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
+                        android:textSize="@dimen/txt_14sp"
                         android:layout_weight="2"
                         android:gravity="center"
                         android:textAppearance="?android:attr/textAppearanceSmall"/>
@@ -88,7 +89,7 @@
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:text="@string/label_ok"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/primary_text"/>
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent"

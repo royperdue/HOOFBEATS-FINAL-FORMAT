@@ -22,72 +22,46 @@ import com.hoofbeats.app.utility.LittleDB;
 import java.util.List;
 import java.util.Locale;
 
-public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo> {
-    private final static int RSSI_BAR_LEVELS= 5;
-    private final static int RSSI_BAR_SCALE= 100 / RSSI_BAR_LEVELS;
+public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
+{
+    private final static int RSSI_BAR_LEVELS = 5;
+    private final static int RSSI_BAR_SCALE = 100 / RSSI_BAR_LEVELS;
     private String hoof;
     private Activity activity;
+    private int checkedId = -1;
 
-    public ScannedDeviceInfoAdapter(Context context, int resource) {
+    public ScannedDeviceInfoAdapter(Context context, int resource)
+    {
         super(context, resource);
 
         this.activity = (Activity) context;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
         ViewHolder viewHolder;
 
-        if (convertView == null) {
-            convertView= LayoutInflater.from(getContext()).inflate(R.layout.blescan_entry, parent, false);
+        if (convertView == null)
+        {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.blescan_entry, parent, false);
 
-            viewHolder= new ViewHolder();
-            viewHolder.deviceAddress= (TextView) convertView.findViewById(R.id.ble_mac_address);
-            viewHolder.deviceName= (TextView) convertView.findViewById(R.id.ble_device);
-            viewHolder.deviceRSSI= (TextView) convertView.findViewById(R.id.ble_rssi_value);
-            viewHolder.rssiChart= (ImageView) convertView.findViewById(R.id.ble_rssi_png);
+            viewHolder = new ViewHolder();
+            viewHolder.deviceAddress = (TextView) convertView.findViewById(R.id.ble_mac_address);
+            viewHolder.deviceName = (TextView) convertView.findViewById(R.id.ble_device);
+            viewHolder.deviceRSSI = (TextView) convertView.findViewById(R.id.ble_rssi_value);
+            viewHolder.rssiChart = (ImageView) convertView.findViewById(R.id.ble_rssi_png);
             viewHolder.connectedCheck = (ImageView) convertView.findViewById(R.id.ble_check_connected);
             viewHolder.configureButton = (Button) convertView.findViewById(R.id.configure);
             viewHolder.radioGroupHooves = (RadioGroup) convertView.findViewById(R.id.radio_group_hooves);
             viewHolder.radioGroupHooves.clearCheck();
-
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder= (ViewHolder) convertView.getTag();
-        }
-
-        ScannedDeviceInfo deviceInfo= getItem(position);
-        final String deviceName= deviceInfo.btDevice.getName();
-
-        List<Horse> horses = DatabaseUtility.retrieveHorseForId(activity, LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
-
-        if (horses.size() > 0)
-        {
-            List<Horseshoe> horseshoes = horses.get(0).getHorseshoes();
-
-            if (horseshoes.size() > 0)
-            {
-                for (int i = 0; i < horseshoes.size(); i++)
-                {
-                    if (horseshoes.get(i).getMacAddress().equals(deviceInfo.btDevice.getAddress()))
-                        viewHolder.deviceName.setText(horseshoes.get(i).getHoof());
-                }
-            }
-
-            viewHolder.configureButton.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-
-                }
-            });
 
             viewHolder.radioGroupHooves.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
             {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId)
                 {
+                    ScannedDeviceInfoAdapter.this.checkedId = checkedId;
                     RadioButton radioButton = (RadioButton) group.findViewById(checkedId);
                     if (radioButton != null && checkedId > -1)
                     {
@@ -102,17 +76,61 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo> {
                     }
                 }
             });
-        } else
-            viewHolder.deviceName.setText(R.string.app_name);
 
-        viewHolder.deviceAddress.setText(deviceInfo.btDevice.getAddress());
-        viewHolder.deviceRSSI.setText(String.format(Locale.US, "%d dBm", deviceInfo.rssi));
-        viewHolder.rssiChart.setImageLevel(Math.min(RSSI_BAR_LEVELS - 1, (127 + deviceInfo.rssi + 5) / RSSI_BAR_SCALE));
+            ScannedDeviceInfo deviceInfo = getItem(position);
+
+            List<Horse> horses = DatabaseUtility.retrieveHorseForId(activity, LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
+
+            if (horses.size() > 0)
+            {
+                List<Horseshoe> horseshoes = horses.get(0).getHorseshoes();
+
+                if (horseshoes.size() > 0)
+                {
+                    for (int i = 0; i < horseshoes.size(); i++)
+                    {
+                        if (horseshoes.get(i).getMacAddress().equals(deviceInfo.btDevice.getAddress()))
+                            viewHolder.deviceName.setText(horseshoes.get(i).getHoof());
+
+                        if (hoof != null)
+                        {
+                            if (horseshoes.get(i).getHoof().equals(hoof))
+                            {
+                                RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(checkedId);
+                                radioButton.setChecked(true);
+                                viewHolder.radioGroupHooves.setClickable(false);
+                            }
+                        }
+                    }
+                }
+            } else
+            {
+                viewHolder.deviceName.setText(R.string.app_name);
+            }
+
+            viewHolder.configureButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    DatabaseUtility.addHorseshoeToHorse(horses.get(0), hoof, deviceInfo.btDevice.getAddress());
+                }
+            });
+
+            viewHolder.deviceAddress.setText(deviceInfo.btDevice.getAddress());
+            viewHolder.deviceRSSI.setText(String.format(Locale.US, "%d dBm", deviceInfo.rssi));
+            viewHolder.rssiChart.setImageLevel(Math.min(RSSI_BAR_LEVELS - 1, (127 + deviceInfo.rssi + 5) / RSSI_BAR_SCALE));
+            convertView.setTag(viewHolder);
+        } else
+        {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
 
         return convertView;
     }
 
-    private class ViewHolder {
+    private class ViewHolder
+    {
         public TextView deviceAddress;
         public TextView deviceName;
         public TextView deviceRSSI;
@@ -122,12 +140,15 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo> {
         public RadioGroup radioGroupHooves;
     }
 
-    public void update(ScannedDeviceInfo newInfo) {
-        int pos= getPosition(newInfo);
-        if (pos == -1) {
+    public void update(ScannedDeviceInfo newInfo)
+    {
+        int pos = getPosition(newInfo);
+        if (pos == -1)
+        {
             add(newInfo);
-        } else {
-            getItem(pos).rssi= newInfo.rssi;
+        } else
+        {
+            getItem(pos).rssi = newInfo.rssi;
             notifyDataSetChanged();
         }
     }

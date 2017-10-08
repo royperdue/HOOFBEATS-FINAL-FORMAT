@@ -728,23 +728,26 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     public void onServiceConnected(ComponentName name, IBinder iBinder)
     {
         serviceBinder = (BtleService.LocalBinder) iBinder;
-
-        if (bluetoothDevices.size() > 0)
-        {
-            for (int i = 0; i < bluetoothDevices.size(); i++)
-            {
-                MetaWearBoard metaWearBoard = ((BtleService.LocalBinder) iBinder).getMetaWearBoard(bluetoothDevices.get(i));
-                metaWearBoard.onUnexpectedDisconnect(status -> attemptReconnect());
-                metaWearBoards.add(metaWearBoard);
-            }
-        } else if (bluetoothDevices.size() == 0)
-            DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.message_no_horseshoes_found_click_scan));
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name)
     {
 
+    }
+
+    public void createMetaWearBoards()
+    {
+        if (bluetoothDevices.size() > 0)
+        {
+            for (int i = 0; i < bluetoothDevices.size(); i++)
+            {
+                MetaWearBoard metaWearBoard = serviceBinder.getMetaWearBoard(bluetoothDevices.get(i));
+                metaWearBoard.onUnexpectedDisconnect(status -> attemptReconnect());
+                metaWearBoards.add(metaWearBoard);
+            }
+        } else if (bluetoothDevices.size() == 0)
+            DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.message_no_horseshoes_found_click_scan));
     }
 
     @Override
@@ -859,7 +862,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             }
         } else
         {
-            int[] avatars = {
+            startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
+            /*int[] avatars = {
                     R.drawable.horse1,
                     R.drawable.horse2,
                     R.drawable.horse3,
@@ -875,7 +879,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, getString(R.string.lorem_ipsum_short));
                 profileMap.put(CustomListAdapter.KEY_DESCRIPTION_FULL, getString(R.string.lorem_ipsum_long));
                 profilesList.add(profileMap);
-            }
+            }*/
         }
 
         return new CustomListAdapter(this, R.layout.list_item, profilesList);

@@ -135,6 +135,21 @@ public final class DatabaseUtility
         return tracks.get(0);
     }
 
+    public static void addHorseshoeToHorse(Horse horse, String hoof, String macAddress)
+    {
+        List<Horseshoe> horseshoes = horse.getHorseshoes();
+        Horseshoe horseshoe = new Horseshoe();
+        horseshoe.setHorseId(horse.getId());
+        horseshoe.setHoof(hoof);
+        horseshoe.setMacAddress(macAddress);
+        horseshoe.setDateAssigned(new SimpleDateFormat("MM-dd-yyyy").format(Calendar.getInstance().getTime()));
+
+        MyApplication.getInstance().getDaoSession().getHorseshoeDao().insert(horseshoe);
+        horseshoes.add(horseshoe);
+
+        horse.resetHorseshoes();
+    }
+
    /* public static List<LatLng> retrieveLatLngList(Activity activity, long trackId, long startNumber, long endNumber)
     {
         List<LatLng> latlngList = new ArrayList<>();
