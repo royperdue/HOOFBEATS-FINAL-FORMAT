@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.hoofbeats.app.adapter.CustomListAdapter;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.model.Horseshoe;
+import com.hoofbeats.app.model.Wrapper;
 import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.DialogUtility;
 import com.hoofbeats.app.utility.LittleDB;
@@ -103,12 +104,12 @@ public abstract class BaseActivity extends AppCompatActivity
                     LittleDB.get().putLong(Config.SELECTED_HORSE_ID, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
                     List<Horse> horseList = DatabaseUtility.retrieveHorseForId(BaseActivity.this, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
                     List<Horseshoe> horseshoes = horseList.get(0).getHorseshoes();
-                    List<String> macAddresses = new ArrayList<>();
+                    List<Wrapper> macAddresses = new ArrayList<>();
                     if (horseshoes.size() > 0)
                     {
                         for (int i = 0; i < horseshoes.size(); i++)
                         {
-                            macAddresses.add(horseshoes.get(i).getMacAddress());
+                            macAddresses.add(new Wrapper(horseshoes.get(i).getMacAddress(), horseshoes.get(i).getHoof()));
                         }
                     } else if (horseshoes.size() == 0)
                         DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horseshoes_assigned));

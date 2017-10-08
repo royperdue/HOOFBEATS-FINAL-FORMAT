@@ -17,6 +17,7 @@ public class Wrapper
     private MetaWearBoard metaWearBoard;
     private SensorFusionBosch sensorFusionBosch;
     private String hoof;
+    private String macAddress;
 
     public Wrapper(Gpio gpio, SensorFusionBosch sensorFusionBosch, Logging logging, Settings settings,
                    MetaWearBoard metaWearBoard)
@@ -26,6 +27,12 @@ public class Wrapper
         this.settings = settings;
         this.metaWearBoard = metaWearBoard;
         this.sensorFusionBosch = sensorFusionBosch;
+    }
+
+    public Wrapper(String hoof, String macAddress)
+    {
+        this.hoof = hoof;
+        this.macAddress = macAddress;
     }
 
     public Wrapper(MetaWearBoard metaWearBoard)
@@ -91,5 +98,15 @@ public class Wrapper
     public void setHoof(String hoof)
     {
         this.hoof = hoof;
+    }
+
+    public String getMacAddress()
+    {
+        return macAddress;
+    }
+
+    public void setMacAddress(String macAddress)
+    {
+        this.macAddress = macAddress;
     }
 }

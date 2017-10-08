@@ -29,6 +29,7 @@ import com.hoofbeats.app.fragment.ModuleFragmentBase;
 import com.hoofbeats.app.NavigationActivity;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOptionAdapter;
+import com.hoofbeats.app.model.Wrapper;
 import com.mbientlab.metawear.UnsupportedModuleException;
 
 import java.nio.ByteBuffer;
@@ -63,7 +64,7 @@ public class BleScannerFragment extends ModuleFragmentBase
     private HashSet<ParcelUuid> api21FilterServiceUuids;
     private boolean isScanReady;
     private ScannerCommunicationBus commBus = null;
-    private List<String> macAddresses = null;
+    private List<Wrapper> macAddresses = null;
 
     public BleScannerFragment()
     {
@@ -279,14 +280,14 @@ public class BleScannerFragment extends ModuleFragmentBase
                             {
                                 for (int i = 0; i < macAddresses.size(); i++)
                                 {
-                                    if (btDevice.getAddress().equals(macAddresses.get(i)))
+                                    if (btDevice.getAddress().equals(macAddresses.get(i).getMacAddress()))
                                     {
-                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi));
+                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi, macAddresses.get(i).getHoof()));
                                     }
                                 }
                             } else
                             {
-                                scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi));
+                                scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi, null));
                             }
                         }
                     });
@@ -375,14 +376,14 @@ public class BleScannerFragment extends ModuleFragmentBase
                                     {
                                         for (int i = 0; i < macAddresses.size(); i++)
                                         {
-                                            if (result.getDevice().getAddress().equals(macAddresses.get(i)))
+                                            if (result.getDevice().getAddress().equals(macAddresses.get(i).getMacAddress()))
                                             {
-                                                scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi()));
+                                                scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), macAddresses.get(i).getHoof()));
                                             }
                                         }
                                     } else
                                     {
-                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi()));
+                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null));
                                     }
                                 }
                             });
@@ -473,7 +474,7 @@ public class BleScannerFragment extends ModuleFragmentBase
         }
     }
 
-    public void setMacAddresses(List<String> macAddresses)
+    public void setMacAddresses(List<Wrapper> macAddresses)
     {
         this.macAddresses = macAddresses;
     }

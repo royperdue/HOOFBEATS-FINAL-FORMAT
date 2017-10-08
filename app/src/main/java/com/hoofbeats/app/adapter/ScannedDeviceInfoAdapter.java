@@ -80,6 +80,41 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
 
             ScannedDeviceInfo deviceInfo = getItem(position);
 
+            if (hoof != null)
+                deviceInfo.setHoof(hoof);
+
+            for (int i = 0; i < getCount(); i++)
+            {
+                if (getItem(i).getHoof() != null)
+                {
+                    if (getItem(i).getHoof().equals("Left Hind"))
+                    {
+                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_hind);
+                        radioButton.setChecked(true);
+                        radioButton.setClickable(false);
+                        radioButton.setEnabled(false);
+                    } else if (getItem(i).getHoof().equals("Left Front"))
+                    {
+                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_front);
+                        radioButton.setChecked(true);
+                        radioButton.setClickable(false);
+                        radioButton.setEnabled(false);
+                    } else if (getItem(i).getHoof().equals("Right Hind"))
+                    {
+                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_hind);
+                        radioButton.setChecked(true);
+                        radioButton.setClickable(false);
+                        radioButton.setEnabled(false);
+                    } else if (getItem(i).getHoof().equals("Right Front"))
+                    {
+                        RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_front);
+                        radioButton.setChecked(true);
+                        radioButton.setClickable(false);
+                        radioButton.setEnabled(false);
+                    }
+                }
+            }
+
             List<Horse> horses = DatabaseUtility.retrieveHorseForId(activity, LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
 
             if (horses.size() > 0)
