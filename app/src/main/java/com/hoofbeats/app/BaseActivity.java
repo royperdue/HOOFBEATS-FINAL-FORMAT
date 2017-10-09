@@ -7,7 +7,6 @@ import android.graphics.RectF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -58,12 +57,11 @@ public abstract class BaseActivity extends AppCompatActivity
     protected Toolbar mToolbar;
     protected RelativeLayout mToolbarProfile;
     protected LinearLayout mProfileDetails;
-    protected TextView mTextViewProfileName;
+    protected TextView mToolBarTextView;
     protected View mButtonProfile;
     protected NestedScrollView nestedScrollView;
     protected FloatingActionButton fab;
     protected Button connectButton;
-    protected NavigationView navigationView;
 
     public static ShapeDrawable sOverlayShape;
     public static int sScreenWidth;
@@ -197,7 +195,7 @@ public abstract class BaseActivity extends AppCompatActivity
      * @param item - data from adapter, that will be set into overlay view.
      */
     private void setProfileDetailsInfo(Map<String, Object> item) {
-        mTextViewProfileName.setText((String) item.get(CustomListAdapter.KEY_NAME));
+        mToolBarTextView.setText((String) item.get(CustomListAdapter.KEY_NAME));
 
     }
 

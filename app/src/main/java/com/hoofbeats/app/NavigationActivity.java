@@ -11,6 +11,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +23,6 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -29,11 +31,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -46,11 +45,17 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hoofbeats.app.adapter.CustomListAdapter;
 import com.hoofbeats.app.adapter.ScannedDeviceInfoAdapter;
 import com.hoofbeats.app.bluetooth.BleScannerFragment;
 import com.hoofbeats.app.bluetooth.ScannedDeviceInfo;
+import com.hoofbeats.app.custom.menu.ContextMenuDialogFragment;
+import com.hoofbeats.app.custom.menu.MenuObject;
+import com.hoofbeats.app.custom.menu.MenuParams;
+import com.hoofbeats.app.custom.menu.interfaces.OnMenuItemClickListener;
+import com.hoofbeats.app.custom.menu.interfaces.OnMenuItemLongClickListener;
 import com.hoofbeats.app.fragment.ConfigureFragment;
 import com.hoofbeats.app.fragment.ModuleFragmentBase;
 import com.hoofbeats.app.fragment.SettingsFragment;
@@ -58,7 +63,6 @@ import com.hoofbeats.app.fragment.StrideLinearFragment;
 import com.hoofbeats.app.fragment.StrideRhythmFragment;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.utility.DatabaseUtility;
-import com.hoofbeats.app.utility.DialogUtility;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.android.BtleService;
 import com.mbientlab.metawear.module.Debug;
@@ -82,7 +86,7 @@ import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
 import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 
-public class NavigationActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,
+public class NavigationActivity extends BaseActivity implements OnMenuItemClickListener, OnMenuItemLongClickListener,
         ServiceConnection, BleScannerFragment.ScannerCommunicationBus, ModuleFragmentBase.FragmentBus, LoaderManager.LoaderCallbacks<Cursor>,
         ScannedDeviceInfoAdapter.OnDeviceConfiguredListener
 {
@@ -106,33 +110,22 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private BtleService.LocalBinder serviceBinder;
     private List<BluetoothDevice> bluetoothDevices = new ArrayList<>();
     private List<MetaWearBoard> metaWearBoards = new ArrayList<>();
+    private ContextMenuDialogFragment mMenuDialogFragment;
 
     static
     {
         Map<Integer, Class<? extends ModuleFragmentBase>> tempMap = new LinkedHashMap<>();
-        tempMap.put(R.id.nav_assign, BleScannerFragment.class);
-        tempMap.put(R.id.nav_capture, ConfigureFragment.class);
-        tempMap.put(R.id.nav_linear, StrideRhythmFragment.class);
-        tempMap.put(R.id.nav_sensor_fusion, StrideLinearFragment.class);
-        tempMap.put(R.id.nav_settings, SettingsFragment.class);
+        tempMap.put(0, BleScannerFragment.class);
+        tempMap.put(1, ConfigureFragment.class);
+        tempMap.put(2, StrideRhythmFragment.class);
+        tempMap.put(3, StrideLinearFragment.class);
+        tempMap.put(4, SettingsFragment.class);
         FRAGMENT_CLASSES = Collections.unmodifiableMap(tempMap);
 
         EXTENSION_TO_APP_TYPE = new HashMap<>();
         EXTENSION_TO_APP_TYPE.put("hex", DfuBaseService.MIME_TYPE_OCTET_STREAM);
         EXTENSION_TO_APP_TYPE.put("bin", DfuBaseService.MIME_TYPE_OCTET_STREAM);
         EXTENSION_TO_APP_TYPE.put("zip", DfuBaseService.MIME_TYPE_ZIP);
-    }
-
-    @Override
-    public UUID[] getFilterServiceUuids()
-    {
-        return serviceUuids;
-    }
-
-    @Override
-    public long getScanDuration()
-    {
-        return 10000L;
     }
 
     public static class ReconnectDialogFragment extends DialogFragment implements ServiceConnection
@@ -456,7 +449,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         mWrapper = (RelativeLayout) findViewById(R.id.wrapper);
         mListView = (ListView) findViewById(R.id.list_view);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+
+        /*mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         final ActionBar actionBar = getSupportActionBar();
@@ -468,12 +463,17 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             actionBar.setDisplayUseLogoEnabled(false);
             actionBar.setHomeButtonEnabled(false);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_36dp);
-        }
+        }*/
 
         mToolbarProfile = (RelativeLayout) findViewById(R.id.toolbar_profile);
+
+        initToolbar();
+        initMenuFragment();
+
+
         nestedScrollView = (NestedScrollView) findViewById(R.id.nested_scrollView);
         mProfileDetails = (LinearLayout) findViewById(R.id.wrapper_profile_details);
-        mTextViewProfileName = (TextView) findViewById(R.id.text_view_profile_name);
+        mToolBarTextView = (TextView) findViewById(R.id.text_view_toolbar_title);
         connectButton = (Button) findViewById(R.id.ble_connect_control);
         mButtonProfile = findViewById(R.id.button_profile);
         mButtonProfile.post(new Runnable()
@@ -501,17 +501,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(view -> ((ModuleFragmentBase) currentFragment).showHelpDialog());
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, null, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
         if (savedInstanceState == null)
         {
-            onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_assign));
+            addFragment(0);
         } else
         {
             currentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_KEY);
@@ -520,6 +512,91 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         getApplicationContext().bindService(new Intent(NavigationActivity.this, BtleService.class), NavigationActivity.this, BIND_AUTO_CREATE);
 
         DfuServiceListenerHelper.registerProgressListener(this, dfuProgressListener);
+    }
+
+    private void initMenuFragment()
+    {
+        MenuParams menuParams = new MenuParams();
+        menuParams.setActionBarSize((int) getResources().getDimension(R.dimen.tool_bar_height));
+        menuParams.setMenuObjects(getMenuObjects());
+        menuParams.setClosableOutside(false);
+        mMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams);
+        mMenuDialogFragment.setItemClickListener(this);
+        mMenuDialogFragment.setItemLongClickListener(this);
+    }
+
+    private List<MenuObject> getMenuObjects()
+    {
+        // You can use any [resource, bitmap, drawable, color] as image:
+        // item.setResource(...)
+        // item.setBitmap(...)
+        // item.setDrawable(...)
+        // item.setColor(...)
+        // You can set image ScaleType:
+        // item.setScaleType(ScaleType.FIT_XY)
+        // You can use any [resource, drawable, color] as background:
+        // item.setBgResource(...)
+        // item.setBgDrawable(...)
+        // item.setBgColor(...)
+        // You can use any [color] as text color:
+        // item.setTextColor(...)
+        // You can set any [color] as divider color:
+        // item.setDividerColor(...)
+
+        List<MenuObject> menuObjects = new ArrayList<>();
+
+        MenuObject close = new MenuObject();
+        close.setResource(R.drawable.icn_close);
+
+        MenuObject send = new MenuObject("Send message");
+        send.setResource(R.drawable.icn_1);
+
+        MenuObject like = new MenuObject("Like profile");
+        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.icn_2);
+        like.setBitmap(b);
+
+        MenuObject addFr = new MenuObject("Add to friends");
+        BitmapDrawable bd = new BitmapDrawable(getResources(),
+                BitmapFactory.decodeResource(getResources(), R.drawable.icn_3));
+        addFr.setDrawable(bd);
+
+        MenuObject addFav = new MenuObject("Add to favorites");
+        addFav.setResource(R.drawable.icn_4);
+
+        MenuObject block = new MenuObject("Block user");
+        block.setResource(R.drawable.icn_5);
+
+        menuObjects.add(close);
+        menuObjects.add(send);
+        menuObjects.add(like);
+        menuObjects.add(addFr);
+        menuObjects.add(addFav);
+        menuObjects.add(block);
+        return menuObjects;
+    }
+
+    private void initToolbar()
+    {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolBarTextView = (TextView) findViewById(R.id.text_view_toolbar_title);
+        setSupportActionBar(mToolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+        {
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        mToolbar.setNavigationIcon(R.drawable.btn_back);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
@@ -573,10 +650,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     @Override
     public void onBackPressed()
     {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START))
+        if (mMenuDialogFragment != null && mMenuDialogFragment.isAdded())
         {
-            drawer.closeDrawer(GravityCompat.START);
+            mMenuDialogFragment.dismiss();
         } else
         {
             if (metaWearBoards.size() > 0)
@@ -587,8 +663,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 }
             }
 
+            finish();
             super.onBackPressed();
         }
+
     }
 
     @Override
@@ -602,112 +680,17 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        FragmentManager fragmentManager = getSupportFragmentManager();
         int id = item.getItemId();
 
         switch (id)
         {
-            case R.id.action_reset:
-                if (metaWearBoards.size() > 0)
-                {
-                    for (int i = 0; i < metaWearBoards.size(); i++)
-                    {
-                        if (!metaWearBoards.get(i).inMetaBootMode())
-                        {
-                            metaWearBoards.get(i).getModule(Debug.class).resetAsync()
-                                    .continueWith(ignored ->
-                                    {
-                                        attemptReconnect(0);
-                                        return null;
-                                    });
-                            Snackbar.make(findViewById(R.id.drawer_layout), R.string.message_soft_reset, Snackbar.LENGTH_LONG).show();
-                        } else
-                        {
-                            Snackbar.make(findViewById(R.id.drawer_layout), R.string.message_no_soft_reset, Snackbar.LENGTH_LONG).show();
-                        }
-                    }
-                }
-                return true;
-            case R.id.action_disconnect:
-                if (metaWearBoards.size() > 0)
-                {
-                    for (int i = 0; i < metaWearBoards.size(); i++)
-                    {
-                        if (!metaWearBoards.get(i).inMetaBootMode())
-                        {
-                            Settings.BleConnectionParametersEditor editor = metaWearBoards.get(i).getModule(Settings.class).editBleConnParams();
-                            if (editor != null)
-                            {
-                                editor.maxConnectionInterval(125f)
-                                        .commit();
-                            }
-                            metaWearBoards.get(i).getModule(Debug.class).disconnectAsync();
-                        } else
-                        {
-                            metaWearBoards.get(i).disconnectAsync();
-                        }
-                    }
-                }
-                //finish();
-                return true;
-            case R.id.action_manual_dfu:
-                if (checkLocationPermission())
-                {
-                    startContentSelectionIntent();
-                }
-                break;
-            case R.id.action_new_horse:
-                startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
+            case R.id.context_menu:
+                mMenuDialogFragment.show(fragmentManager, "ContextMenuDialogFragment");
                 break;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item)
-    {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        if (currentFragment != null)
-        {
-            transaction.detach(currentFragment);
-        }
-
-        String fragmentTag = FRAGMENT_CLASSES.get(id).getCanonicalName();
-        currentFragment = fragmentManager.findFragmentByTag(fragmentTag);
-
-        if (currentFragment == null)
-        {
-            try
-            {
-                currentFragment = FRAGMENT_CLASSES.get(id).getConstructor().newInstance();
-            } catch (Exception e)
-            {
-                throw new RuntimeException("Cannot instantiate fragment", e);
-            }
-
-            transaction.add(R.id.container, currentFragment, fragmentTag);
-        }
-
-        transaction.attach(currentFragment).commit();
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-        {
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(item.getTitle());
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     @Override
@@ -720,20 +703,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     public void onServiceDisconnected(ComponentName name)
     {
 
-    }
-
-    public void createMetaWearBoards()
-    {
-        if (bluetoothDevices.size() > 0)
-        {
-            for (int i = 0; i < bluetoothDevices.size(); i++)
-            {
-                MetaWearBoard metaWearBoard = serviceBinder.getMetaWearBoard(bluetoothDevices.get(i));
-                metaWearBoard.onUnexpectedDisconnect(status -> attemptReconnect());
-                metaWearBoards.add(metaWearBoard);
-            }
-        } else if (bluetoothDevices.size() == 0)
-            DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.message_no_horseshoes_found_click_scan));
     }
 
     @Override
@@ -899,7 +868,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 });
     }
 
-    //********************Interface from ScannedInfoAdapter******************
+    //********************Interface methods******************
 
     @Override
     public void onDeviceConfigured(View convertView, ScannedDeviceInfo scannedDeviceInfo)
@@ -950,5 +919,131 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                     }
                     return null;
                 });
+    }
+
+    @Override
+    public UUID[] getFilterServiceUuids()
+    {
+        return serviceUuids;
+    }
+
+    @Override
+    public long getScanDuration()
+    {
+        return 10000L;
+    }
+
+    @Override
+    public void onMenuItemClick(View clickedView, int position)
+    {
+        Toast.makeText(this, "Clicked on position: " + position, Toast.LENGTH_SHORT).show();
+
+        //mToolBarTextView.setText(getMenuObjects().get(position).getTitle());
+
+        switch (position)
+        {
+            case 0:
+                addFragment(0);
+                break;
+            case 1:
+                addFragment(1);
+                break;
+            case 2:
+                addFragment(2);
+                break;
+            case 3:
+                addFragment(3);
+                break;
+            case 4:
+                addFragment(4);
+                break;
+            case 5:
+                if (metaWearBoards.size() > 0)
+                {
+                    for (int i = 0; i < metaWearBoards.size(); i++)
+                    {
+                        if (!metaWearBoards.get(i).inMetaBootMode())
+                        {
+                            metaWearBoards.get(i).getModule(Debug.class).resetAsync()
+                                    .continueWith(ignored ->
+                                    {
+                                        attemptReconnect(0);
+                                        return null;
+                                    });
+                            Snackbar.make(findViewById(R.id.drawer_layout), R.string.message_soft_reset, Snackbar.LENGTH_LONG).show();
+                        } else
+                        {
+                            Snackbar.make(findViewById(R.id.drawer_layout), R.string.message_no_soft_reset, Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            case 6:
+                if (metaWearBoards.size() > 0)
+                {
+                    for (int i = 0; i < metaWearBoards.size(); i++)
+                    {
+                        if (!metaWearBoards.get(i).inMetaBootMode())
+                        {
+                            Settings.BleConnectionParametersEditor editor = metaWearBoards.get(i).getModule(Settings.class).editBleConnParams();
+                            if (editor != null)
+                            {
+                                editor.maxConnectionInterval(125f)
+                                        .commit();
+                            }
+                            metaWearBoards.get(i).getModule(Debug.class).disconnectAsync();
+                        } else
+                        {
+                            metaWearBoards.get(i).disconnectAsync();
+                        }
+                    }
+                }
+            case 7:
+                if (checkLocationPermission())
+                {
+                    startContentSelectionIntent();
+                }
+                break;
+            case 8:
+                startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
+                break;
+        }
+
+    }
+
+    @Override
+    public void onMenuItemLongClick(View clickedView, int position)
+    {
+        Toast.makeText(this, "Long clicked on position: " + position, Toast.LENGTH_SHORT).show();
+    }
+
+    protected void addFragment(int position)
+    {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction= fragmentManager.beginTransaction();
+
+        if (currentFragment != null) {
+            transaction.detach(currentFragment);
+        }
+
+        String fragmentTag= FRAGMENT_CLASSES.get(position).getCanonicalName();
+        currentFragment= fragmentManager.findFragmentByTag(fragmentTag);
+
+        if (currentFragment == null) {
+            try {
+                currentFragment= FRAGMENT_CLASSES.get(position).getConstructor().newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException("Cannot instantiate fragment", e);
+            }
+
+            transaction.add(R.id.container, currentFragment, fragmentTag);
+        }
+
+        transaction.attach(currentFragment).commit();
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setTitle(currentFragment.getTag());
+        }
     }
 }
