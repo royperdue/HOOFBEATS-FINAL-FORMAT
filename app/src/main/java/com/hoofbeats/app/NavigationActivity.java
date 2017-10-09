@@ -23,7 +23,6 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -63,6 +62,7 @@ import com.hoofbeats.app.fragment.StrideLinearFragment;
 import com.hoofbeats.app.fragment.StrideRhythmFragment;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.utility.DatabaseUtility;
+import com.hoofbeats.app.utility.DialogUtility;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.android.BtleService;
 import com.mbientlab.metawear.module.Debug;
@@ -246,7 +246,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         public void onDfuCompleted(String deviceAddress)
         {
             ((DialogFragment) getSupportFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
-            Snackbar.make(NavigationActivity.this.findViewById(R.id.drawer_layout), R.string.message_dfu_success, Snackbar.LENGTH_LONG).show();
+            DialogUtility.showNoticeSnackBarShort(NavigationActivity.this, getString(R.string.message_dfu_success));
             resetConnectionStateHandler(5000L);
         }
 
@@ -254,7 +254,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         public void onDfuAborted(String deviceAddress)
         {
             ((DialogFragment) getSupportFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
-            Snackbar.make(NavigationActivity.this.findViewById(R.id.drawer_layout), R.string.error_dfu_aborted, Snackbar.LENGTH_LONG).show();
+            DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.error_dfu_aborted));
             resetConnectionStateHandler(5000L);
         }
 
@@ -262,7 +262,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         public void onError(String deviceAddress, int error, int errorType, String message)
         {
             ((DialogFragment) getSupportFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
-            Snackbar.make(NavigationActivity.this.findViewById(R.id.drawer_layout), message, Snackbar.LENGTH_LONG).show();
+            DialogUtility.showWarningSnackBarLong(NavigationActivity.this, message);
             resetConnectionStateHandler(5000L);
         }
     };
@@ -384,7 +384,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
         if (!addMimeType(path))
         {
-            Snackbar.make(NavigationActivity.this.findViewById(R.id.drawer_layout), R.string.error_firmware_path_type, Snackbar.LENGTH_LONG).show();
+            DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.error_firmware_path_type));
             return;
         }
 
@@ -409,7 +409,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             {
                                 if (task.isFaulted())
                                 {
-                                    Snackbar.make(NavigationActivity.this.findViewById(R.id.drawer_layout), task.getError().getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
+                                    DialogUtility.showWarningSnackBarLong(NavigationActivity.this, task.getError().getLocalizedMessage());
                                 } else
                                 {
                                     if (addMimeType(firmwareCapture.get()))
@@ -418,7 +418,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                                     } else
                                     {
                                         ((DialogFragment) getSupportFragmentManager().findFragmentByTag(DFU_PROGRESS_FRAGMENT_TAG)).dismiss();
-                                        Snackbar.make(NavigationActivity.this.findViewById(R.id.drawer_layout), R.string.error_firmware_path_type, Snackbar.LENGTH_LONG).show();
+                                        DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.error_firmware_path_type));
                                     }
                                 }
                                 return null;
@@ -450,8 +450,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         mWrapper = (RelativeLayout) findViewById(R.id.wrapper);
         mListView = (ListView) findViewById(R.id.list_view);
 
-
-        /*mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         final ActionBar actionBar = getSupportActionBar();
@@ -463,7 +462,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             actionBar.setDisplayUseLogoEnabled(false);
             actionBar.setHomeButtonEnabled(false);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_36dp);
-        }*/
+        }
 
         mToolbarProfile = (RelativeLayout) findViewById(R.id.toolbar_profile);
 
@@ -492,6 +491,14 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 animateCloseProfileDetails();
             }
         });
+        findViewById(R.id.toolbar_menu).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                mMenuDialogFragment.show(getSupportFragmentManager(), "ContextMenuDialogFragment");
+            }
+        });
 
         sScreenWidth = getResources().getDisplayMetrics().widthPixels;
         sProfileImageHeight = getResources().getDimensionPixelSize(R.dimen.height_profile_image);
@@ -512,6 +519,30 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         getApplicationContext().bindService(new Intent(NavigationActivity.this, BtleService.class), NavigationActivity.this, BIND_AUTO_CREATE);
 
         DfuServiceListenerHelper.registerProgressListener(this, dfuProgressListener);
+    }
+
+    private void initToolbar()
+    {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolBarTextView = (TextView) findViewById(R.id.text_view_toolbar_title);
+        setSupportActionBar(mToolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+        {
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        mToolbar.setNavigationIcon(R.drawable.btn_back);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onBackPressed();
+            }
+        });
     }
 
     private void initMenuFragment()
@@ -548,22 +579,22 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         MenuObject close = new MenuObject();
         close.setResource(R.drawable.icn_close);
 
-        MenuObject send = new MenuObject("Send message");
+        MenuObject send = new MenuObject("Configure");
         send.setResource(R.drawable.icn_1);
 
-        MenuObject like = new MenuObject("Like profile");
+        MenuObject like = new MenuObject("Linear Data");
         Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.icn_2);
         like.setBitmap(b);
 
-        MenuObject addFr = new MenuObject("Add to friends");
+        MenuObject addFr = new MenuObject("Rhythm Data");
         BitmapDrawable bd = new BitmapDrawable(getResources(),
                 BitmapFactory.decodeResource(getResources(), R.drawable.icn_3));
         addFr.setDrawable(bd);
 
-        MenuObject addFav = new MenuObject("Add to favorites");
+        MenuObject addFav = new MenuObject("Force Data");
         addFav.setResource(R.drawable.icn_4);
 
-        MenuObject block = new MenuObject("Block user");
+        MenuObject block = new MenuObject("Left Hind");
         block.setResource(R.drawable.icn_5);
 
         menuObjects.add(close);
@@ -573,30 +604,6 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         menuObjects.add(addFav);
         menuObjects.add(block);
         return menuObjects;
-    }
-
-    private void initToolbar()
-    {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBarTextView = (TextView) findViewById(R.id.text_view_toolbar_title);
-        setSupportActionBar(mToolbar);
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-        {
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-        mToolbar.setNavigationIcon(R.drawable.btn_back);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                onBackPressed();
-            }
-        });
     }
 
     @Override
@@ -673,7 +680,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.navigation, menu);
+        //getMenuInflater().inflate(R.menu.navigation, menu);
         return true;
     }
 
@@ -787,7 +794,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             {
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
                 {
-                    Snackbar.make(findViewById(R.id.drawer_layout), R.string.message_permission_denied, Snackbar.LENGTH_LONG).show();
+                    DialogUtility.showWarningSnackBarLong(NavigationActivity.this, getString(R.string.message_permission_denied));
                 } else
                 {
                     startContentSelectionIntent();
@@ -944,9 +951,11 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         {
             case 0:
                 addFragment(0);
+                mToolBarTextView.setText("Assign");
                 break;
             case 1:
                 addFragment(1);
+                mToolBarTextView.setText("Capture");
                 break;
             case 2:
                 addFragment(2);
@@ -970,10 +979,9 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                                         attemptReconnect(0);
                                         return null;
                                     });
-                            Snackbar.make(findViewById(R.id.drawer_layout), R.string.message_soft_reset, Snackbar.LENGTH_LONG).show();
+                            DialogUtility.showNoticeSnackBarShort(NavigationActivity.this, getString(R.string.message_soft_reset));
                         } else
-                        {
-                            Snackbar.make(findViewById(R.id.drawer_layout), R.string.message_no_soft_reset, Snackbar.LENGTH_LONG).show();
+                        {   DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.message_no_soft_reset));
                         }
                     }
                 }
