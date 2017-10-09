@@ -51,13 +51,11 @@ import com.hoofbeats.app.adapter.CustomListAdapter;
 import com.hoofbeats.app.adapter.ScannedDeviceInfoAdapter;
 import com.hoofbeats.app.bluetooth.BleScannerFragment;
 import com.hoofbeats.app.bluetooth.ScannedDeviceInfo;
-import com.hoofbeats.app.fragment.AccelerometerFragment;
-import com.hoofbeats.app.fragment.GpioFragment;
-import com.hoofbeats.app.fragment.GyroFragment;
-import com.hoofbeats.app.fragment.HomeFragment;
+import com.hoofbeats.app.fragment.ConfigureFragment;
 import com.hoofbeats.app.fragment.ModuleFragmentBase;
-import com.hoofbeats.app.fragment.SensorFusionFragment;
 import com.hoofbeats.app.fragment.SettingsFragment;
+import com.hoofbeats.app.fragment.StrideLinearFragment;
+import com.hoofbeats.app.fragment.StrideRhythmFragment;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.DialogUtility;
@@ -113,11 +111,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     {
         Map<Integer, Class<? extends ModuleFragmentBase>> tempMap = new LinkedHashMap<>();
         tempMap.put(R.id.nav_assign, BleScannerFragment.class);
-        tempMap.put(R.id.nav_home, HomeFragment.class);
-        tempMap.put(R.id.nav_accelerometer, AccelerometerFragment.class);
-        tempMap.put(R.id.nav_gpio, GpioFragment.class);
-        tempMap.put(R.id.nav_gyro, GyroFragment.class);
-        tempMap.put(R.id.nav_sensor_fusion, SensorFusionFragment.class);
+        tempMap.put(R.id.nav_home, ConfigureFragment.class);
+        tempMap.put(R.id.nav_accelerometer, StrideRhythmFragment.class);
+        tempMap.put(R.id.nav_sensor_fusion, StrideLinearFragment.class);
         tempMap.put(R.id.nav_settings, SettingsFragment.class);
         FRAGMENT_CLASSES = Collections.unmodifiableMap(tempMap);
 
@@ -854,20 +850,15 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         } else
         {
             int[] avatars = {
-                    R.drawable.horse1,
-                    R.drawable.horse2,
-                    R.drawable.horse3,
-                    R.drawable.horse4,
-                    R.drawable.horse5};
-            String[] names = getResources().getStringArray(R.array.array_names);
+                    R.mipmap.ic_launcher,};
 
             for (int i = 0; i < avatars.length; i++)
             {
                 profileMap = new HashMap<>();
                 profileMap.put(CustomListAdapter.KEY_AVATAR, avatars[i]);
-                profileMap.put(CustomListAdapter.KEY_NAME, names[i]);
-                profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, getString(R.string.lorem_ipsum_short));
-                profileMap.put(CustomListAdapter.KEY_DESCRIPTION_FULL, getString(R.string.lorem_ipsum_long));
+                profileMap.put(CustomListAdapter.KEY_NAME, NavigationActivity.this.getString(R.string.app_name));
+                profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, "click New Horse");
+                profileMap.put(CustomListAdapter.KEY_DESCRIPTION_FULL, "-");
                 profilesList.add(profileMap);
             }
         }

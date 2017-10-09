@@ -15,7 +15,7 @@ import com.mbientlab.metawear.UnsupportedModuleException;
 import com.mbientlab.metawear.module.Led;
 import com.mbientlab.metawear.module.Led.Color;
 
-public class HomeFragment extends ModuleFragmentBase
+public class ConfigureFragment extends ModuleFragmentBase
 {
     private Led ledModule;
     private int switchRouteId = -1;
@@ -34,7 +34,7 @@ public class HomeFragment extends ModuleFragmentBase
         }
     }
 
-    public HomeFragment()
+    public ConfigureFragment()
     {
         super(R.string.navigation_fragment_home);
     }
@@ -43,7 +43,7 @@ public class HomeFragment extends ModuleFragmentBase
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState)
     {
         setRetainInstance(true);
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_configure, container, false);
     }
 
     @Override

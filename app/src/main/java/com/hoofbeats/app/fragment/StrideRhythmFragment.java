@@ -18,7 +18,7 @@ import com.mbientlab.metawear.module.Accelerometer;
 import com.mbientlab.metawear.module.AccelerometerBosch;
 import com.mbientlab.metawear.module.AccelerometerMma8452q;
 
-public class AccelerometerFragment extends ThreeAxisChartFragment
+public class StrideRhythmFragment extends ThreeAxisChartFragment
 {
     private static final float[] MMA845Q_RANGES= {2.f, 4.f, 8.f}, BOSCH_RANGES = {2.f, 4.f, 8.f, 16.f};
     private static final float INITIAL_RANGE= 2.f, ACC_FREQ= 50.f;
@@ -27,7 +27,7 @@ public class AccelerometerFragment extends ThreeAxisChartFragment
     private Accelerometer accelerometer = null;
     private int rangeIndex= 0;
 
-    public AccelerometerFragment() {
+    public StrideRhythmFragment() {
         super("acceleration", R.layout.fragment_sensor_config_spinner,
                 R.string.navigation_fragment_accelerometer, -INITIAL_RANGE, INITIAL_RANGE);
     }

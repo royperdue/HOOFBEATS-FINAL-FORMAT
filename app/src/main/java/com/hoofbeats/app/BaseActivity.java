@@ -162,14 +162,27 @@ public abstract class BaseActivity extends AppCompatActivity
 
         mOverlayListItemView.findViewById(R.id.view_avatar_overlay).setBackground(sOverlayShape);
 
-        Picasso.with(BaseActivity.this).load(String.valueOf(item.get(CustomListAdapter.KEY_AVATAR)))
-                .resize(sScreenWidth, sProfileImageHeight).centerCrop()
-                .placeholder(R.color.blue)
-                .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_reveal_avatar));
-        Picasso.with(BaseActivity.this).load(String.valueOf(item.get(CustomListAdapter.KEY_AVATAR)))
-                .resize(sScreenWidth, sProfileImageHeight).centerCrop()
-                .placeholder(R.color.blue)
-                .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_avatar));
+        if (!String.valueOf(item.get(CustomListAdapter.KEY_NAME)).equals(getString(R.string.app_name)))
+        {
+            Picasso.with(BaseActivity.this).load(String.valueOf(item.get(CustomListAdapter.KEY_AVATAR)))
+                    .resize(sScreenWidth, sProfileImageHeight).centerCrop()
+                    .placeholder(R.color.blue)
+                    .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_reveal_avatar));
+            Picasso.with(BaseActivity.this).load(String.valueOf(item.get(CustomListAdapter.KEY_AVATAR)))
+                    .resize(sScreenWidth, sProfileImageHeight).centerCrop()
+                    .placeholder(R.color.blue)
+                    .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_avatar));
+        } else
+        {
+            Picasso.with(BaseActivity.this).load((Integer) item.get(CustomListAdapter.KEY_AVATAR))
+                    .resize(sScreenWidth, sProfileImageHeight).centerCrop()
+                    .placeholder(R.color.blue)
+                    .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_reveal_avatar));
+            Picasso.with(BaseActivity.this).load((Integer)item.get(CustomListAdapter.KEY_AVATAR))
+                    .resize(sScreenWidth, sProfileImageHeight).centerCrop()
+                    .placeholder(R.color.blue)
+                    .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_avatar));
+        }
 
         ((TextView) mOverlayListItemView.findViewById(R.id.text_view_name)).setText((String) item.get(CustomListAdapter.KEY_NAME));
         ((TextView) mOverlayListItemView.findViewById(R.id.text_view_description)).setText((String) item.get(CustomListAdapter.KEY_DESCRIPTION_SHORT));

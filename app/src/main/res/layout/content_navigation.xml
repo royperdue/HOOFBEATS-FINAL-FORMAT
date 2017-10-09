@@ -104,11 +104,183 @@
                     android:layout_marginTop="@dimen/cardMarginVertical"
                     android:background="@android:color/white"
                     app:cardElevation="4dp">
-
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/pad_1000dp"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="@dimen/pad_20dp"
+                        android:weightSum="12"
                         android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="3"
+                            android:orientation="vertical">
+
+                            <TableLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/pad_2dp">
+
+                                    <TextView
+                                        android:id="@+id/horse_name_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="@string/label_horse_name"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                    <TextView
+                                        android:id="@+id/horse_name_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:gravity="center_horizontal"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                </TableRow>
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/pad_2dp">
+
+                                    <TextView
+                                        android:id="@+id/horse_age_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="@string/label_horse_age"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                    <TextView
+                                        android:id="@+id/horse_age_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:gravity="center_horizontal"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                                </TableRow>
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/pad_2dp">
+
+                                    <TextView
+                                        android:id="@+id/horse_color_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="@string/label_horse_color"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                    <TextView
+                                        android:id="@+id/horse_color_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:gravity="center_horizontal"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                                </TableRow>
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/pad_2dp">
+
+                                    <TextView
+                                        android:id="@+id/horse_sex_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="@string/label_horse_sex"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                    <TextView
+                                        android:id="@+id/horse_sex_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:gravity="center_horizontal"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                                </TableRow>
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/pad_2dp">
+
+                                    <TextView
+                                        android:id="@+id/horse_height_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="@string/label_horse_height"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                    <TextView
+                                        android:id="@+id/horse_height_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:gravity="center_horizontal"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                                </TableRow>
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/pad_2dp">
+
+                                    <TextView
+                                        android:id="@+id/horse_weight_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="@string/label_horse_weight"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                    <TextView
+                                        android:id="@+id/horse_weight_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:gravity="center_horizontal"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                                </TableRow>
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/pad_2dp">
+
+                                    <TextView
+                                        android:id="@+id/horse_discipline_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="@string/label_horse_discipline"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                    <TextView
+                                        android:id="@+id/horse_discipline_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:gravity="center_horizontal"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                                </TableRow>
+                            </TableLayout>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="9"
+                            android:orientation="vertical">
                             <FrameLayout android:id="@+id/container"
                                          android:layout_width="match_parent"
                                          android:layout_height="match_parent"
@@ -118,8 +290,8 @@
                                          android:paddingTop="@dimen/activity_vertical_margin"
                                          app:layout_behavior="@string/appbar_scrolling_view_behavior">
                             </FrameLayout>
+                        </LinearLayout>
                     </LinearLayout>
-
                 </android.support.v7.widget.CardView>
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>

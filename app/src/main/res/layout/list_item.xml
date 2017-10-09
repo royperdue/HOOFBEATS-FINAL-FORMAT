@@ -15,7 +15,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="10dp"
         android:paddingBottom="1dp"
-        tools:src="@drawable/nicolas_cage" />
+        tools:src="@drawable/horse5" />
     <!--Add 1dp bottom padding to remove weird flickering while animating-->
 
     <View
