@@ -951,7 +951,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                         setConnInterval(metaWearBoard.getModule(Settings.class));
                         runOnUiThread(connectDialog::dismiss);
 
-                        connectedCheckMarks.put(scannedDeviceInfo.btDevice.getAddress(), connectedCheck);
+                        scannedDeviceInfo.setConnected(true);
+                        scannedDeviceInfo.setColorCheckMark();
 
                         metaWearBoards.add(metaWearBoard);
 

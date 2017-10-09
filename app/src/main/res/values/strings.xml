@@ -491,6 +491,8 @@
     <string name="message_select_horse_sex">Select horse sex...</string>
     <string name="message_unknown_breed">Breed unknown...</string>
 
+    <string name="message_unsuccessful">Unsuccessful...</string>
+    <string name="message_successful">Successful...</string>
     <string name="message_convertView_null">Error...convertView null in ScannedInfoAdapter.</string>
 
     <string name="message_updating">Updating...</string>

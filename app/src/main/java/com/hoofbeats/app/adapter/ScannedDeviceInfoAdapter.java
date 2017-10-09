@@ -90,6 +90,41 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
 
             ScannedDeviceInfo scannedDeviceInfo = getItem(position);
 
+            scannedDeviceInfo.setHoof(hoof);
+            scannedDeviceInfo.setActivity(activity);
+            scannedDeviceInfo.setConnectedCheck(viewHolder.connectedCheck);
+            scannedDeviceInfo.setDeviceName(viewHolder.deviceName);
+            scannedDeviceInfo.setRadioGroupHooves(viewHolder.radioGroupHooves);
+            scannedDeviceInfo.setDeviceRSSI(viewHolder.deviceRSSI);
+            scannedDeviceInfo.setConfigureButton(viewHolder.configureButton);
+            scannedDeviceInfo.setRssiChart(viewHolder.rssiChart);
+
+            scannedDeviceInfo.setHoofFromDatabase();
+
+            if (scannedDeviceInfo.getHoof() != null)
+            {
+                if (scannedDeviceInfo.getHoof().equals("Left Hind"))
+                {
+                    RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_hind);
+                    scannedDeviceInfo.setRadioButton(radioButton);
+                } else if (scannedDeviceInfo.getHoof().equals("Left Front"))
+                {
+                    RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_left_front);
+                    scannedDeviceInfo.setRadioButton(radioButton);
+                } else if (scannedDeviceInfo.getHoof().equals("Right Hind"))
+                {
+                    RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_hind);
+                    scannedDeviceInfo.setRadioButton(radioButton);
+                } else if (scannedDeviceInfo.getHoof().equals("Right Front"))
+                {
+                    RadioButton radioButton = (RadioButton) viewHolder.radioGroupHooves.findViewById(R.id.radio_right_front);
+                    scannedDeviceInfo.setRadioButton(radioButton);
+                }
+            }
+
+            if (scannedDeviceInfo.getHoof() != null)
+                scannedDeviceInfo.checkListItemConfiguration();
+
             viewHolder.deviceRSSI.setText(String.format(Locale.US, "%d dBm", scannedDeviceInfo.rssi));
             viewHolder.rssiChart.setImageLevel(Math.min(RSSI_BAR_LEVELS - 1, (127 + scannedDeviceInfo.rssi + 5) / RSSI_BAR_SCALE));
 
@@ -133,7 +168,10 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
                         scannedDeviceInfo.setRadioButton(radioButton);
                     }
 
-                    scannedDeviceInfo.configureListItem();
+                    if (((Button) v).getText().toString().equals(activity.getString(R.string.label_horseshoe_assign)))
+                        scannedDeviceInfo.assignListItem();
+                    else
+                        scannedDeviceInfo.removeListItem();
                 }
             });
 

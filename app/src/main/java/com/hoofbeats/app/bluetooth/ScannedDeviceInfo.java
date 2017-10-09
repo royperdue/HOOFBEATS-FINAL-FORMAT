@@ -11,7 +11,9 @@ import android.widget.TextView;
 import com.hoofbeats.app.Config;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.model.Horse;
+import com.hoofbeats.app.model.Horseshoe;
 import com.hoofbeats.app.utility.DatabaseUtility;
+import com.hoofbeats.app.utility.DialogUtility;
 import com.hoofbeats.app.utility.LittleDB;
 
 public class ScannedDeviceInfo
@@ -184,17 +186,81 @@ public class ScannedDeviceInfo
         isConnected = connected;
     }
 
-    public void configureListItem()
+    public void setHoofFromDatabase()
     {
-        System.out.println("----Two---");
+        Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
+
+        if (horseshoe != null)
+        {
+            hoof = horseshoe.getHoof();
+        }
+    }
+
+    public void checkListItemConfiguration()
+    {
+        Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
+
+        if (horseshoe != null)
+        {
+            deviceName.setText(horseshoe.getHoof());
+            radioButton.setChecked(true);
+            radioButton.setClickable(false);
+            radioButton.setEnabled(false);
+            configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
+            isAssigned = true;
+
+        }
+    }
+
+    public void assignListItem()
+    {
+        System.out.println("----Assign---");
 
         Horse horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
         DatabaseUtility.addHorseshoeToHorse(horse, hoof, btDevice.getAddress());
-        deviceName.setText(hoof);
-        radioButton.setChecked(true);
-        radioButton.setClickable(false);
-        radioButton.setEnabled(false);
-        configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
-        isAssigned = true;
+
+        Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
+
+        if (horseshoe != null)
+        {
+            deviceName.setText(hoof);
+            radioButton.setChecked(true);
+            radioButton.setClickable(false);
+            radioButton.setEnabled(false);
+            configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
+            isAssigned = true;
+            DialogUtility.showNoticeSnackBarShort(activity, activity.getString(R.string.message_successful));
+        } else
+            DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_unsuccessful));
+    }
+
+    public void removeListItem()
+    {
+        System.out.println("----Remove---");
+
+        DatabaseUtility.removeHorseshoeMacAddress(btDevice.getAddress());
+        Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
+
+        if (horseshoe == null)
+        {
+            deviceName.setText(activity.getString(R.string.app_name));
+            radioButton.setChecked(false);
+            radioButton.setClickable(true);
+            radioButton.setEnabled(true);
+            configureButton.setText(activity.getString(R.string.label_horseshoe_assign));
+            isAssigned = false;
+            DialogUtility.showNoticeSnackBarShort(activity, activity.getString(R.string.message_successful));
+        } else
+            DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_unsuccessful));
+    }
+
+    public void setColorCheckMark()
+    {
+        if (isConnected)
+            connectedCheck.setImageDrawable(activity.getDrawable(R.drawable.ic_check_circle_green_600_24dp));
+        else
+            connectedCheck.setImageDrawable(activity.getDrawable(R.drawable.ic_check_circle_red_700_36dp));
+
+        connectedCheck.invalidate();
     }
 }
