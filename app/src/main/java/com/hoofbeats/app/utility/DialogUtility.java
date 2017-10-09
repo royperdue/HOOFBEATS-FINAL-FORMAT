@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.hoofbeats.app.BaseActivity;
+import com.hoofbeats.app.NavigationActivity;
 import com.hoofbeats.app.R;
-import com.hoofbeats.app.fragment.ConfigureFragment;
 import com.hoofbeats.app.help.HelpOptionAdapter;
 import com.hoofbeats.app.model.Wrapper;
 import com.liuguangqiang.cookie.CookieBar;
@@ -261,7 +261,7 @@ public final class DialogUtility
                 }).show();
     }
 
-    public static void showStartLoggingDialog(Activity activity, ConfigureFragment configureFragment)
+    public static void showStartLoggingDialog(Activity activity, NavigationActivity navigationActivity)
     {
        new MaterialDialog.Builder(activity)
                 .title(R.string.title_success)
@@ -277,7 +277,7 @@ public final class DialogUtility
                             @Override
                             public void run()
                             {
-                                configureFragment.closeModules();
+                                navigationActivity.closeModules();
                             }
                         });
 

@@ -55,21 +55,32 @@ import com.hoofbeats.app.custom.menu.MenuObject;
 import com.hoofbeats.app.custom.menu.MenuParams;
 import com.hoofbeats.app.custom.menu.interfaces.OnMenuItemClickListener;
 import com.hoofbeats.app.custom.menu.interfaces.OnMenuItemLongClickListener;
-import com.hoofbeats.app.fragment.ConfigureFragment;
 import com.hoofbeats.app.fragment.ModuleFragmentBase;
-import com.hoofbeats.app.fragment.SettingsFragment;
 import com.hoofbeats.app.fragment.StrideLinearFragment;
-import com.hoofbeats.app.fragment.StrideRhythmFragment;
 import com.hoofbeats.app.model.Horse;
+import com.hoofbeats.app.model.Horseshoe;
+import com.hoofbeats.app.model.Workout;
+import com.hoofbeats.app.model.Wrapper;
+import com.hoofbeats.app.utility.BoardVault;
 import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.DialogUtility;
+import com.hoofbeats.app.utility.LittleDB;
+import com.hoofbeats.app.utility.SaveUtility;
+import com.mbientlab.metawear.DataToken;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.android.BtleService;
+import com.mbientlab.metawear.builder.RouteComponent;
+import com.mbientlab.metawear.data.Acceleration;
 import com.mbientlab.metawear.module.Debug;
+import com.mbientlab.metawear.module.Gpio;
+import com.mbientlab.metawear.module.Logging;
+import com.mbientlab.metawear.module.SensorFusionBosch;
 import com.mbientlab.metawear.module.Settings;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -98,6 +109,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     private final static Map<Integer, Class<? extends ModuleFragmentBase>> FRAGMENT_CLASSES;
     private final static Map<String, String> EXTENSION_TO_APP_TYPE;
     private final static UUID[] serviceUuids;
+    private Map<Wrapper, BluetoothDevice> modules = new HashMap<>();
 
     static
     {
@@ -116,10 +128,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     {
         Map<Integer, Class<? extends ModuleFragmentBase>> tempMap = new LinkedHashMap<>();
         tempMap.put(0, BleScannerFragment.class);
-        tempMap.put(1, ConfigureFragment.class);
-        tempMap.put(2, StrideRhythmFragment.class);
-        tempMap.put(3, StrideLinearFragment.class);
-        tempMap.put(4, SettingsFragment.class);
+        tempMap.put(1, StrideLinearFragment.class);
         FRAGMENT_CLASSES = Collections.unmodifiableMap(tempMap);
 
         EXTENSION_TO_APP_TYPE = new HashMap<>();
@@ -586,16 +595,19 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.icn_2);
         like.setBitmap(b);
 
-        MenuObject addFr = new MenuObject("Rhythm Data");
+        MenuObject addFr = new MenuObject("Reset");
         BitmapDrawable bd = new BitmapDrawable(getResources(),
                 BitmapFactory.decodeResource(getResources(), R.drawable.icn_3));
         addFr.setDrawable(bd);
 
-        MenuObject addFav = new MenuObject("Force Data");
+        MenuObject addFav = new MenuObject("Disconnect");
         addFav.setResource(R.drawable.icn_4);
 
-        MenuObject block = new MenuObject("Left Hind");
+        MenuObject block = new MenuObject("Update");
         block.setResource(R.drawable.icn_5);
+
+        MenuObject newHorse = new MenuObject("New Horse");
+        newHorse.setResource(R.drawable.icn_5);
 
         menuObjects.add(close);
         menuObjects.add(send);
@@ -603,6 +615,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         menuObjects.add(addFr);
         menuObjects.add(addFav);
         menuObjects.add(block);
+        menuObjects.add(newHorse);
         return menuObjects;
     }
 
@@ -680,20 +693,19 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.navigation, menu);
+        getMenuInflater().inflate(R.menu.navigation, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        FragmentManager fragmentManager = getSupportFragmentManager();
         int id = item.getItemId();
 
         switch (id)
         {
-            case R.id.context_menu:
-                mMenuDialogFragment.show(fragmentManager, "ContextMenuDialogFragment");
+            case R.id.action_new_horse:
+               startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
                 break;
         }
 
@@ -921,6 +933,8 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             {
                                 scannedDeviceInfo.setConnected(true);
                                 scannedDeviceInfo.setColorCheckMark();
+
+                                setupFragment(metaWearBoard, scannedDeviceInfo.getHoof());
                             }
                         });
                     }
@@ -950,23 +964,16 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         switch (position)
         {
             case 0:
-                addFragment(0);
-                mToolBarTextView.setText("Assign");
+                finish();
                 break;
             case 1:
-                addFragment(1);
+                addFragment(0);
                 mToolBarTextView.setText("Capture");
                 break;
             case 2:
-                addFragment(2);
+                addFragment(1);
                 break;
             case 3:
-                addFragment(3);
-                break;
-            case 4:
-                addFragment(4);
-                break;
-            case 5:
                 if (metaWearBoards.size() > 0)
                 {
                     for (int i = 0; i < metaWearBoards.size(); i++)
@@ -985,7 +992,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                         }
                     }
                 }
-            case 6:
+            case 4:
                 if (metaWearBoards.size() > 0)
                 {
                     for (int i = 0; i < metaWearBoards.size(); i++)
@@ -1005,13 +1012,13 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                         }
                     }
                 }
-            case 7:
+            case 5:
                 if (checkLocationPermission())
                 {
                     startContentSelectionIntent();
                 }
                 break;
-            case 8:
+            case 6:
                 startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
                 break;
         }
@@ -1053,5 +1060,380 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(currentFragment.getTag());
         }
+    }
+
+
+    //******************Configure fragments code*********************
+    private void setupFragment(MetaWearBoard metaWearBoard, String hoof)
+    {
+            Gpio gpio = metaWearBoard.getModule(Gpio.class);
+            SensorFusionBosch sensorFusionBosch = metaWearBoard.getModule(SensorFusionBosch.class);
+            Logging logging = metaWearBoard.getModule(Logging.class);
+            Settings settings = metaWearBoard.getModule(Settings.class);
+            Wrapper wrapper = new Wrapper(gpio, sensorFusionBosch, logging,
+                    settings, metaWearBoard);
+
+            if (hoof.contains("LH"))
+            {
+                configureGpioLH(wrapper);
+                configureSensorFusionLH(wrapper);
+            } else if (hoof.contains("LF"))
+            {
+                configureGpioLF(wrapper);
+                configureSensorFusionLF(wrapper);
+            } else if (hoof.contains("RH"))
+            {
+                configureGpioRH(wrapper);
+                configureSensorFusionRH(wrapper);
+            } else if (hoof.contains("RF"))
+            {
+                configureGpioRF(wrapper);
+                configureSensorFusionRF(wrapper);
+            }
+
+        for (BluetoothDevice bluetoothDevice : bluetoothDevices)
+        {
+            if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
+                modules.put(wrapper, bluetoothDevice);
+        }
+    }
+    // ************************** Configure horseshoes start ****************************
+
+    private void configureSensorFusionLH(Wrapper wrapper)
+    {
+        wrapper.getSensorFusionBosch().configure()
+                .mode(SensorFusionBosch.Mode.NDOF)
+                .accRange(SensorFusionBosch.AccRange.AR_16G)
+                .gyroRange(SensorFusionBosch.GyroRange.GR_2000DPS)
+                .commit();
+
+        wrapper.getSensorFusionBosch().linearAcceleration()
+                .addRouteAsync(source -> source.log((data, env) ->
+                {
+                    if (env != null)
+                    {
+                        SaveUtility saveUtility = ((SaveUtility) env[0]);
+                        saveUtility.setSensor(Config.SENSOR_FUSION_BOSCH);
+                        saveUtility.setHoof("LH");
+                        saveUtility.setTimestamp(System.nanoTime());
+                        saveUtility.setxValueLinearAcceleration(data.value(Acceleration.class).x());
+                        saveUtility.setyValueLinearAcceleration(data.value(Acceleration.class).y());
+                        saveUtility.setzValueLinearAcceleration(data.value(Acceleration.class).z());
+                        saveUtility.executeSave();
+                    }
+                }).react(new RouteComponent.Action()
+                {
+                    @Override
+                    public void execute(DataToken token)
+                    {
+                        wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc().read();
+                    }
+                })).continueWith(task ->
+        {
+            task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
+            return null;
+        });
+    }
+
+    private void configureSensorFusionLF(Wrapper wrapper)
+    {
+        wrapper.getSensorFusionBosch().configure()
+                .mode(SensorFusionBosch.Mode.NDOF)
+                .accRange(SensorFusionBosch.AccRange.AR_16G)
+                .gyroRange(SensorFusionBosch.GyroRange.GR_2000DPS)
+                .commit();
+
+        wrapper.getSensorFusionBosch().linearAcceleration()
+                .addRouteAsync(source -> source.log((data, env) ->
+                {
+                    if (env != null)
+                    {
+                        ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
+                        ((SaveUtility) env[0]).setHoof("LF");
+                        ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
+                        ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
+                        ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
+                        ((SaveUtility) env[0]).setzValueLinearAcceleration(data.value(Acceleration.class).z());
+                        ((SaveUtility) env[0]).executeSave();
+                    }
+                }).react(new RouteComponent.Action()
+                {
+                    @Override
+                    public void execute(DataToken token)
+                    {
+                        wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc().read();
+                    }
+                })).continueWith(task ->
+        {
+            task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
+            return null;
+        });
+    }
+
+    private void configureSensorFusionRH(Wrapper wrapper)
+    {
+        wrapper.getSensorFusionBosch().configure()
+                .mode(SensorFusionBosch.Mode.NDOF)
+                .accRange(SensorFusionBosch.AccRange.AR_16G)
+                .gyroRange(SensorFusionBosch.GyroRange.GR_2000DPS)
+                .commit();
+
+        wrapper.getSensorFusionBosch().linearAcceleration()
+                .addRouteAsync(source -> source.log((data, env) ->
+                {
+                    if (env != null)
+                    {
+                        ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
+                        ((SaveUtility) env[0]).setHoof("RH");
+                        ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
+                        ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
+                        ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
+                        ((SaveUtility) env[0]).setzValueLinearAcceleration(data.value(Acceleration.class).z());
+                        ((SaveUtility) env[0]).executeSave();
+                    }
+                }).react(new RouteComponent.Action()
+                {
+                    @Override
+                    public void execute(DataToken token)
+                    {
+                        wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc().read();
+                    }
+                })).continueWith(task ->
+        {
+            task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
+            return null;
+        });
+    }
+
+    private void configureSensorFusionRF(Wrapper wrapper)
+    {
+        wrapper.getSensorFusionBosch().configure()
+                .mode(SensorFusionBosch.Mode.NDOF)
+                .accRange(SensorFusionBosch.AccRange.AR_16G)
+                .gyroRange(SensorFusionBosch.GyroRange.GR_2000DPS)
+                .commit();
+
+        wrapper.getSensorFusionBosch().linearAcceleration()
+                .addRouteAsync(source -> source.log((data, env) ->
+                {
+                    if (env != null)
+                    {
+                        ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
+                        ((SaveUtility) env[0]).setHoof("RF");
+                        ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
+                        ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
+                        ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
+                        ((SaveUtility) env[0]).setzValueLinearAcceleration(data.value(Acceleration.class).z());
+                        ((SaveUtility) env[0]).executeSave();
+                    }
+                }).react(new RouteComponent.Action()
+                {
+                    @Override
+                    public void execute(DataToken token)
+                    {
+                        wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc().read();
+                    }
+                })).continueWith(task ->
+        {
+            task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
+            return null;
+        });
+    }
+
+    private void configureGpioLH(Wrapper wrapper)
+    {
+        wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc()
+                .addRouteAsync(source -> source
+                        .log((data, env) ->
+                        {
+                            if (env != null)
+                            {
+                                System.out.println("GPIO-READING: " + data.value(Short.class));
+
+                                ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
+                                ((SaveUtility) env[0]).setHoof("LH");
+                                ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
+                                ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
+                                ((SaveUtility) env[0]).executeSave();
+                            }
+                        })).continueWithTask(task ->
+        {
+            task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
+            return null;
+        });
+    }
+
+    private void configureGpioLF(Wrapper wrapper)
+    {
+        wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc()
+                .addRouteAsync(source -> source
+                        .log((data, env) ->
+                        {
+                            if (env != null)
+                            {
+                                ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
+                                ((SaveUtility) env[0]).setHoof("LF");
+                                ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
+                                ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
+                                ((SaveUtility) env[0]).executeSave();
+                            }
+                        })).continueWith(task ->
+        {
+            task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
+            return null;
+        });
+    }
+
+    private void configureGpioRH(Wrapper wrapper)
+    {
+        wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc()
+                .addRouteAsync(source -> source
+                        .log((data, env) ->
+                        {
+                            if (env != null)
+                            {
+                                ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
+                                ((SaveUtility) env[0]).setHoof("RH");
+                                ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
+                                ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
+                                ((SaveUtility) env[0]).executeSave();
+                            }
+                        })).continueWith(task ->
+        {
+            task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
+            return null;
+        });
+    }
+
+    private void configureGpioRF(Wrapper wrapper)
+    {
+        wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc()
+                .addRouteAsync(source -> source
+                        .log((data, env) ->
+                        {
+                            if (env != null)
+                            {
+                                ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
+                                ((SaveUtility) env[0]).setHoof("RF");
+                                ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
+                                ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
+                                ((SaveUtility) env[0]).executeSave();
+                            }
+                        })).continueWith(task -> {
+            task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
+            return null;
+        });
+    }// **************************** Configure horseshoes end **********************************
+
+    private MetaWearBoard getMetaWearBoard(String hoof, BluetoothDevice bluetoothDevice)
+    {
+        MetaWearBoard metaWearBoard = BoardVault.get().getMetaWearBoard(hoof, serviceBinder.getMetaWearBoard(bluetoothDevice));
+
+        metaWearBoards.add(metaWearBoard);
+
+        return metaWearBoard;
+    }
+
+    private void startModules()
+    {
+        for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
+        {
+            if (entry.getKey().getLogging() != null)
+            {
+                entry.getKey().getLogging().start(Config.LOGGING_OVERWRITE_MODE);
+                System.out.println("LOGGING-STARTED");
+            }
+
+            if (entry.getKey().getGpio() != null)
+            {
+                System.out.println("GPIO-NOT-NULL");
+
+                if (entry.getKey().getSensorFusionBosch() != null)
+                {
+                    entry.getKey().getSensorFusionBosch().linearAcceleration().start();
+                    entry.getKey().getSensorFusionBosch().start();
+
+                    System.out.println("ACCELEROMETER-STARTED");
+                }
+
+                Horse horse = null;
+
+                Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(entry.getKey().getMetaWearBoard().getMacAddress());
+
+                if (horseshoe != null)
+                {
+                    horseshoe.setLogging(true);
+                    horseshoe.update();
+
+                    horse = horseshoe.getHorse();
+                }
+
+                Workout workout = null;
+
+                List<Workout> workouts = DatabaseUtility.retrieveWorkouts(horse.getId());
+
+                if (workouts.size() == 0)
+                {
+                    System.out.println("WORKOUT-1");
+                    workout = new Workout();
+                    workout.setHorseId(horse.getId());
+                    workout.setHorse(horse);
+                    workout.setDate(new SimpleDateFormat("d-M-yyyy").format(Calendar.getInstance().getTime()));
+                    workout.setStartTime(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(Calendar.getInstance().getTime()));
+                    MyApplication.getInstance().getDaoSession().getWorkoutDao().insert(workout);
+                } else if (workouts.size() > 0)
+                {
+                    for (int i = 0; i < workouts.size(); i++)
+                    {
+                        if (workouts.get(i).getDate().equals(new SimpleDateFormat("d-M-yyyy").format(Calendar.getInstance().getTime())))
+                        {
+                            System.out.println("WORKOUT-2");
+
+                            // UPDATE SO CAN SELECT START TIME FROM DATE/TIME PICKER TO ENSURE CORRECT WORKOUT IS
+                            // SELECTED IF HORSE HAS MULTIPLE WORKOUTS FOR SAME DATE.
+                            workout = workouts.get(i);
+                        }
+                    }
+
+                    if (workout == null)
+                    {
+                        System.out.println("WORKOUT-3");
+                        workout = new Workout();
+                        workout.setHorseId(horse.getId());
+                        workout.setHorse(horse);
+                        workout.setDate(new SimpleDateFormat("d-M-yyyy").format(Calendar.getInstance().getTime()));
+                        workout.setStartTime(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(Calendar.getInstance().getTime()));
+                        MyApplication.getInstance().getDaoSession().getWorkoutDao().insert(workout);
+                    }
+                }
+
+                System.out.println("WORKOUT-ID: " + workout.getId());
+
+                LittleDB.get().putLong(Config.WORKOUT_ID, workout.getId());
+                horse.getWorkouts().add(workout);
+
+                // SET TO FALSE IN THE LOGGING DOWNLOAD SECTION.
+                LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING, true);
+
+                DialogUtility.showStartLoggingDialog(NavigationActivity.this, NavigationActivity.this);
+            }
+        }
+    }
+
+    public void closeModules()
+    {
+        for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
+        {
+            BoardVault.get().putMetaWearBoard(entry.getValue().getName(), Config.SERIALIZED_BOARDS_FILE,
+                    entry.getKey().getMetaWearBoard().getMacAddress(), entry.getKey().getMetaWearBoard());
+
+            if (entry.getKey().getMetaWearBoard().isConnected())
+            {
+                entry.getKey().getMetaWearBoard().tearDown();
+                entry.getKey().getMetaWearBoard().disconnectAsync();
+            }
+        }
+
+        finish();
     }
 }
