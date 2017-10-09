@@ -16,6 +16,8 @@ import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.DialogUtility;
 import com.hoofbeats.app.utility.LittleDB;
 
+import java.util.List;
+
 public class ScannedDeviceInfo
 {
     public BluetoothDevice btDevice;
@@ -215,23 +217,41 @@ public class ScannedDeviceInfo
     public void assignListItem()
     {
         System.out.println("----Assign---");
-
+        boolean alreadyAssigned = false;
         Horse horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
-        DatabaseUtility.addHorseshoeToHorse(horse, hoof, btDevice.getAddress());
 
-        Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
+        List<Horseshoe> horseshoeList = horse.getHorseshoes();
 
-        if (horseshoe != null)
+        if (horseshoeList.size() > 0)
         {
-            deviceName.setText(hoof);
-            radioButton.setChecked(true);
-            radioButton.setClickable(false);
-            radioButton.setEnabled(false);
-            configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
-            isAssigned = true;
-            DialogUtility.showNoticeSnackBarShort(activity, activity.getString(R.string.message_successful));
+            for (Horseshoe h : horseshoeList)
+            {
+                if (h.getHoof().equals(hoof))
+                {
+                    alreadyAssigned = true;
+                    break;
+                }
+            }
+        }
+
+        if (!alreadyAssigned)
+        {
+            DatabaseUtility.addHorseshoeToHorse(horse, hoof, btDevice.getAddress());
+            Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
+
+            if (horseshoe != null)
+            {
+                deviceName.setText(hoof);
+                radioButton.setChecked(true);
+                radioButton.setClickable(false);
+                radioButton.setEnabled(false);
+                configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
+                isAssigned = true;
+                DialogUtility.showNoticeSnackBarShort(activity, activity.getString(R.string.message_successful));
+            } else
+                DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_unsuccessful));
         } else
-            DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_unsuccessful));
+            DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_reset_before_reassign));
     }
 
     public void removeListItem()

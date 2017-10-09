@@ -29,7 +29,7 @@ public class StrideRhythmFragment extends ThreeAxisChartFragment
 
     public StrideRhythmFragment() {
         super("acceleration", R.layout.fragment_sensor_config_spinner,
-                R.string.navigation_fragment_accelerometer, -INITIAL_RANGE, INITIAL_RANGE);
+                R.string.navigation_fragment_display_linear, -INITIAL_RANGE, INITIAL_RANGE);
     }
 
     @Override

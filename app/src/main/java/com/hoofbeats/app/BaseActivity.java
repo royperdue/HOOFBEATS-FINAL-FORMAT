@@ -6,7 +6,6 @@ import android.animation.ObjectAnimator;
 import android.graphics.RectF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.NestedScrollView;
@@ -38,7 +37,6 @@ import com.nhaarman.listviewanimations.appearance.simple.SwingLeftInAnimationAda
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,8 +64,6 @@ public abstract class BaseActivity extends AppCompatActivity
     protected FloatingActionButton fab;
     protected Button connectButton;
     protected NavigationView navigationView;
-    protected Bundle savedInstanceState;
-    protected Map<String, ImageView> connectedCheckMarks = new HashMap<>();
 
     public static ShapeDrawable sOverlayShape;
     public static int sScreenWidth;

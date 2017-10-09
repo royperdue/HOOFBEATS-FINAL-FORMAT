@@ -190,37 +190,6 @@ public final class DatabaseUtility
         return tracks.get(0);
     }
 
-   /* public static TrackSummary getTrackSummary() {
-
-        double startLon, startLat, endLon, endLat;
-        long startTime, endTime;
-        long distance = 0;
-        TrackSummary summary = null;
-
-        if (positions.moveToFirst()) {
-            long count = 1;
-            startLon = positions.getDouble(positions.getColumnIndex(DbContract.Positions.COLUMN_LONGITUDE));
-            startLat = positions.getDouble(positions.getColumnIndex(DbContract.Positions.COLUMN_LATITUDE));
-            startTime = positions.getLong(positions.getColumnIndex(DbContract.Positions.COLUMN_TIME));
-            endTime = startTime;
-            while (positions.moveToNext()) {
-                count++;
-                endLon = positions.getDouble(positions.getColumnIndex(DbContract.Positions.COLUMN_LONGITUDE));
-                endLat = positions.getDouble(positions.getColumnIndex(DbContract.Positions.COLUMN_LATITUDE));
-                endTime = positions.getLong(positions.getColumnIndex(DbContract.Positions.COLUMN_TIME));
-                float[] results = new float[1];
-                Location.distanceBetween(startLat, startLon, endLat, endLon, results);
-                distance += results[0];
-                startLon = endLon;
-                startLat = endLat;
-            }
-            long duration = endTime - startTime;
-            summary = new TrackSummary(distance, duration, count);
-        }
-        positions.close();
-        return summary;
-    }*/
-
     public static void addHorseshoeToHorse(Horse horse, String hoof, String macAddress)
     {
         List<Horseshoe> horseshoes = horse.getHorseshoes();
@@ -239,33 +208,6 @@ public final class DatabaseUtility
 
         clearSession();
     }
-
-   /* public static List<LatLng> retrieveLatLngList(Activity activity, long trackId, long startNumber, long endNumber)
-    {
-        List<LatLng> latlngList = new ArrayList<>();
-        List<Track> tracks = null;
-
-        tracks = MyApplication.getInstance().getDaoSession().getTrackDao().queryBuilder()
-                .where(TrackDao.Properties.Id.eq(trackId)).list();
-
-        List<Position> locations = tracks.get(0).getLocations();
-
-        for (int i = 0; i < locations.size(); i++)
-        {
-            if (locations.get(i).getLocationNumber() > startNumber && locations.get(i).getLocationNumber() < endNumber)
-            {
-                LatLng latLng = new LatLng();
-                latLng.Latitude = locations.get(i).getLocationLatitude();
-                latLng.Longitude = locations.get(i).getLocationLongitude();
-
-                latlngList.add(latLng);
-            }
-        }
-
-        clearSession();
-
-        return latlngList;
-    }*/
 
     public static void insertTrack(Track track)
     {

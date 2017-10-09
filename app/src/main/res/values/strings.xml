@@ -285,9 +285,9 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="navigation_drawer_mbientlab_website">https://mbientlab.com</string>
-    <string name="navigation_fragment_home">Home</string>
-    <string name="navigation_fragment_accelerometer">Accelerometer</string>
+    <string name="navigation_drawer_hoofbeats_website">https://hoofbeats.tech</string>
+    <string name="navigation_fragment_capture">Capture</string>
+    <string name="navigation_fragment_display_linear">Linear Stride Characteristics</string>
     <string name="navigation_fragment_barometer">Barometer</string>
     <string name="navigation_fragment_color_detector">Color Detector</string>
     <string name="navigation_fragment_gpio">Gpio</string>
@@ -333,14 +333,15 @@
     </string>
 
     <string name="label_cancel">Cancel</string>
-    <string name="label_horse_name">Horse name...</string>
-    <string name="label_horse_age">Horse age...</string>
-    <string name="label_horse_sex">Horse sex...</string>
-    <string name="label_horse_height">Horse height...</string>
-    <string name="label_horse_breed">Horse breed...</string>
-    <string name="label_horse_discipline">Horse discipline...</string>
-    <string name="label_horse_color">Horse color...</string>
-    <string name="label_horse_notes">Horse notes...</string>
+    <string name="label_horse_name">Horse name</string>
+    <string name="label_horse_age">Horse age</string>
+    <string name="label_horse_sex">Horse sex</string>
+    <string name="label_horse_height">Horse height</string>
+    <string name="label_horse_breed">Horse breed</string>
+    <string name="label_horse_discipline">Horse discipline</string>
+    <string name="label_horse_color">Horse color</string>
+    <string name="label_horse_notes">Horse notes</string>
+    <string name="label_locate_horseshoe_module">Locate Horseshoe Module</string>
 
     <string name="label_left_hind">Left Hind</string>
     <string name="label_left_front">Left Front</string>
@@ -400,6 +401,8 @@
     <string name="label_horseshoe_modules_section">Horseshoe Modules</string>
     <string name="label_add_note">Add note...</string>
     <string name="label_horse_weight">Weight(lbs).</string>
+
+    <string name="label_assigned_hoof">Assigned Hoof</string>
 
     <string name="label_horseshoe_assign">Assign</string>
     <string name="label_horseshoe_remove">Remove</string>

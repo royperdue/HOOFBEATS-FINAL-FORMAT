@@ -111,8 +111,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     {
         Map<Integer, Class<? extends ModuleFragmentBase>> tempMap = new LinkedHashMap<>();
         tempMap.put(R.id.nav_assign, BleScannerFragment.class);
-        tempMap.put(R.id.nav_home, ConfigureFragment.class);
-        tempMap.put(R.id.nav_accelerometer, StrideRhythmFragment.class);
+        tempMap.put(R.id.nav_capture, ConfigureFragment.class);
+        tempMap.put(R.id.nav_linear, StrideRhythmFragment.class);
         tempMap.put(R.id.nav_sensor_fusion, StrideLinearFragment.class);
         tempMap.put(R.id.nav_settings, SettingsFragment.class);
         FRAGMENT_CLASSES = Collections.unmodifiableMap(tempMap);
@@ -840,7 +840,11 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             for (int i = 0; i < horses.size(); i++)
             {
                 profileMap = new HashMap<>();
-                profileMap.put(CustomListAdapter.KEY_HORSE_ID, horses.get(i).getId());
+
+                long horseId = -1;
+                horseId = horses.get(i).getId();
+
+                profileMap.put(CustomListAdapter.KEY_HORSE_ID, horseId);
                 profileMap.put(CustomListAdapter.KEY_AVATAR, horses.get(i).getProfilePictureURI());
                 profileMap.put(CustomListAdapter.KEY_NAME, horses.get(i).getHorseName());
                 profileMap.put(CustomListAdapter.KEY_DESCRIPTION_SHORT, getString(R.string.lorem_ipsum_short));
@@ -881,15 +885,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
     public Task<Void> reconnect(final MetaWearBoard board)
     {
-        for (final Map.Entry<String, ImageView> entry : connectedCheckMarks.entrySet())
-        {
-            if (entry.getKey().equals(board.getMacAddress()))
-            {
-                entry.getValue().setImageDrawable(getDrawable(R.drawable.ic_check_circle_red_700_36dp));
-                break;
-            }
-        }
-
         return board.connectAsync()
                 .continueWithTask(task ->
                 {
@@ -941,13 +936,17 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                         metaWearBoard.onUnexpectedDisconnect(status -> attemptReconnect());
                         setConnInterval(metaWearBoard.getModule(Settings.class));
                         runOnUiThread(connectDialog::dismiss);
-
-                        scannedDeviceInfo.setConnected(true);
-                        scannedDeviceInfo.setColorCheckMark();
-
                         metaWearBoards.add(metaWearBoard);
 
-                        connectedCheck.setVisibility(View.VISIBLE);
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                scannedDeviceInfo.setConnected(true);
+                                scannedDeviceInfo.setColorCheckMark();
+                            }
+                        });
                     }
                     return null;
                 });

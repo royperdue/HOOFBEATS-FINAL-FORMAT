@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v13.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class HorseProfileActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback
+public class HorseProfileActivity extends BaseActivity implements ActivityCompat.OnRequestPermissionsResultCallback
 {
     private ImageButton horseProfileImage;
     private MaterialSpinner horseBreedSpinner;
@@ -226,6 +226,7 @@ public class HorseProfileActivity extends AppCompatActivity implements ActivityC
 
                                                 horse.resetNotes();
 
+
                                                 finish();
                                             } else
                                                 DialogUtility.showAlertSnackBarMedium(HorseProfileActivity.this, getString(R.string.message_select_horse_discipline));
@@ -293,5 +294,11 @@ public class HorseProfileActivity extends AppCompatActivity implements ActivityC
         adapter.add(new HelpOption(R.string.config_settings_page_header_two, com.hoofbeats.app.R.string.config_settings_page_paragraph_two));
         adapter.add(new HelpOption(com.hoofbeats.app.R.string.config_settings_page_header_three, com.hoofbeats.app.R.string.config_settings_page_paragraph_three));
         adapter.add(new HelpOption(com.hoofbeats.app.R.string.config_settings_page_header_four, com.hoofbeats.app.R.string.config_settings_page_paragraph_four));
+    }
+
+    @Override
+    protected BaseAdapter getAdapter()
+    {
+        return null;
     }
 }

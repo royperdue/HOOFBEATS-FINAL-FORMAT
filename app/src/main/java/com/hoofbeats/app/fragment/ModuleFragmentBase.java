@@ -16,13 +16,16 @@ import android.widget.ListView;
 
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOptionAdapter;
+import com.hoofbeats.app.model.Wrapper;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.UnsupportedModuleException;
 import com.mbientlab.metawear.android.BtleService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public abstract class ModuleFragmentBase extends Fragment implements ServiceConnection
 {
@@ -39,8 +42,10 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
     //protected MetaWearBoard mwBoard;
     protected FragmentBus fragBus;
     protected int sensorResId;
+    protected Map<Wrapper, BluetoothDevice> modules = new HashMap<>();
     protected List<BluetoothDevice> bluetoothDevices;
     protected List<MetaWearBoard> metaWearBoards = new ArrayList<>();
+    protected BtleService.LocalBinder serviceBinder;
 
     protected abstract void boardReady() throws UnsupportedModuleException;
 
@@ -122,9 +127,11 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
     {
         bluetoothDevices = fragBus.getBtDevices();
 
+        serviceBinder = ((BtleService.LocalBinder) iBinder);
+
         for (int i = 0; i < bluetoothDevices.size(); i++)
         {
-            MetaWearBoard metaWearBoard = ((BtleService.LocalBinder) iBinder).getMetaWearBoard(bluetoothDevices.get(i));
+            MetaWearBoard metaWearBoard = serviceBinder.getMetaWearBoard(bluetoothDevices.get(i));
             metaWearBoards.add(metaWearBoard);
         }
 
