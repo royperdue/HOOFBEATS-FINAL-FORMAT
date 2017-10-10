@@ -110,6 +110,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     private final static Map<String, String> EXTENSION_TO_APP_TYPE;
     private final static UUID[] serviceUuids;
     private Map<Wrapper, BluetoothDevice> modules = new HashMap<>();
+    private Button startModulesButton;
 
     static
     {
@@ -329,6 +330,12 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     }
 
     @Override
+    public Map<Wrapper, BluetoothDevice> getModules()
+    {
+        return modules;
+    }
+
+    @Override
     public void resetConnectionStateHandler(long delay)
     {
         attemptReconnect(delay);
@@ -447,6 +454,26 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     {
         super.onDestroy();
 
+        for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
+        {
+            if (entry.getKey().getSensorFusionBosch() != null)
+            {
+                entry.getKey().getSensorFusionBosch().linearAcceleration().stop();
+                entry.getKey().getSensorFusionBosch().stop();
+            }
+
+            if (entry.getKey().getMetaWearBoard() != null)
+            {
+                if (entry.getKey().getMetaWearBoard().isConnected())
+                {
+                    entry.getKey().getMetaWearBoard().tearDown();
+
+                    if (entry.getKey().getMetaWearBoard() != null)
+                        entry.getKey().getMetaWearBoard().disconnectAsync();
+                }
+            }
+        }
+
         getApplicationContext().unbindService(this);
     }
 
@@ -506,6 +533,16 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             public void onClick(View v)
             {
                 mMenuDialogFragment.show(getSupportFragmentManager(), "ContextMenuDialogFragment");
+            }
+        });
+
+        startModulesButton = (Button) findViewById(R.id.start_modules_button);
+        startModulesButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startModules();
             }
         });
 
@@ -624,6 +661,17 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     {
         super.onSaveInstanceState(outState);
 
+        /*
+        * Saves the metawear boards serialized state when the activity closes.
+        * */
+        for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
+        {
+            BoardVault.get().putMetaWearBoard(entry.getValue().getName(), Config.SERIALIZED_BOARDS_FILE,
+                    entry.getKey().getMetaWearBoard().getMacAddress(), entry.getKey().getMetaWearBoard());
+        }
+
+        System.out.println("SAVED-INSTANCE-STATE-CALLED");
+
         if (currentFragment != null)
         {
             getSupportFragmentManager().putFragment(outState, FRAGMENT_KEY, currentFragment);
@@ -675,12 +723,10 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             mMenuDialogFragment.dismiss();
         } else
         {
-            if (metaWearBoards.size() > 0)
+            for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
             {
-                for (int i = 0; i < metaWearBoards.size(); i++)
-                {
-                    metaWearBoards.get(i).disconnectAsync();
-                }
+                BoardVault.get().putMetaWearBoard(entry.getValue().getName(), Config.SERIALIZED_BOARDS_FILE,
+                        entry.getKey().getMetaWearBoard().getMacAddress(), entry.getKey().getMetaWearBoard());
             }
 
             finish();
@@ -1073,19 +1119,19 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             Wrapper wrapper = new Wrapper(gpio, sensorFusionBosch, logging,
                     settings, metaWearBoard);
 
-            if (hoof.contains("LH"))
+            if (hoof.contains("Left Hind"))
             {
                 configureGpioLH(wrapper);
                 configureSensorFusionLH(wrapper);
-            } else if (hoof.contains("LF"))
+            } else if (hoof.contains("Left Front"))
             {
                 configureGpioLF(wrapper);
                 configureSensorFusionLF(wrapper);
-            } else if (hoof.contains("RH"))
+            } else if (hoof.contains("Right Hind"))
             {
                 configureGpioRH(wrapper);
                 configureSensorFusionRH(wrapper);
-            } else if (hoof.contains("RF"))
+            } else if (hoof.contains("Right Front"))
             {
                 configureGpioRF(wrapper);
                 configureSensorFusionRF(wrapper);
@@ -1101,6 +1147,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
     private void configureSensorFusionLH(Wrapper wrapper)
     {
+        System.out.println("LH-CONFIGURED-1");
         wrapper.getSensorFusionBosch().configure()
                 .mode(SensorFusionBosch.Mode.NDOF)
                 .accRange(SensorFusionBosch.AccRange.AR_16G)
@@ -1114,7 +1161,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     {
                         SaveUtility saveUtility = ((SaveUtility) env[0]);
                         saveUtility.setSensor(Config.SENSOR_FUSION_BOSCH);
-                        saveUtility.setHoof("LH");
+                        saveUtility.setHoof("Left Hind");
                         saveUtility.setTimestamp(System.nanoTime());
                         saveUtility.setxValueLinearAcceleration(data.value(Acceleration.class).x());
                         saveUtility.setyValueLinearAcceleration(data.value(Acceleration.class).y());
@@ -1128,8 +1175,8 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     {
                         wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc().read();
                     }
-                })).continueWith(task ->
-        {
+                })).continueWith(task -> {
+            System.out.println("LH-CONFIGURED-2");
             task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
             return null;
         });
@@ -1149,7 +1196,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     if (env != null)
                     {
                         ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
-                        ((SaveUtility) env[0]).setHoof("LF");
+                        ((SaveUtility) env[0]).setHoof("Left Front");
                         ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                         ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
                         ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
@@ -1184,7 +1231,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     if (env != null)
                     {
                         ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
-                        ((SaveUtility) env[0]).setHoof("RH");
+                        ((SaveUtility) env[0]).setHoof("Right Hind");
                         ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                         ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
                         ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
@@ -1219,7 +1266,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     if (env != null)
                     {
                         ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
-                        ((SaveUtility) env[0]).setHoof("RF");
+                        ((SaveUtility) env[0]).setHoof("Right Front");
                         ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                         ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
                         ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
@@ -1251,7 +1298,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                                 System.out.println("GPIO-READING: " + data.value(Short.class));
 
                                 ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
-                                ((SaveUtility) env[0]).setHoof("LH");
+                                ((SaveUtility) env[0]).setHoof("Left Hind");
                                 ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();
@@ -1272,7 +1319,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             if (env != null)
                             {
                                 ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
-                                ((SaveUtility) env[0]).setHoof("LF");
+                                ((SaveUtility) env[0]).setHoof("Left Front");
                                 ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();
@@ -1293,7 +1340,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             if (env != null)
                             {
                                 ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
-                                ((SaveUtility) env[0]).setHoof("RH");
+                                ((SaveUtility) env[0]).setHoof("Right Hind");
                                 ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();
@@ -1314,7 +1361,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             if (env != null)
                             {
                                 ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
-                                ((SaveUtility) env[0]).setHoof("RF");
+                                ((SaveUtility) env[0]).setHoof("Right Front");
                                 ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();

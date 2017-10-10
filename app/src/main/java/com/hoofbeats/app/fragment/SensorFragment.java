@@ -1,23 +1,16 @@
 package com.hoofbeats.app.fragment;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.Switch;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.YAxis;
 import com.hoofbeats.app.R;
 import com.mbientlab.metawear.Route;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -96,7 +89,7 @@ public abstract class SensorFragment extends ModuleFragmentBase
 
         initializeChart();
         resetData(false);
-        chart.invalidate();
+/*        chart.invalidate();
         chart.setDescription(null);
 
         Button clearButton= (Button) view.findViewById(R.id.layout_two_button_left);
@@ -133,24 +126,24 @@ public abstract class SensorFragment extends ModuleFragmentBase
                 intent.putExtra(Intent.EXTRA_STREAM, contentUri);
                 startActivity(Intent.createChooser(intent, "Saving Data"));
             }
-        });
+        });*/
     }
 
     protected void refreshChart(boolean clearData) {
-        chart.resetTracking();
-        chart.clear();
+       // chart.resetTracking();
+        //chart.clear();
         resetData(clearData);
-        chart.invalidate();
-        chart.fitScreen();
+        //chart.invalidate();
+       // chart.fitScreen();
     }
 
     protected void initializeChart() {
         ///< configure axis settings
-        YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setStartAtZero(false);
-        leftAxis.setAxisMaxValue(max);
-        leftAxis.setAxisMinValue(min);
-        chart.getAxisRight().setEnabled(false);
+        //YAxis leftAxis = chart.getAxisLeft();
+        //leftAxis.setStartAtZero(false);
+        //leftAxis.setAxisMaxValue(max);
+        //leftAxis.setAxisMinValue(min);
+        //chart.getAxisRight().setEnabled(false);
     }
 
     protected abstract void setup();

@@ -1,6 +1,7 @@
 
 package com.hoofbeats.app.fragment;
 
+import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.View;
@@ -11,11 +12,19 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hoofbeats.app.Config;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.custom.chart.plot2d;
 import com.hoofbeats.app.help.HelpOption;
 import com.hoofbeats.app.help.HelpOptionAdapter;
+import com.hoofbeats.app.model.Horseshoe;
+import com.hoofbeats.app.model.Reading;
+import com.hoofbeats.app.model.Workout;
+import com.hoofbeats.app.model.Wrapper;
+import com.hoofbeats.app.utility.DatabaseUtility;
+import com.hoofbeats.app.utility.LittleDB;
 import com.mbientlab.metawear.UnsupportedModuleException;
+import com.mbientlab.metawear.module.Logging;
 
 import java.lang.reflect.Array;
 import java.text.DecimalFormat;
@@ -25,7 +34,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
+
+import bolts.Continuation;
+import bolts.Task;
 
 
 public class StrideLinearFragment extends SingleDataSensorFragment
@@ -156,13 +167,13 @@ public class StrideLinearFragment extends SingleDataSensorFragment
     {
         super.onViewCreated(view, savedInstanceState);
 
-        this.sview = (TextView) view.findViewById(R.id.stepcount);
-        this.dis = (TextView) view.findViewById(R.id.dis);
-        this.avgspeed = (TextView) view.findViewById(R.id.avgspeed);
-        this.f1295X = (TextView) view.findViewById(R.id.X);
-        this.f1296Y = (TextView) view.findViewById(R.id.Y);
-        this.f1297Z = (TextView) view.findViewById(R.id.Z);
-        this.timerValue = (TextView) view.findViewById(R.id.timer);
+       // this.sview = (TextView) view.findViewById(R.id.stepcount);
+       // this.dis = (TextView) view.findViewById(R.id.dis);
+       // this.avgspeed = (TextView) view.findViewById(R.id.avgspeed);
+       // this.f1295X = (TextView) view.findViewById(R.id.X);
+       // this.f1296Y = (TextView) view.findViewById(R.id.Y);
+       // this.f1297Z = (TextView) view.findViewById(R.id.Z);
+       // this.timerValue = (TextView) view.findViewById(R.id.timer);
 
         this.f1298c = Calendar.getInstance();
         this.filenameDate = Calendar.getInstance();
@@ -180,9 +191,11 @@ public class StrideLinearFragment extends SingleDataSensorFragment
         dArr2[1] = 0.0d;
         dArr[0] = 0.0d;
         String outputFileName = null;
-        if (outputFileName == null || outputFileName.isEmpty()) {
+        if (outputFileName == null || outputFileName.isEmpty())
+        {
             this.filename = "PV_17736bba5c054b5939990fb18." + this.str2 + ".txt";
-        } else if (!outputFileName.contains(".")) {
+        } else if (!outputFileName.contains("."))
+        {
             this.filename = outputFileName + ".txt";
         }
 
@@ -194,70 +207,7 @@ public class StrideLinearFragment extends SingleDataSensorFragment
     @Override
     protected void boardReady() throws UnsupportedModuleException
     {
-        //StrideLinearFragment.this.dx[0] = (double) data.value(Acceleration.class).x();
-        //StrideLinearFragment.this.dx[1] = (double) data.value(Acceleration.class).y();
-        //StrideLinearFragment.this.dx[2] = (double) data.value(Acceleration.class).z();
-
-        for (int i = 0; i < 200; i++)
-        {
-            StrideLinearFragment.this.dx[0] = ThreadLocalRandom.current().nextDouble(.5, 9);
-            StrideLinearFragment.this.dx[1] = ThreadLocalRandom.current().nextDouble(.5, 9);
-            StrideLinearFragment.this.dx[2] = ThreadLocalRandom.current().nextDouble(.5, 12);
-
-                    stepwise_dr_tu();
-
-            timeSec = f1298c.getTimeInMillis() - StrideLinearFragment.this.filenameDate.getTimeInMillis();
-
-            if (timeSec != StrideLinearFragment.this.timeSec1)
-            {
-                StrideLinearFragment.this.timeSec1 = timeSec;
-            }
-            if (StrideLinearFragment.this.distance1 >= 0.05d)
-            {
-                StrideLinearFragment.this.timeSec3 = StrideLinearFragment.this.timeSec1 - StrideLinearFragment.this.timeSec2;
-                StrideLinearFragment.this.timeSec6 += StrideLinearFragment.this.timeSec3;
-                StrideLinearFragment.this.timeSec2 = StrideLinearFragment.this.timeSec1;
-                long timeSec5 = StrideLinearFragment.this.f1298c.getTimeInMillis() - StrideLinearFragment.this.filenameDate.getTimeInMillis();
-                StrideLinearFragment.this.step_counter++;
-                DecimalFormat df1 = new DecimalFormat("0.00");
-                DecimalFormat df2 = new DecimalFormat("000");
-                StrideLinearFragment.this.avg = StrideLinearFragment.this.distance / ((double) StrideLinearFragment.this.step_counter);
-                StrideLinearFragment.this.speednow = (StrideLinearFragment.this.distance1 * 3.6d) / ((double) (StrideLinearFragment.this.timeSec3 / 1000));
-                StrideLinearFragment.this.Avgspeed = (StrideLinearFragment.this.distance * 3.6d) / ((double) (StrideLinearFragment.this.timeSec6 / 1000));
-                StrideLinearFragment.this.StepD = StrideLinearFragment.this.timeSec6 / ((long) StrideLinearFragment.this.step_counter);
-
-                getActivity().runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        Printdata();
-                        StrideLinearFragment.this.mConversationArrayAdapter.add("  " + StrideLinearFragment.this.step_counter + ". x= " + df1.format(StrideLinearFragment.this.final_data[0]) + "m   y= " + df1.format(StrideLinearFragment.this.final_data[1]) + "m   z= " + df1.format(StrideLinearFragment.this.final_data[2]) + "m" + " " + "Speed = " + df1.format(StrideLinearFragment.this.speednow) + "m");
-                        DecimalFormat df = new DecimalFormat("0.000");
-                        String Str = df.format(StrideLinearFragment.this.final_data[0]) + " " + df.format(StrideLinearFragment.this.final_data[1]) + " " + df.format(StrideLinearFragment.this.final_data[2]) + " " + (StrideLinearFragment.this.timeSec6 / 1000) + "." + df2.format(StrideLinearFragment.this.timeSec6 % 1000) + " " + df.format(StrideLinearFragment.this.distance) + "\n";
-                        //writetofile(StrideLinearFragment.this.filename, Str);
-
-                        String[] xyztd = Str.split("\\s+");
-                        float x = toDouble(xyztd[0].trim());
-                        float y = toDouble(xyztd[1].trim());
-                        float z = (float) toDouble(xyztd[2].trim());
-                        double stepLen = (double) toDouble(xyztd[3].trim());
-                        double stepDur = (double) toDouble(xyztd[4].trim());
-                        xAxisList.add(Float.valueOf(x));
-                        yAxisList.add(Float.valueOf(y));
-                        zAxisList.add(Float.valueOf(z));
-                        stepLenList.add(Double.valueOf(stepLen));
-                        stepDurList.add(Double.valueOf(stepDur));
-                        stepLenAvg += stepLen;
-                        stepDurAvg += stepDur;
-                        numOfSteps++;
-
-                        System.out.println(Str);
-                    }
-                });
-            }
-        }
-        setup();
+        startDownload();
     }
 
     @Override
@@ -272,12 +222,76 @@ public class StrideLinearFragment extends SingleDataSensorFragment
     @Override
     protected void setup()
     {
+        List<Workout> workouts = DatabaseUtility.retrieveWorkouts(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
+        Workout workout = workouts.get(0);
+
+        List<Reading> readings = workout.getReadings();
+
+        for (int i = 0; i < readings.size(); i++)
+        {
+            StrideLinearFragment.this.dx[0] = (double) readings.get(i).getXValueLinearAcceleration();
+            StrideLinearFragment.this.dx[1] = (double) readings.get(i).getYValueLinearAcceleration();
+            StrideLinearFragment.this.dx[2] = (double) readings.get(i).getZValueLinearAcceleration();
+        }
+
+        stepwise_dr_tu();
+
+        timeSec = f1298c.getTimeInMillis() - StrideLinearFragment.this.filenameDate.getTimeInMillis();
+
+        if (timeSec != StrideLinearFragment.this.timeSec1)
+        {
+            StrideLinearFragment.this.timeSec1 = timeSec;
+        }
+        if (StrideLinearFragment.this.distance1 >= 0.05d)
+        {
+            StrideLinearFragment.this.timeSec3 = StrideLinearFragment.this.timeSec1 - StrideLinearFragment.this.timeSec2;
+            StrideLinearFragment.this.timeSec6 += StrideLinearFragment.this.timeSec3;
+            StrideLinearFragment.this.timeSec2 = StrideLinearFragment.this.timeSec1;
+            long timeSec5 = StrideLinearFragment.this.f1298c.getTimeInMillis() - StrideLinearFragment.this.filenameDate.getTimeInMillis();
+            StrideLinearFragment.this.step_counter++;
+            DecimalFormat df1 = new DecimalFormat("0.00");
+            DecimalFormat df2 = new DecimalFormat("000");
+            StrideLinearFragment.this.avg = StrideLinearFragment.this.distance / ((double) StrideLinearFragment.this.step_counter);
+            StrideLinearFragment.this.speednow = (StrideLinearFragment.this.distance1 * 3.6d) / ((double) (StrideLinearFragment.this.timeSec3 / 1000));
+            StrideLinearFragment.this.Avgspeed = (StrideLinearFragment.this.distance * 3.6d) / ((double) (StrideLinearFragment.this.timeSec6 / 1000));
+            StrideLinearFragment.this.StepD = StrideLinearFragment.this.timeSec6 / ((long) StrideLinearFragment.this.step_counter);
+
+            getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    //Printdata();
+                    StrideLinearFragment.this.mConversationArrayAdapter.add("  " + StrideLinearFragment.this.step_counter + ". x= " + df1.format(StrideLinearFragment.this.final_data[0]) + "m   y= " + df1.format(StrideLinearFragment.this.final_data[1]) + "m   z= " + df1.format(StrideLinearFragment.this.final_data[2]) + "m" + " " + "Speed = " + df1.format(StrideLinearFragment.this.speednow) + "m");
+                    DecimalFormat df = new DecimalFormat("0.000");
+                    String Str = df.format(StrideLinearFragment.this.final_data[0]) + " " + df.format(StrideLinearFragment.this.final_data[1]) + " " + df.format(StrideLinearFragment.this.final_data[2]) + " " + (StrideLinearFragment.this.timeSec6 / 1000) + "." + df2.format(StrideLinearFragment.this.timeSec6 % 1000) + " " + df.format(StrideLinearFragment.this.distance) + "\n";
+                    //writetofile(StrideLinearFragment.this.filename, Str);
+
+                    String[] xyztd = Str.split("\\s+");
+                    float x = toDouble(xyztd[0].trim());
+                    float y = toDouble(xyztd[1].trim());
+                    float z = (float) toDouble(xyztd[2].trim());
+                    double stepLen = (double) toDouble(xyztd[3].trim());
+                    double stepDur = (double) toDouble(xyztd[4].trim());
+                    xAxisList.add(Float.valueOf(x));
+                    yAxisList.add(Float.valueOf(y));
+                    zAxisList.add(Float.valueOf(z));
+                    stepLenList.add(Double.valueOf(stepLen));
+                    stepDurList.add(Double.valueOf(stepDur));
+                    stepLenAvg += stepLen;
+                    stepDurAvg += stepDur;
+                    numOfSteps++;
+
+                    System.out.println(Str);
+                }
+            });
+        }
+
         StrideLinearFragment.this.xvalues = getXAxisData();
         StrideLinearFragment.this.yvalues = getYAxisData();
 
 
         StrideLinearFragment.this.graphLH = new plot2d(getActivity(), StrideLinearFragment.this.xvalues, StrideLinearFragment.this.yvalues, 1);
-
 
 
         StrideLinearFragment.this.graphView.addView(StrideLinearFragment.this.graphLH, StrideLinearFragment.this.layoutParams);
@@ -365,5 +379,66 @@ public class StrideLinearFragment extends SingleDataSensorFragment
         this.f1296Y.invalidate();
         this.f1297Z.setText(" " + this.df1.format(this.final_data[2]));
         this.f1297Z.invalidate();
+    }
+
+    public void startDownload()
+    {
+        System.out.println("DOWNLOAD-LOG-CALLED");
+
+        modules = fragBus.getModules();
+
+        for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
+        {
+            if (entry.getKey().getMetaWearBoard().isConnected())
+            {
+                Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(entry.getValue().getAddress());
+
+                entry.getKey().getLogging().stop();
+
+                entry.getKey().getSensorFusionBosch().linearAcceleration().stop();
+                entry.getKey().getSensorFusionBosch().stop();
+
+                horseshoe.setLogging(false);
+                horseshoe.update();
+
+                entry.getKey().getLogging().downloadAsync(100, new Logging.LogDownloadUpdateHandler()
+                {
+                    @Override
+                    public void receivedUpdate(long nEntriesLeft, long totalEntries)
+                    {
+                        getActivity().runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+
+                            }
+                        });
+                    }
+                }).continueWithTask(new Continuation<Void, Task<Void>>()
+                {
+                    @Override
+                    public Task<Void> then(Task<Void> task) throws Exception
+                    {
+                        //wrapper.getLogging().clearEntries();
+                        //metaWearBoard.getModule(Debug.class).resetAfterGc();
+
+                        getActivity().runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                entry.getKey().getMetaWearBoard().tearDown();
+                                entry.getKey().getMetaWearBoard().disconnectAsync();
+                                //DialogUtility.showDownloadFinishedDialog((BaseActivity) getActivity());
+
+                                setup();
+                            }
+                        });
+                        return null;
+                    }
+                });
+            }
+        }
     }
 }

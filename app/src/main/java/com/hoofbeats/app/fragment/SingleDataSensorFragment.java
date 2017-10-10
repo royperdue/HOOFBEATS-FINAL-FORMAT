@@ -76,6 +76,6 @@ public abstract class SingleDataSensorFragment extends SensorFragment {
         LineData data= new LineData(chartXValues);
         data.addDataSet(tempDataSet);
         data.setDrawValues(false);
-        chart.setData(data);
+//        chart.setData(data);
     }
 }

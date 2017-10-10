@@ -22,7 +22,6 @@ import com.mbientlab.metawear.UnsupportedModuleException;
 import com.mbientlab.metawear.android.BtleService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,7 +31,7 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
     public interface FragmentBus
     {
         List<BluetoothDevice> getBtDevices();
-
+        Map<Wrapper, BluetoothDevice> getModules();
         void resetConnectionStateHandler(long delay);
 
         void initiateDfu(Object path);
@@ -42,7 +41,7 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
     //protected MetaWearBoard mwBoard;
     protected FragmentBus fragBus;
     protected int sensorResId;
-    protected Map<Wrapper, BluetoothDevice> modules = new HashMap<>();
+    protected Map<Wrapper, BluetoothDevice> modules;
     protected List<BluetoothDevice> bluetoothDevices;
     protected List<MetaWearBoard> metaWearBoards = new ArrayList<>();
     protected BtleService.LocalBinder serviceBinder;

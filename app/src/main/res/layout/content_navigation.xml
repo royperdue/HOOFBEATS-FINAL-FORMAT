@@ -299,6 +299,37 @@
                                 </TableRow>
                             </TableLayout>
                         </LinearLayout>
+                        <View
+                            style="@style/HorizontalLine"
+                            android:background="@android:color/darker_gray"/>
+
+                        <LinearLayout android:layout_width="match_parent"
+                                      android:layout_height="wrap_content"
+                                      android:gravity="center"
+                                      android:orientation="horizontal"
+                                      android:weightSum="5">
+                            <Button
+                                android:id="@+id/start_modules_button"
+                                style="?android:attr/buttonBarButtonStyle"
+                                android:textColor="@color/orange"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="5"
+                                android:gravity="center"
+                                android:text="@string/label_capture"/>
+                            <!--Switch
+                                android:id="@+id/gps_switch"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2.5"
+                                android:checked="false"
+                                android:gravity="center"
+                                android:text="GPS"
+                                android:textAppearance="?android:attr/textAppearanceSmall"/-->
+                        </LinearLayout>
+                        <View
+                            style="@style/HorizontalLine"
+                            android:background="@android:color/darker_gray"/>
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
