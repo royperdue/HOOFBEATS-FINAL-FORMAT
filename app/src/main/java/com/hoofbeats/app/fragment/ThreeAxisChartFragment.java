@@ -14,7 +14,11 @@ import java.util.Locale;
 
 public abstract class ThreeAxisChartFragment extends SensorFragment
 {
-    private final ArrayList<Entry> axisDataLH = new ArrayList<>(), axisDataLF = new ArrayList<>(), axisDataRH = new ArrayList<>(), axisDataRF = new ArrayList<>();
+    private final ArrayList<Entry> axisDataLH = new ArrayList<>();
+    private final ArrayList<Entry> axisDataLF = new ArrayList<>();
+    private final ArrayList<Entry> axisDataRH = new ArrayList<>();
+    private final ArrayList<Entry> axisDataRF = new ArrayList<>();
+    private final ArrayList<Entry> xAxisValues = new ArrayList<>();
     private final String dataType;
     protected float samplePeriod;
 

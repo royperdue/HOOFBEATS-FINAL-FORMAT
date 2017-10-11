@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.hoofbeats.app.Config;
 import com.hoofbeats.app.R;
-import com.hoofbeats.app.custom.chart.plot2d;
 import com.hoofbeats.app.help.HelpOption;
 import com.hoofbeats.app.help.HelpOptionAdapter;
 import com.hoofbeats.app.model.Reading;
@@ -30,7 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StrideLinearFragment extends ThreeAxisChartFragment {
+public class StrideLinearFragment extends ThreeAxisChartFragment
+{
     double Avgspeed;
     private long StepD = 0;
     double avg = 0.0d;
@@ -53,18 +53,15 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
     double distance1 = 0.0d;
     double[][] dp = ((double[][]) Array.newInstance(Double.TYPE, new int[]{4, 4}));
     double[][] dr = ((double[][]) Array.newInstance(Double.TYPE, new int[]{4, 4}));
-    double[] dx = new double[4];
-    String filename;
+
+    double[] dxLH = new double[4];
+    double[] dxLF = new double[4];
+    double[] dxRH = new double[4];
+    double[] dxRF = new double[4];
+
     Calendar filenameDate;
     double[] final_data = new double[3];
 
-    private plot2d graphLH;
-    private plot2d graphLF;
-    private plot2d graphRH;
-    private plot2d graphRF;
-
-    int f1300i;
-    int f1301j;
     private ArrayAdapter<String> mConversationArrayAdapter;
     SimpleDateFormat sdf;
     private TextView sduration;
@@ -104,7 +101,8 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
 
     protected List<Workout> workouts = null;
 
-    public StrideLinearFragment() {
+    public StrideLinearFragment()
+    {
         super("linear", R.layout.fragment_stride_linear, R.string.navigation_fragment_stride_linear, 0f, 14f, 25f);
 
         this.unexpectedData = null;
@@ -124,26 +122,30 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         System.out.println("ON-CREATE-VIEW");
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
-    public void onViewCreated(final View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
 
         System.out.println("ON-VIEW-CREATED");
     }
 
     @Override
-    protected void boardReady() throws UnsupportedModuleException {
+    protected void boardReady() throws UnsupportedModuleException
+    {
         System.out.println("---BOARD-READY");
 
     }
 
     @Override
-    protected void setup() {
+    protected void setup()
+    {
         workouts = DatabaseUtility.retrieveWorkouts(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
 
         this.mConversationArrayAdapter = new ArrayAdapter(getActivity(), R.layout.message);
@@ -172,81 +174,106 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
             System.out.println("X-----" + readings.get(i).getXValueLinearAcceleration());
             System.out.println("Y-----" + readings.get(i).getYValueLinearAcceleration());
             System.out.println("Z-----" + readings.get(i).getZValueLinearAcceleration());
-
-            this.dx[0] = (double) readings.get(i).getXValueLinearAcceleration();
-            this.dx[1] = (double) readings.get(i).getYValueLinearAcceleration();
-            this.dx[2] = (double) readings.get(i).getZValueLinearAcceleration();
-
-            stepwise_dr_tu();
-
             if ((i + 1) < readings.size())
             {
-                timeSec = readings.get(i + 1).getTimestamp() - readings.get(i).getTimestamp();
-
-                if (timeSec != StrideLinearFragment.this.timeSec1)
+                if (readings.get(i).getHoof().equals("Left Hind"))
                 {
-                    this.timeSec1 = timeSec;
+                    this.dxLH[0] = (double) readings.get(i).getXValueLinearAcceleration();
+                    this.dxLH[1] = (double) readings.get(i).getYValueLinearAcceleration();
+                    this.dxLH[2] = (double) readings.get(i).getZValueLinearAcceleration();
+
+                    updateGraph("Left Hind", dxLH, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
+                } else if (readings.get(i).getHoof().equals("Left Front"))
+                {
+                    this.dxLF[0] = (double) readings.get(i).getXValueLinearAcceleration();
+                    this.dxLF[1] = (double) readings.get(i).getYValueLinearAcceleration();
+                    this.dxLF[2] = (double) readings.get(i).getZValueLinearAcceleration();
+                    updateGraph("Left Front", dxLF, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
+                } else if (readings.get(i).getHoof().equals("Right Hind"))
+                {
+                    this.dxRH[0] = (double) readings.get(i).getXValueLinearAcceleration();
+                    this.dxRH[1] = (double) readings.get(i).getYValueLinearAcceleration();
+                    this.dxRH[2] = (double) readings.get(i).getZValueLinearAcceleration();
+                    updateGraph("Right Hind", dxRH, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
+                } else if (readings.get(i).getHoof().equals("Right Front"))
+                {
+                    this.dxRF[0] = (double) readings.get(i).getXValueLinearAcceleration();
+                    this.dxRF[1] = (double) readings.get(i).getYValueLinearAcceleration();
+                    this.dxRF[2] = (double) readings.get(i).getZValueLinearAcceleration();
+                    updateGraph("Right Front", dxRF, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
                 }
-                if (this.distance1 >= 0.05)
+            }
+        }
+    }
+
+    private void updateGraph(String hoof, double[] dx, long timeStamp1, long timeStamp2)
+    {
+        stepwise_dr_tu(dx);
+
+        timeSec = timeStamp1 - timeStamp2;
+
+        if (timeSec != StrideLinearFragment.this.timeSec1)
+        {
+            this.timeSec1 = timeSec;
+        }
+        if (this.distance1 >= 0.05)
+        {
+            this.timeSec3 = this.timeSec1 - this.timeSec2;
+            this.timeSec6 += this.timeSec3;
+            this.timeSec2 = this.timeSec1;
+            this.step_counter++;
+            DecimalFormat df1 = new DecimalFormat("0.00");
+            DecimalFormat df2 = new DecimalFormat("000");
+            this.avg = this.distance / ((double) this.step_counter);
+            this.speednow = (this.distance1 * 3.6d) / ((double) (this.timeSec3 / 1000));
+            this.Avgspeed = (this.distance * 3.6d) / ((double) (this.timeSec6 / 1000));
+            this.StepD = this.timeSec6 / ((long) this.step_counter);
+
+            getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
                 {
-                    this.timeSec3 = this.timeSec1 - this.timeSec2;
-                    this.timeSec6 += this.timeSec3;
-                    this.timeSec2 = this.timeSec1;
-                    this.step_counter++;
-                    DecimalFormat df1 = new DecimalFormat("0.00");
-                    DecimalFormat df2 = new DecimalFormat("000");
-                    this.avg = this.distance / ((double) this.step_counter);
-                    this.speednow = (this.distance1 * 3.6d) / ((double) (this.timeSec3 / 1000));
-                    this.Avgspeed = (this.distance * 3.6d) / ((double) (this.timeSec6 / 1000));
-                    this.StepD = this.timeSec6 / ((long) this.step_counter);
+                    StrideLinearFragment.this.mConversationArrayAdapter.add("  " + StrideLinearFragment.this.step_counter + ". x= " + df1.format(StrideLinearFragment.this.final_data[0]) + "m   y= " + df1.format(StrideLinearFragment.this.final_data[1]) + "m   z= " + df1.format(StrideLinearFragment.this.final_data[2]) + "m" + " " + "Speed = " + df1.format(StrideLinearFragment.this.speednow) + "m");
+                    DecimalFormat df = new DecimalFormat("0.000");
+                    String Str = df.format(StrideLinearFragment.this.final_data[0]) + " " + df.format(StrideLinearFragment.this.final_data[1]) + " " + df.format(StrideLinearFragment.this.final_data[2]) + " " + (StrideLinearFragment.this.timeSec6 / 1000) + "." + df2.format(StrideLinearFragment.this.timeSec6 % 1000) + " " + df.format(StrideLinearFragment.this.distance) + "\n";
 
-                    int finalI = i;
-                    getActivity().runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            //Printdata();
-                            StrideLinearFragment.this.mConversationArrayAdapter.add("  " + StrideLinearFragment.this.step_counter + ". x= " + df1.format(StrideLinearFragment.this.final_data[0]) + "m   y= " + df1.format(StrideLinearFragment.this.final_data[1]) + "m   z= " + df1.format(StrideLinearFragment.this.final_data[2]) + "m" + " " + "Speed = " + df1.format(StrideLinearFragment.this.speednow) + "m");
-                            DecimalFormat df = new DecimalFormat("0.000");
-                            String Str = df.format(StrideLinearFragment.this.final_data[0]) + " " + df.format(StrideLinearFragment.this.final_data[1]) + " " + df.format(StrideLinearFragment.this.final_data[2]) + " " + (StrideLinearFragment.this.timeSec6 / 1000) + "." + df2.format(StrideLinearFragment.this.timeSec6 % 1000) + " " + df.format(StrideLinearFragment.this.distance) + "\n";
+                    String[] xyztd = Str.split("\\s+");
+                    float x = toDouble(xyztd[0].trim());
+                    float y = toDouble(xyztd[1].trim());
+                    float z = (float) toDouble(xyztd[2].trim());
+                    double stepLen = (double) toDouble(xyztd[3].trim());
+                    double stepDur = (double) toDouble(xyztd[4].trim());
 
-                            String[] xyztd = Str.split("\\s+");
-                            float x = toDouble(xyztd[0].trim());
-                            float y = toDouble(xyztd[1].trim());
-                            float z = (float) toDouble(xyztd[2].trim());
-                            double stepLen = (double) toDouble(xyztd[3].trim());
-                            double stepDur = (double) toDouble(xyztd[4].trim());
+                    xAxisList.add(Float.valueOf(x));
+                    yAxisList.add(Float.valueOf(z));
+                    zAxisList.add(Float.valueOf(z));
+                    stepLenList.add(Double.valueOf(stepLen));
+                    stepDurList.add(Double.valueOf(stepDur));
+                    stepLenAvg += stepLen;
+                    stepDurAvg += stepDur;
+                    numOfSteps++;
 
-                            xAxisList.add(Float.valueOf(x));
-                            yAxisList.add(Float.valueOf(z));
-                            zAxisList.add(Float.valueOf(z));
-                            stepLenList.add(Double.valueOf(stepLen));
-                            stepDurList.add(Double.valueOf(stepDur));
-                            stepLenAvg += stepLen;
-                            stepDurAvg += stepDur;
-                            numOfSteps++;
+                    if (hoof.equals("Left Hind"))
+                        addChartData(x, y, 0, 0, 0);
+                    else if (hoof.equals("Left Front"))
+                        addChartData(x, 0, y, 0, 0);
+                    else if (hoof.equals("Right Hind"))
+                        addChartData(x, 0, 0, y, 0);
+                    else if (hoof.equals("Right Front"))
+                        addChartData(x, 0, 0, 0, y);
 
-                            if (readings.get(finalI).getHoof().equals("Left Hind"))
-                                addChartData(x, y, 0, 0, 0);
-                            else if (readings.get(finalI).getHoof().equals("Left Front"))
-                                addChartData(x, 0, y, 0, 0);
-                            else if (readings.get(finalI).getHoof().equals("Right Hind"))
-                                addChartData(x, 0, 0, y, 0);
-                            else if (readings.get(finalI).getHoof().equals("Right Front"))
-                                addChartData(x, 0, 0, 0, y);
+                    updateChart();
 
-                            updateChart();
+                    System.out.println(Str);
 
-                            System.out.println(Str);
-
-                            // this.sview = (TextView) view.findViewById(R.id.stepcount);
-                            // this.dis = (TextView) view.findViewById(R.id.dis);
-                            // this.avgspeed = (TextView) view.findViewById(R.id.avgspeed);
-                            // this.f1295X = (TextView) view.findViewById(R.id.X);
-                            // this.f1296Y = (TextView) view.findViewById(R.id.Y);
-                            // this.f1297Z = (TextView) view.findViewById(R.id.Z);
-                            // this.timerValue = (TextView) view.findViewById(R.id.timer);
+                    // this.sview = (TextView) view.findViewById(R.id.stepcount);
+                    // this.dis = (TextView) view.findViewById(R.id.dis);
+                    // this.avgspeed = (TextView) view.findViewById(R.id.avgspeed);
+                    // this.f1295X = (TextView) view.findViewById(R.id.X);
+                    // this.f1296Y = (TextView) view.findViewById(R.id.Y);
+                    // this.f1297Z = (TextView) view.findViewById(R.id.Z);
+                    // this.timerValue = (TextView) view.findViewById(R.id.timer);
 
                             /*StrideLinearFragment.this.xvalues = getXAxisData();
                             StrideLinearFragment.this.yvalues = getYAxisData();
@@ -259,29 +286,29 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
                             StrideLinearFragment.this.graphLH.invalidate();
 
                             StrideLinearFragment.this.plotdraw = StrideLinearFragment.f1294D;*/
-                        }
-                    });
                 }
-            }
+            });
         }
     }
 
     @Override
-    protected void clean() {
+    protected void clean()
+    {
     }
 
     @Override
-    protected void resetData(boolean clearData) {
+    protected void resetData(boolean clearData)
+    {
         super.resetData(clearData);
     }
 
-    public void stepwise_dr_tu()
+    public void stepwise_dr_tu(double[] dx)
     {
         this.sin_phi = (double) ((float) Math.sin(this.x_sw[3]));
         this.cos_phi = (double) ((float) Math.cos(this.x_sw[3]));
-        this.delta[0] = (this.cos_phi * this.dx[0]) - (this.sin_phi * this.dx[1]);
-        this.delta[1] = (this.sin_phi * this.dx[0]) + (this.cos_phi * this.dx[1]);
-        this.delta[2] = this.dx[2];
+        this.delta[0] = (this.cos_phi * dx[0]) - (this.sin_phi * dx[1]);
+        this.delta[1] = (this.sin_phi * dx[0]) + (this.cos_phi * dx[1]);
+        this.delta[2] = dx[2];
         double[] dArr = this.x_sw;
         dArr[0] = dArr[0] + this.delta[0];
         dArr = this.x_sw;
@@ -289,7 +316,7 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
         dArr = this.x_sw;
         dArr[2] = dArr[2] + this.delta[2];
         dArr = this.x_sw;
-        dArr[3] = dArr[3] + this.dx[3];
+        dArr[3] = dArr[3] + dx[3];
         this.final_data[0] = this.x_sw[0];
         this.final_data[1] = this.x_sw[1];
         this.final_data[2] = this.x_sw[2];
@@ -344,7 +371,8 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
     }
 
     @Override
-    protected void fillHelpOptionAdapter(HelpOptionAdapter adapter) {
+    protected void fillHelpOptionAdapter(HelpOptionAdapter adapter)
+    {
         adapter.add(new HelpOption(R.string.config_name_gpio_pin, R.string.config_desc_gpio_pin));
         adapter.add(new HelpOption(R.string.config_name_gpio_read_mode, R.string.config_desc_gpio_read_mode));
         adapter.add(new HelpOption(R.string.config_name_output_control, R.string.config_desc_output_control));

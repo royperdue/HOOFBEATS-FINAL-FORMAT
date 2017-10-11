@@ -228,9 +228,8 @@ public class ScannedDeviceInfo
     public void checkListItemConfiguration()
     {
         Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
-        Horse horse = horseshoe.getHorse();
 
-        if (horseshoe != null && horse.getId() == LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1))
+        if (horseshoe != null)
         {
             deviceName.setText(horseshoe.getHoof());
             radioButton.setChecked(true);

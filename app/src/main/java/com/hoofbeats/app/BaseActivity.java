@@ -272,7 +272,7 @@ public abstract class BaseActivity extends AppCompatActivity
      */
     private void setProfileDetailsInfo(Map<String, Object> item)
     {
-        mToolBarTextView.setText((String) item.get(CustomListAdapter.KEY_NAME));
+        //mToolBarTextView.setText((String) item.get(CustomListAdapter.KEY_NAME));
 
     }
 
