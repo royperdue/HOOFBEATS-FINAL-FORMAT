@@ -9,6 +9,7 @@ import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.arasthel.asyncjob.AsyncJob;
 import com.hoofbeats.app.Config;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOption;
@@ -169,41 +170,82 @@ public class StrideLinearFragment extends ThreeAxisChartFragment
         List<Reading> readings = workouts.get(0).getReadings();
         Collections.sort(readings, (a, b) -> a.getTimestamp() < b.getTimestamp() ? -1 : a.getTimestamp() == b.getTimestamp() ? 0 : 1);
 
-        for (int i = 0; i < readings.size(); i++)
-        {
-            System.out.println("X-----" + readings.get(i).getXValueLinearAcceleration());
-            System.out.println("Y-----" + readings.get(i).getYValueLinearAcceleration());
-            System.out.println("Z-----" + readings.get(i).getZValueLinearAcceleration());
-            if ((i + 1) < readings.size())
-            {
-                if (readings.get(i).getHoof().equals("Left Hind"))
+        new AsyncJob.AsyncJobBuilder<Boolean>()
+                .doInBackground(new AsyncJob.AsyncAction<Boolean>()
                 {
-                    this.dxLH[0] = (double) readings.get(i).getXValueLinearAcceleration();
-                    this.dxLH[1] = (double) readings.get(i).getYValueLinearAcceleration();
-                    this.dxLH[2] = (double) readings.get(i).getZValueLinearAcceleration();
+                    @Override
+                    public Boolean doAsync()
+                    {
+                        for (int i = 0; i < readings.size(); i++)
+                        {
+                            System.out.println("X-----" + readings.get(i).getXValueLinearAcceleration());
+                            System.out.println("Y-----" + readings.get(i).getYValueLinearAcceleration());
+                            System.out.println("Z-----" + readings.get(i).getZValueLinearAcceleration());
+                            if ((i + 1) < readings.size())
+                            {
+                                if (readings.get(i).getHoof().equals("Left Hind"))
+                                {
+                                    StrideLinearFragment.this.dxLH[0] = (double) readings.get(i).getXValueLinearAcceleration();
+                                    StrideLinearFragment.this.dxLH[1] = (double) readings.get(i).getYValueLinearAcceleration();
+                                    StrideLinearFragment.this.dxLH[2] = (double) readings.get(i).getZValueLinearAcceleration();
+                                    int finalI3 = i;
+                                    getActivity().runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            updateGraph("Left Hind", dxLH, readings.get(finalI3 + 1).getTimestamp(), readings.get(finalI3).getTimestamp());
+                                        }
+                                    });
+                                } else if (readings.get(i).getHoof().equals("Left Front"))
+                                {
+                                    StrideLinearFragment.this.dxLF[0] = (double) readings.get(i).getXValueLinearAcceleration();
+                                    StrideLinearFragment.this.dxLF[1] = (double) readings.get(i).getYValueLinearAcceleration();
+                                    StrideLinearFragment.this.dxLF[2] = (double) readings.get(i).getZValueLinearAcceleration();
+                                    int finalI2 = i;
+                                    getActivity().runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            updateGraph("Left Front", dxLF, readings.get(finalI2 + 1).getTimestamp(), readings.get(finalI2).getTimestamp());
+                                        }
+                                    });
+                                } else if (readings.get(i).getHoof().equals("Right Hind"))
+                                {
+                                    StrideLinearFragment.this.dxRH[0] = (double) readings.get(i).getXValueLinearAcceleration();
+                                    StrideLinearFragment.this.dxRH[1] = (double) readings.get(i).getYValueLinearAcceleration();
+                                    StrideLinearFragment.this.dxRH[2] = (double) readings.get(i).getZValueLinearAcceleration();
+                                    int finalI1 = i;
+                                    getActivity().runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            updateGraph("Right Hind", dxRH, readings.get(finalI1 + 1).getTimestamp(), readings.get(finalI1).getTimestamp());
+                                        }
+                                    });
+                                } else if (readings.get(i).getHoof().equals("Right Front"))
+                                {
+                                    StrideLinearFragment.this.dxRF[0] = (double) readings.get(i).getXValueLinearAcceleration();
+                                    StrideLinearFragment.this.dxRF[1] = (double) readings.get(i).getYValueLinearAcceleration();
+                                    StrideLinearFragment.this.dxRF[2] = (double) readings.get(i).getZValueLinearAcceleration();
+                                    int finalI = i;
+                                    getActivity().runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            updateGraph("Right Front", dxRF, readings.get(finalI + 1).getTimestamp(), readings.get(finalI).getTimestamp());
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                }).create().start();
 
-                    updateGraph("Left Hind", dxLH, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
-                } else if (readings.get(i).getHoof().equals("Left Front"))
-                {
-                    this.dxLF[0] = (double) readings.get(i).getXValueLinearAcceleration();
-                    this.dxLF[1] = (double) readings.get(i).getYValueLinearAcceleration();
-                    this.dxLF[2] = (double) readings.get(i).getZValueLinearAcceleration();
-                    updateGraph("Left Front", dxLF, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
-                } else if (readings.get(i).getHoof().equals("Right Hind"))
-                {
-                    this.dxRH[0] = (double) readings.get(i).getXValueLinearAcceleration();
-                    this.dxRH[1] = (double) readings.get(i).getYValueLinearAcceleration();
-                    this.dxRH[2] = (double) readings.get(i).getZValueLinearAcceleration();
-                    updateGraph("Right Hind", dxRH, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
-                } else if (readings.get(i).getHoof().equals("Right Front"))
-                {
-                    this.dxRF[0] = (double) readings.get(i).getXValueLinearAcceleration();
-                    this.dxRF[1] = (double) readings.get(i).getYValueLinearAcceleration();
-                    this.dxRF[2] = (double) readings.get(i).getZValueLinearAcceleration();
-                    updateGraph("Right Front", dxRF, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
-                }
-            }
-        }
     }
 
     private void updateGraph(String hoof, double[] dx, long timeStamp1, long timeStamp2)

@@ -229,7 +229,7 @@ public class HorseProfileActivity extends BaseActivity implements ActivityCompat
 
                                                 horse.resetNotes();
 
-
+                                                startActivity(new Intent(HorseProfileActivity.this, NavigationActivity.class));
                                                 finish();
                                             } else
                                                 DialogUtility.showAlertSnackBarMedium(HorseProfileActivity.this, getString(R.string.message_select_horse_discipline));

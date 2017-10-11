@@ -403,6 +403,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         {
             case R.id.action_new_horse:
                 startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
+                finish();
                 break;
         }
 
@@ -691,6 +692,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 break;
             case 6:
                 startActivity(new Intent(NavigationActivity.this, HorseProfileActivity.class));
+                finish();
                 break;
         }
 
@@ -1534,9 +1536,12 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
-            for (int i = 0; i < bluetoothDevices.size(); i++)
+            if (bluetoothDevices != null)
             {
-                metaWearBoards.add(((BtleService.LocalBinder) service).getMetaWearBoard(bluetoothDevices.get(i)));
+                for (int i = 0; i < bluetoothDevices.size(); i++)
+                {
+                    metaWearBoards.add(((BtleService.LocalBinder) service).getMetaWearBoard(bluetoothDevices.get(i)));
+                }
             }
         }
 
