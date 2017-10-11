@@ -8,23 +8,23 @@
                 tools:context="com.hoofbeats.app.NavigationActivity"
                 tools:showIn="@layout/content_navigation">
 
-    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+                                       xmlns:android="http://schemas.android.com/apk/res/android"
                                        xmlns:app="http://schemas.android.com/apk/res-auto"
-                                       android:id="@+id/toolbar"
-                                       app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                                        android:layout_width="match_parent"
                                        android:layout_height="?attr/actionBarSize"
+                                       android:background="?attr/colorPrimary"
                                        android:minHeight="?attr/actionBarSize"
-                                       android:background="?attr/colorPrimary">
+                                       app:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
         <TextView
             android:id="@+id/text_view_toolbar_title"
-            android:layout_centerInParent="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
             android:textColor="@color/primary_text"
-            android:textSize="@dimen/tool_bar_text_size"
-            android:gravity="center" />
+            android:textSize="@dimen/tool_bar_text_size"/>
 
     </android.support.v7.widget.Toolbar>
 
@@ -80,8 +80,8 @@
             android:id="@+id/toolbar_menu"
             android:layout_width="@dimen/height_toolbar"
             android:layout_height="match_parent"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_gravity="end|center"
             android:padding="15dp"
             android:src="@drawable/ic_arrow_drop_down_circle_white_36dp"/>
@@ -130,9 +130,9 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="vertical"
                         android:paddingLeft="@dimen/pad_20dp"
-                        android:weightSum="12"
-                        android:orientation="vertical">
+                        android:weightSum="12">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
@@ -303,29 +303,40 @@
                             style="@style/HorizontalLine"
                             android:background="@android:color/darker_gray"/>
 
-                        <LinearLayout android:layout_width="match_parent"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                                       android:layout_height="wrap_content"
                                       android:gravity="center"
                                       android:orientation="horizontal"
-                                      android:weightSum="5">
+                                      android:weightSum="3">
                             <Button
-                                android:id="@+id/start_modules_button"
+                                android:id="@+id/capture_button"
                                 style="?android:attr/buttonBarButtonStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="@string/label_capture"
                                 android:textColor="@color/orange"
+                                android:visibility="gone"/>
+                            <Button
+                                android:id="@+id/blescan_control"
+                                style="?android:attr/buttonBarButtonStyle"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="5"
-                                android:gravity="center"
-                                android:text="@string/label_capture"/>
-                            <!--Switch
-                                android:id="@+id/gps_switch"
+                                android:layout_weight="1"
+                                android:text="@string/ble_scan"
+                                android:textColor="@android:color/holo_green_dark"
+                                android:visibility="gone"/>
+                            <Button
+                                android:id="@+id/ble_connect_control"
+                                style="?android:attr/buttonBarButtonStyle"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="2.5"
-                                android:checked="false"
-                                android:gravity="center"
-                                android:text="GPS"
-                                android:textAppearance="?android:attr/textAppearanceSmall"/-->
+                                android:layout_weight="1"
+                                android:text="@string/label_connect"
+                                android:textColor="@android:color/holo_blue_dark"
+                                android:visibility="gone"/>
                         </LinearLayout>
                         <View
                             style="@style/HorizontalLine"

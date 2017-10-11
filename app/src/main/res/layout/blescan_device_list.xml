@@ -3,30 +3,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="top"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/blescan_control"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/ble_scan_cancel"
-            android:textColor="@android:color/holo_green_dark"/>
-
-        <Button
-            android:id="@+id/ble_connect_control"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/label_connect"
-            android:textColor="@android:color/holo_blue_dark"/>
-    </LinearLayout>
     <ListView
         android:id="@+id/blescan_devices"
         android:layout_width="match_parent"

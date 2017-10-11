@@ -20,7 +20,6 @@ import android.os.ParcelUuid;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.hoofbeats.app.Config;
@@ -47,18 +46,13 @@ public class BleScannerFragment extends ModuleFragmentBase
         long getScanDuration();
     }
 
-    //public static final long DEFAULT_SCAN_PERIOD = 5000L;
-    //private static final int REQUEST_ENABLE_BT = 1, PERMISSION_REQUEST_COARSE_LOCATION = 2;
-
     private ScannedDeviceInfoAdapter scannedDevicesAdapter;
-    private Button scanControl;
-    private Button connectControl;
     private Handler mHandler;
-    private boolean isScanning = false;
+    public boolean isScanning = false;
     private BluetoothAdapter btAdapter = null;
     private HashSet<UUID> filterServiceUuids;
     private HashSet<ParcelUuid> api21FilterServiceUuids;
-    private boolean isScanReady;
+    public boolean isScanReady;
     private ScannerCommunicationBus commBus = null;
     private List<String> macAddresses = null;
 
@@ -172,49 +166,6 @@ public class BleScannerFragment extends ModuleFragmentBase
 
         ListView scannedDevices = (ListView) view.findViewById(R.id.blescan_devices);
         scannedDevices.setAdapter(scannedDevicesAdapter);
-        /*if (macAddresses == null)
-        {
-            scannedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener()
-            {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
-                {
-                    stopBleScan();
-
-                    commBus.onDeviceSelected(scannedDevicesAdapter.getItem(i).btDevice);
-                }
-            });
-        }*/
-        scanControl = (Button) view.findViewById(R.id.blescan_control);
-        scanControl.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                if (isScanning)
-                {
-                    stopBleScan();
-                } else
-                {
-                    startBleScan();
-                }
-            }
-        });
-
-        connectControl = (Button) view.findViewById(R.id.ble_connect_control);
-        connectControl.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                if (isScanning)
-                {
-                    stopBleScan();
-                }
-
-                scannedDevicesAdapter.connectAssignedDevices();
-            }
-        });
 
         if (isScanReady)
         {
@@ -240,13 +191,13 @@ public class BleScannerFragment extends ModuleFragmentBase
     {
         if (!checkLocationPermission())
         {
-            scanControl.setText(R.string.ble_scan);
+            //scanControl.setText(R.string.ble_scan);
             return;
         }
 
         scannedDevicesAdapter.clear();
         isScanning = true;
-        scanControl.setText(R.string.ble_scan_cancel);
+        //scanControl.setText(R.string.ble_scan_cancel);
         mHandler.postDelayed(new Runnable()
         {
             @Override
@@ -388,9 +339,6 @@ public class BleScannerFragment extends ModuleFragmentBase
         }
     }
 
-    /**
-     * Stops the Bluetooth LE scan
-     */
     public void stopBleScan()
     {
         if (isScanning)
@@ -404,7 +352,7 @@ public class BleScannerFragment extends ModuleFragmentBase
             }
 
             isScanning = false;
-            scanControl.setText(R.string.ble_scan);
+            //scanControl.setText(R.string.ble_scan);
         }
     }
 

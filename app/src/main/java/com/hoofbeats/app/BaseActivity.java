@@ -6,7 +6,10 @@ import android.animation.ObjectAnimator;
 import android.graphics.RectF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.net.Uri;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hoofbeats.app.adapter.CustomListAdapter;
+import com.hoofbeats.app.bluetooth.BleScannerFragment;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.model.Horseshoe;
 import com.hoofbeats.app.utility.DatabaseUtility;
@@ -41,6 +45,7 @@ import java.util.Map;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
+import no.nordicsemi.android.dfu.DfuServiceInitiator;
 
 public abstract class BaseActivity extends AppCompatActivity
 {
@@ -63,6 +68,13 @@ public abstract class BaseActivity extends AppCompatActivity
     protected FloatingActionButton fab;
     protected Button connectButton;
 
+    protected final String RECONNECT_DIALOG_TAG = "reconnect_dialog_tag";
+    protected final Handler taskScheduler = new Handler();
+    protected Fragment currentFragment = null;
+    protected Uri fileStreamUri;
+    protected String fileName;
+    protected DfuServiceInitiator starter;
+
     public static ShapeDrawable sOverlayShape;
     public static int sScreenWidth;
     public static int sProfileImageHeight;
@@ -78,6 +90,10 @@ public abstract class BaseActivity extends AppCompatActivity
     private AnimatorSet mOpenProfileAnimatorSet;
     private AnimatorSet mCloseProfileAnimatorSet;
     private Animation mProfileButtonShowAnimation;
+
+    protected Button scanControl;
+    protected Button connectControl;
+    protected Button startModulesButton;
 
     protected void initList() {
         mListViewAnimationAdapter = new SwingLeftInAnimationAdapter(getAdapter());
@@ -112,6 +128,9 @@ public abstract class BaseActivity extends AppCompatActivity
                         {
                             macAddresses.add(horseshoes.get(i).getMacAddress());
                         }
+
+                        if (currentFragment != null)
+                            ((BleScannerFragment) currentFragment).setMacAddresses(macAddresses);
                     } else if (horseshoes.size() == 0)
                         DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horseshoes_assigned));
                 } else if (horses.size() == 0)
@@ -121,6 +140,44 @@ public abstract class BaseActivity extends AppCompatActivity
                 showProfileDetails(profileMap, view);
             }
         });
+
+        scanControl = (Button) findViewById(R.id.blescan_control);
+        scanControl.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                if (((BleScannerFragment) currentFragment).isScanning)
+                {
+                    ((BleScannerFragment) currentFragment).stopBleScan();
+                } else
+                {
+                    ((BleScannerFragment) currentFragment).startBleScan();
+                }
+            }
+        });
+
+        connectControl = (Button) findViewById(R.id.ble_connect_control);
+        connectControl.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                if (((BleScannerFragment) currentFragment).isScanning)
+                {
+                    ((BleScannerFragment) currentFragment).stopBleScan();
+                }
+
+                ((BleScannerFragment) currentFragment).getScannedDevicesAdapter().connectAssignedDevices();
+            }
+        });
+
+        if (currentFragment instanceof  BleScannerFragment)
+        {
+            scanControl.setVisibility(View.VISIBLE);
+            connectControl.setVisibility(View.VISIBLE);
+            startModulesButton.setVisibility(View.VISIBLE);
+        }
     }
 
     /**

@@ -35,6 +35,10 @@ public final class Config
     public static final long DEFAULT_SCAN_PERIOD = 5000L;
     public static final int REQUEST_ENABLE_BT = 1, PERMISSION_REQUEST_COARSE_LOCATION = 2;
 
+    public static final int SELECT_FILE_REQ = 1, PERMISSION_REQUEST_READ_STORAGE = 2;
+    public static final String EXTRA_URI = "uri", FRAGMENT_KEY = "NavigationActivity.FRAGMENT_KEY",
+            DFU_PROGRESS_FRAGMENT_TAG = "NavigationActivity.DFU_PROGRESS_FRAGMENT_TAG";
+
     public static final String DEFAULT_DEVICE_NAME = "Hoofbeat";
     //public static final String SERVICE_BOUND = "**serviceBound**";
 
