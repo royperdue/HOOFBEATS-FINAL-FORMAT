@@ -12,10 +12,13 @@ import com.hoofbeats.app.Config;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.model.Horseshoe;
+import com.hoofbeats.app.utility.BoardVault;
 import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.DialogUtility;
 import com.hoofbeats.app.utility.LittleDB;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class ScannedDeviceInfo
@@ -23,6 +26,8 @@ public class ScannedDeviceInfo
     public BluetoothDevice btDevice;
     public int rssi;
     public String hoof;
+    public String horseName;
+    public TextView horseNameTextView;
     public TextView deviceName;
     public TextView deviceRSSI;
     public ImageView rssiChart;
@@ -188,6 +193,28 @@ public class ScannedDeviceInfo
         isConnected = connected;
     }
 
+    public String getHorseName()
+    {
+        return horseName;
+    }
+
+    public void setHorseName(String horseName)
+    {
+        this.horseName = horseName;
+    }
+
+    public TextView getHorseNameTextView()
+    {
+        return horseNameTextView;
+    }
+
+    public void setHorseNameTextView(TextView horseNameTextView)
+    {
+        this.horseNameTextView = horseNameTextView;
+        horseNameTextView.setText(horseName);
+        horseNameTextView.invalidate();
+    }
+
     public void setHoofFromDatabase()
     {
         Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
@@ -201,8 +228,9 @@ public class ScannedDeviceInfo
     public void checkListItemConfiguration()
     {
         Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(btDevice.getAddress());
+        Horse horse = horseshoe.getHorse();
 
-        if (horseshoe != null)
+        if (horseshoe != null && horse.getId() == LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1))
         {
             deviceName.setText(horseshoe.getHoof());
             radioButton.setChecked(true);
@@ -272,6 +300,8 @@ public class ScannedDeviceInfo
             DialogUtility.showNoticeSnackBarShort(activity, activity.getString(R.string.message_successful));
         } else
             DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_unsuccessful));
+
+        deleteSerializedBoard(BoardVault.get().getString(btDevice.getAddress()));
     }
 
     public void setColorCheckMark()
@@ -282,5 +312,24 @@ public class ScannedDeviceInfo
             connectedCheck.setImageDrawable(activity.getDrawable(R.drawable.ic_check_circle_red_700_36dp));
 
         connectedCheck.invalidate();
+    }
+
+    private void deleteSerializedBoard(String path)
+    {
+        File file = new File(path);
+        file.delete();
+        if(file.exists()){
+            try
+            {
+                file.getCanonicalFile().delete();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            if(file.exists()){
+                activity.getApplicationContext().deleteFile(file.getName());
+                System.out.println("----SERIALIZED-BOARD-DELETED---");
+            }
+        }
     }
 }

@@ -28,6 +28,9 @@ import com.hoofbeats.app.R;
 import com.hoofbeats.app.adapter.ScannedDeviceInfoAdapter;
 import com.hoofbeats.app.fragment.ModuleFragmentBase;
 import com.hoofbeats.app.help.HelpOptionAdapter;
+import com.hoofbeats.app.model.Horse;
+import com.hoofbeats.app.model.Horseshoe;
+import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.LittleDB;
 import com.mbientlab.metawear.UnsupportedModuleException;
 
@@ -61,7 +64,8 @@ public class BleScannerFragment extends ModuleFragmentBase
     private HashSet<ParcelUuid> api21FilterServiceUuids;
     public boolean isScanReady;
     private ScannerCommunicationBus commBus = null;
-    private List<String> macAddresses = null;
+    private Horse horse;
+    private List<Horseshoe> horseshoes = null;
 
     public BleScannerFragment()
     {
@@ -118,6 +122,10 @@ public class BleScannerFragment extends ModuleFragmentBase
         {
             isScanReady = true;
         }
+
+        horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
+        if (horse != null)
+            horseshoes = horse.getHorseshoes();
     }
 
     @Override
@@ -225,11 +233,11 @@ public class BleScannerFragment extends ModuleFragmentBase
                         @Override
                         public void run()
                         {
-                            if (macAddresses != null)
+                            if (horseshoes.size() > 0)
                             {
-                                for (int i = 0; i < macAddresses.size(); i++)
+                                for (int i = 0; i < horseshoes.size(); i++)
                                 {
-                                    if (btDevice.getAddress().equals(macAddresses.get(i)))
+                                    if (btDevice.getAddress().equals(horseshoes.get(i).getMacAddress()))
                                     {
                                         if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
                                         {
@@ -240,7 +248,9 @@ public class BleScannerFragment extends ModuleFragmentBase
                                 }
                             } else
                             {
-                                scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi, null));
+                                ScannedDeviceInfo scannedDeviceInfo = new ScannedDeviceInfo(btDevice, rssi, null);
+                                scannedDeviceInfo.setHorseName(horse.getHorseName());
+                                scannedDevicesAdapter.update(scannedDeviceInfo);
                             }
                         }
                     });
@@ -325,17 +335,26 @@ public class BleScannerFragment extends ModuleFragmentBase
                                 @Override
                                 public void run()
                                 {
-                                    if (macAddresses != null)
+                                    List<Horseshoe> horseshoes = null;
+
+                                    if (horse != null)
+                                        horseshoes = horse.getHorseshoes();
+
+                                    if (horseshoes.size() > 0)
                                     {
-                                        for (int i = 0; i < macAddresses.size(); i++)
+                                        for (int i = 0; i < horseshoes.size(); i++)
                                         {
-                                            if (result.getDevice().getAddress().equals(macAddresses.get(i)))
+                                            if (result.getDevice().getAddress().equals(horseshoes.get(i).getMacAddress()))
                                             {
                                                 if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
                                                 {
                                                     ((NavigationActivity) getActivity()).onLogging(result.getDevice());
                                                 } else
-                                                    scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null));
+                                                {
+                                                    ScannedDeviceInfo scannedDeviceInfo = new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null);
+                                                    scannedDeviceInfo.setHorseName(horse.getHorseName());
+                                                    scannedDevicesAdapter.update(scannedDeviceInfo);
+                                                }
                                             }
                                         }
                                     } else
@@ -418,11 +437,6 @@ public class BleScannerFragment extends ModuleFragmentBase
                 }
             }
         }
-    }
-
-    public void setMacAddresses(List<String> macAddresses)
-    {
-        this.macAddresses = macAddresses;
     }
 
     public ScannedDeviceInfoAdapter getScannedDevicesAdapter()

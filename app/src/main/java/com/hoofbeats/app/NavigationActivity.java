@@ -44,6 +44,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.hoofbeats.app.adapter.CustomListAdapter;
 import com.hoofbeats.app.adapter.ScannedDeviceInfoAdapter;
 import com.hoofbeats.app.bluetooth.BleScannerFragment;
@@ -1156,6 +1157,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
         if (wrapper.getMetaWearBoard().isConnected())
         {
+            MaterialDialog materialDialog = DialogUtility.showProgressDialogDownload(NavigationActivity.this);
             Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(bluetoothDevice.getAddress());
 
             wrapper.getLogging().stop();
@@ -1197,8 +1199,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             wrapper.getMetaWearBoard().disconnectAsync();
                             LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING, false);
                             DialogUtility.showDownloadFinishedDialog(NavigationActivity.this);
-
-                            //setup();
+                            materialDialog.dismiss();
                         }
                     });
                     return null;
@@ -1492,8 +1493,8 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         private static final String KEY_BLUETOOTH_DEVICE = "NavigationActivity.ReconnectDialogFragment.KEY_BLUETOOTH_DEVICE";
 
         private ProgressDialog reconnectDialog = null;
-        private BluetoothDevice btDevice = null;
-        private MetaWearBoard currentMwBoard = null;
+        private List<BluetoothDevice> bluetoothDevices;
+        private List<MetaWearBoard> metaWearBoards = new ArrayList<>();
 
         public static ReconnectDialogFragment newInstance(List<BluetoothDevice> bluetoothDevices)
         {
@@ -1510,7 +1511,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState)
         {
-            btDevice = getArguments().getParcelable(KEY_BLUETOOTH_DEVICE);
+            bluetoothDevices = getArguments().getParcelable(KEY_BLUETOOTH_DEVICE);
             getActivity().getApplicationContext().bindService(new Intent(getActivity(), BtleService.class), this, BIND_AUTO_CREATE);
 
             reconnectDialog = new ProgressDialog(getActivity());
@@ -1521,7 +1522,9 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             reconnectDialog.setIndeterminate(true);
             reconnectDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.label_cancel), (dialogInterface, i) ->
             {
-                currentMwBoard.disconnectAsync();
+                for (int j = 0; j < metaWearBoards.size(); j++)
+                    metaWearBoards.get(j).disconnectAsync();
+
                 getActivity().finish();
             });
 
@@ -1531,7 +1534,10 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
-            currentMwBoard = ((BtleService.LocalBinder) service).getMetaWearBoard(btDevice);
+            for (int i = 0; i < bluetoothDevices.size(); i++)
+            {
+                metaWearBoards.add(((BtleService.LocalBinder) service).getMetaWearBoard(bluetoothDevices.get(i)));
+            }
         }
 
         @Override

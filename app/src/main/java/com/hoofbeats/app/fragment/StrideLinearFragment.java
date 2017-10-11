@@ -236,8 +236,6 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
                             else if (readings.get(finalI).getHoof().equals("Right Front"))
                                 addChartData(x, 0, 0, 0, y);
 
-                            sampleCount++;
-
                             updateChart();
 
                             System.out.println(Str);

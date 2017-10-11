@@ -57,6 +57,8 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
 
             this.convertView = convertView;
             viewHolder = new ViewHolder();
+
+            viewHolder.horseName = (TextView) convertView.findViewById(R.id.ble_horse_name);
             viewHolder.deviceName = (TextView) convertView.findViewById(R.id.ble_device);
             viewHolder.deviceName.setText(R.string.app_name);
 
@@ -91,6 +93,7 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
             ScannedDeviceInfo scannedDeviceInfo = getItem(position);
 
             scannedDeviceInfo.setHoof(hoof);
+            scannedDeviceInfo.setHorseNameTextView(viewHolder.horseName);
             scannedDeviceInfo.setActivity(activity);
             scannedDeviceInfo.setConnectedCheck(viewHolder.connectedCheck);
             scannedDeviceInfo.setDeviceName(viewHolder.deviceName);
@@ -142,6 +145,7 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
                     viewHolder.rssiChart.setImageLevel(Math.min(RSSI_BAR_LEVELS - 1, (127 + deviceInfo.rssi + 5) / RSSI_BAR_SCALE));
 
                     scannedDeviceInfo.setHoof(hoof);
+                    scannedDeviceInfo.setHorseNameTextView(viewHolder.horseName);
                     scannedDeviceInfo.setActivity(activity);
                     scannedDeviceInfo.setConnectedCheck(viewHolder.connectedCheck);
                     scannedDeviceInfo.setDeviceName(viewHolder.deviceName);
@@ -186,6 +190,7 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
 
     private class ViewHolder
     {
+        public TextView horseName;
         public TextView deviceName;
         public TextView deviceRSSI;
         public ImageView rssiChart;

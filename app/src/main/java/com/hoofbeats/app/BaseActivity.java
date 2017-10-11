@@ -114,7 +114,7 @@ public abstract class BaseActivity extends AppCompatActivity
         horseHeightTextView = (TextView) findViewById(R.id.horse_height_value);
         horseWeightTextView = (TextView) findViewById(R.id.horse_weight_value);
         horseSexTextView = (TextView) findViewById(R.id.horse_sex_value);
-        horseDisciplineTextView = (TextView) findViewById(R.id.horse_name_value);
+        horseDisciplineTextView = (TextView) findViewById(R.id.horse_discipline_value);
         mListViewAnimationAdapter = new SwingLeftInAnimationAdapter(getAdapter());
         mListViewAnimationAdapter.setAbsListView(mListView);
         mListViewAnimator = mListViewAnimationAdapter.getViewAnimator();
@@ -148,24 +148,6 @@ public abstract class BaseActivity extends AppCompatActivity
                     horseWeightTextView.setText(String.valueOf(horse.getHorseWeight()));
                     horseSexTextView.setText(horse.getHorseSex());
                     horseDisciplineTextView.setText(horse.getDiscipline());
-
-                    if (horse != null)
-                        horseshoes = horse.getHorseshoes();
-                    else
-                        DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horse_found));
-
-                    List<String> macAddresses = new ArrayList<>();
-                    if (horseshoes.size() > 0)
-                    {
-                        for (int i = 0; i < horseshoes.size(); i++)
-                        {
-                            macAddresses.add(horseshoes.get(i).getMacAddress());
-                        }
-
-                        if (currentFragment != null)
-                            ((BleScannerFragment) currentFragment).setMacAddresses(macAddresses);
-                    } else if (horseshoes.size() == 0)
-                        DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horseshoes_assigned));
                 } else if (horses.size() == 0)
                     DialogUtility.showAlertSnackBarMedium(BaseActivity.this, getString(R.string.message_no_horse_found));
 
