@@ -1,6 +1,7 @@
 package com.hoofbeats.app.utility;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -329,5 +330,12 @@ public final class DatabaseUtility
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, horseName, null);
         return Uri.parse(path);
+    }
+
+    public static void deleteHorseProfileImage(Activity activity, String imagePath)
+    {
+        ContentResolver contentResolver = activity.getContentResolver();
+        contentResolver.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.Images.ImageColumns.DATA + "=?" , new String[]{ imagePath });
     }
 }

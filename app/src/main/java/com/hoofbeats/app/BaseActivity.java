@@ -95,18 +95,42 @@ public abstract class BaseActivity extends AppCompatActivity
     protected Button connectControl;
     protected Button startModulesButton;
 
-    protected void initList() {
+    protected TextView horseNameTextView;
+    protected TextView horseAgeTextView;
+    protected TextView horseColorTextView;
+    protected TextView horseBreedTextView;
+    protected TextView horseHeightTextView;
+    protected TextView horseWeightTextView;
+    protected TextView horseSexTextView;
+    protected TextView horseDisciplineTextView;
+
+
+    protected void initList()
+    {
+        horseNameTextView = (TextView) findViewById(R.id.horse_name_value);
+        horseAgeTextView = (TextView) findViewById(R.id.horse_age_value);
+        horseColorTextView = (TextView) findViewById(R.id.horse_color_value);
+        horseBreedTextView = (TextView) findViewById(R.id.horse_breed_value);
+        horseHeightTextView = (TextView) findViewById(R.id.horse_height_value);
+        horseWeightTextView = (TextView) findViewById(R.id.horse_weight_value);
+        horseSexTextView = (TextView) findViewById(R.id.horse_sex_value);
+        horseDisciplineTextView = (TextView) findViewById(R.id.horse_name_value);
         mListViewAnimationAdapter = new SwingLeftInAnimationAdapter(getAdapter());
         mListViewAnimationAdapter.setAbsListView(mListView);
         mListViewAnimator = mListViewAnimationAdapter.getViewAnimator();
-        if (mListViewAnimator != null) {
+
+        if (mListViewAnimator != null)
+        {
             mListViewAnimator.setAnimationDurationMillis(getAnimationDurationCloseProfileDetails());
             mListViewAnimator.disableAnimations();
         }
+
         mListView.setAdapter(mListViewAnimationAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
                 Map<String, Object> profileMap = (Map<String, Object>) parent.getItemAtPosition(position);
                 List<Horse> horses = DatabaseUtility.retrieveHorses();
                 List<Horseshoe> horseshoes = null;
@@ -115,6 +139,15 @@ public abstract class BaseActivity extends AppCompatActivity
                 {
                     LittleDB.get().putLong(Config.SELECTED_HORSE_ID, (Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
                     Horse horse = DatabaseUtility.retrieveHorseForId((Long) profileMap.get(CustomListAdapter.KEY_HORSE_ID));
+
+                    horseNameTextView.setText(horse.getHorseName());
+                    horseAgeTextView.setText(String.valueOf(horse.getHorseAge()));
+                    horseColorTextView.setText(horse.getHorseColor());
+                    horseBreedTextView.setText(horse.getHorseBreed());
+                    horseHeightTextView.setText(String.valueOf(horse.getHorseHeight()));
+                    horseWeightTextView.setText(String.valueOf(horse.getHorseWeight()));
+                    horseSexTextView.setText(horse.getHorseSex());
+                    horseDisciplineTextView.setText(horse.getDiscipline());
 
                     if (horse != null)
                         horseshoes = horse.getHorseshoes();
@@ -172,7 +205,7 @@ public abstract class BaseActivity extends AppCompatActivity
             }
         });
 
-        if (currentFragment instanceof  BleScannerFragment)
+        if (currentFragment instanceof BleScannerFragment)
         {
             scanControl.setVisibility(View.VISIBLE);
             connectControl.setVisibility(View.VISIBLE);
@@ -187,7 +220,8 @@ public abstract class BaseActivity extends AppCompatActivity
      * @param item - data from adapter, that will be set into overlay view.
      * @param view - clicked view.
      */
-    private void showProfileDetails(Map<String, Object> item, final View view) {
+    private void showProfileDetails(Map<String, Object> item, final View view)
+    {
         mListView.setEnabled(false);
 
         int profileDetailsAnimationDelay = getMaxDelayShowDetailsAnimation() * Math.abs(view.getTop())
@@ -204,10 +238,13 @@ public abstract class BaseActivity extends AppCompatActivity
      * @param item - data from adapter, that will be set into overlay view.
      * @param view - clicked view.
      */
-    private void addOverlayListItem(Map<String, Object> item, View view) {
-        if (mOverlayListItemView == null) {
+    private void addOverlayListItem(Map<String, Object> item, View view)
+    {
+        if (mOverlayListItemView == null)
+        {
             mOverlayListItemView = getLayoutInflater().inflate(R.layout.overlay_list_item, mWrapper, false);
-        } else {
+        } else
+        {
             mWrapper.removeView(mOverlayListItemView);
         }
 
@@ -229,7 +266,7 @@ public abstract class BaseActivity extends AppCompatActivity
                     .resize(sScreenWidth, sProfileImageHeight).centerCrop()
                     .placeholder(R.color.blue)
                     .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_reveal_avatar));
-            Picasso.with(BaseActivity.this).load((Integer)item.get(CustomListAdapter.KEY_AVATAR))
+            Picasso.with(BaseActivity.this).load((Integer) item.get(CustomListAdapter.KEY_AVATAR))
                     .resize(sScreenWidth, sProfileImageHeight).centerCrop()
                     .placeholder(R.color.blue)
                     .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_avatar));
@@ -251,7 +288,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @param item - data from adapter, that will be set into overlay view.
      */
-    private void setProfileDetailsInfo(Map<String, Object> item) {
+    private void setProfileDetailsInfo(Map<String, Object> item)
+    {
         mToolBarTextView.setText((String) item.get(CustomListAdapter.KEY_NAME));
 
     }
@@ -264,10 +302,13 @@ public abstract class BaseActivity extends AppCompatActivity
      * @param profileDetailsAnimationDelay - delay before profile toolbar and profile details start their transition
      *                                     animations.
      */
-    private void startRevealAnimation(final int profileDetailsAnimationDelay) {
-        mOverlayListItemView.post(new Runnable() {
+    private void startRevealAnimation(final int profileDetailsAnimationDelay)
+    {
+        mOverlayListItemView.post(new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 getAvatarRevealAnimator().start();
                 getAvatarShowAnimator(profileDetailsAnimationDelay).start();
             }
@@ -279,7 +320,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - animator object that starts circle reveal animation.
      */
-    private SupportAnimator getAvatarRevealAnimator() {
+    private SupportAnimator getAvatarRevealAnimator()
+    {
         final LinearLayout mWrapperListItemReveal = (LinearLayout) mOverlayListItemView.findViewById(R.id.wrapper_list_item_reveal);
 
         int finalRadius = Math.max(mOverlayListItemView.getWidth(), mOverlayListItemView.getHeight());
@@ -291,25 +333,30 @@ public abstract class BaseActivity extends AppCompatActivity
                 dpToPx(getCircleRadiusDp() * 2),
                 finalRadius);
         mRevealAnimator.setDuration(getRevealAnimationDuration());
-        mRevealAnimator.addListener(new SupportAnimator.AnimatorListener() {
+        mRevealAnimator.addListener(new SupportAnimator.AnimatorListener()
+        {
             @Override
-            public void onAnimationStart() {
+            public void onAnimationStart()
+            {
                 mWrapperListItemReveal.setVisibility(View.VISIBLE);
                 mOverlayListItemView.setX(0);
             }
 
             @Override
-            public void onAnimationEnd() {
+            public void onAnimationEnd()
+            {
 
             }
 
             @Override
-            public void onAnimationCancel() {
+            public void onAnimationCancel()
+            {
 
             }
 
             @Override
-            public void onAnimationRepeat() {
+            public void onAnimationRepeat()
+            {
 
             }
         });
@@ -323,7 +370,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *                                     animations.
      * @return - animator object that starts transition animation.
      */
-    private Animator getAvatarShowAnimator(int profileDetailsAnimationDelay) {
+    private Animator getAvatarShowAnimator(int profileDetailsAnimationDelay)
+    {
         final Animator mAvatarShowAnimator = ObjectAnimator.ofFloat(mOverlayListItemView, View.Y, mOverlayListItemView.getTop(), mToolbarProfile.getBottom());
         mAvatarShowAnimator.setDuration(profileDetailsAnimationDelay + getAnimationDurationShowProfileDetails());
         mAvatarShowAnimator.setInterpolator(new DecelerateInterpolator());
@@ -337,7 +385,8 @@ public abstract class BaseActivity extends AppCompatActivity
      * @param profileDetailsAnimationDelay - delay before profile toolbar and profile details
      *                                     start their transition animations.
      */
-    private void animateOpenProfileDetails(int profileDetailsAnimationDelay) {
+    private void animateOpenProfileDetails(int profileDetailsAnimationDelay)
+    {
         createOpenProfileButtonAnimation();
         getOpenProfileAnimatorSet(profileDetailsAnimationDelay).start();
     }
@@ -350,8 +399,10 @@ public abstract class BaseActivity extends AppCompatActivity
      *                                      start their transition animations.
      * @return - animator set that starts transition animations.
      */
-    private AnimatorSet getOpenProfileAnimatorSet(int profileDetailsAnimationDelay) {
-        if (mOpenProfileAnimatorSet == null) {
+    private AnimatorSet getOpenProfileAnimatorSet(int profileDetailsAnimationDelay)
+    {
+        if (mOpenProfileAnimatorSet == null)
+        {
             List<Animator> profileAnimators = new ArrayList<>();
             profileAnimators.add(getOpenProfileToolbarAnimator());
             profileAnimators.add(getOpenProfileDetailsAnimator());
@@ -368,25 +419,31 @@ public abstract class BaseActivity extends AppCompatActivity
     /**
      * This method, if needed, creates and setups animation of scaling button from 0 to 1.
      */
-    private void createOpenProfileButtonAnimation() {
-        if (mProfileButtonShowAnimation == null) {
+    private void createOpenProfileButtonAnimation()
+    {
+        if (mProfileButtonShowAnimation == null)
+        {
             mProfileButtonShowAnimation = AnimationUtils.loadAnimation(this, R.anim.profile_button_scale);
             mProfileButtonShowAnimation.setDuration(getAnimationDurationShowProfileButton());
             mProfileButtonShowAnimation.setInterpolator(new AccelerateInterpolator());
-            mProfileButtonShowAnimation.setAnimationListener(new Animation.AnimationListener() {
+            mProfileButtonShowAnimation.setAnimationListener(new Animation.AnimationListener()
+            {
                 @Override
-                public void onAnimationStart(Animation animation) {
+                public void onAnimationStart(Animation animation)
+                {
                     mButtonProfile.setVisibility(View.VISIBLE);
                     fab.setVisibility(View.GONE);
                 }
 
                 @Override
-                public void onAnimationEnd(Animation animation) {
+                public void onAnimationEnd(Animation animation)
+                {
 
                 }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) {
+                public void onAnimationRepeat(Animation animation)
+                {
 
                 }
             });
@@ -398,11 +455,14 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - animator object.
      */
-    private Animator getOpenProfileToolbarAnimator() {
+    private Animator getOpenProfileToolbarAnimator()
+    {
         Animator mOpenProfileToolbarAnimator = ObjectAnimator.ofFloat(mToolbarProfile, View.Y, -mToolbarProfile.getHeight(), 0);
-        mOpenProfileToolbarAnimator.addListener(new Animator.AnimatorListener() {
+        mOpenProfileToolbarAnimator.addListener(new Animator.AnimatorListener()
+        {
             @Override
-            public void onAnimationStart(Animator animation) {
+            public void onAnimationStart(Animator animation)
+            {
                 mToolbarProfile.setX(0);
                 mToolbarProfile.bringToFront();
                 mToolbarProfile.setVisibility(View.VISIBLE);
@@ -415,19 +475,22 @@ public abstract class BaseActivity extends AppCompatActivity
             }
 
             @Override
-            public void onAnimationEnd(Animator animation) {
+            public void onAnimationEnd(Animator animation)
+            {
                 mButtonProfile.startAnimation(mProfileButtonShowAnimation);
 
                 mState = CustomState.Opened;
             }
 
             @Override
-            public void onAnimationCancel(Animator animation) {
+            public void onAnimationCancel(Animator animation)
+            {
 
             }
 
             @Override
-            public void onAnimationRepeat(Animator animation) {
+            public void onAnimationRepeat(Animator animation)
+            {
 
             }
         });
@@ -439,7 +502,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - animator object.
      */
-    private Animator getOpenProfileDetailsAnimator() {
+    private Animator getOpenProfileDetailsAnimator()
+    {
         Animator mOpenProfileDetailsAnimator = ObjectAnimator.ofFloat(mProfileDetails, View.Y,
                 getResources().getDisplayMetrics().heightPixels,
                 getResources().getDimensionPixelSize(R.dimen.height_profile_picture_with_toolbar));
@@ -450,7 +514,8 @@ public abstract class BaseActivity extends AppCompatActivity
      * This method starts set of transition animations, which hides profile toolbar, profile avatar
      * and profile details views.
      */
-    protected void animateCloseProfileDetails() {
+    protected void animateCloseProfileDetails()
+    {
         mState = CustomState.Closing;
         getCloseProfileAnimatorSet().start();
     }
@@ -462,8 +527,10 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - animator set that starts transition animations.
      */
-    private AnimatorSet getCloseProfileAnimatorSet() {
-        if (mCloseProfileAnimatorSet == null) {
+    private AnimatorSet getCloseProfileAnimatorSet()
+    {
+        if (mCloseProfileAnimatorSet == null)
+        {
             Animator profileToolbarAnimator = ObjectAnimator.ofFloat(mToolbarProfile, View.X,
                     0, mToolbarProfile.getWidth());
 
@@ -489,17 +556,21 @@ public abstract class BaseActivity extends AppCompatActivity
             mCloseProfileAnimatorSet.playTogether(profileAnimators);
             mCloseProfileAnimatorSet.setDuration(getAnimationDurationCloseProfileDetails());
             mCloseProfileAnimatorSet.setInterpolator(new AccelerateInterpolator());
-            mCloseProfileAnimatorSet.addListener(new Animator.AnimatorListener() {
+            mCloseProfileAnimatorSet.addListener(new Animator.AnimatorListener()
+            {
                 @Override
-                public void onAnimationStart(Animator animation) {
-                    if (mListViewAnimator != null) {
+                public void onAnimationStart(Animator animation)
+                {
+                    if (mListViewAnimator != null)
+                    {
                         mListViewAnimator.reset();
                         mListViewAnimationAdapter.notifyDataSetChanged();
                     }
                 }
 
                 @Override
-                public void onAnimationEnd(Animator animation) {
+                public void onAnimationEnd(Animator animation)
+                {
                     mToolbarProfile.setVisibility(View.INVISIBLE);
                     mButtonProfile.setVisibility(View.INVISIBLE);
                     mProfileDetails.setVisibility(View.INVISIBLE);
@@ -511,12 +582,14 @@ public abstract class BaseActivity extends AppCompatActivity
                 }
 
                 @Override
-                public void onAnimationCancel(Animator animation) {
+                public void onAnimationCancel(Animator animation)
+                {
 
                 }
 
                 @Override
-                public void onAnimationRepeat(Animator animation) {
+                public void onAnimationRepeat(Animator animation)
+                {
 
                 }
             });
@@ -530,7 +603,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - ShapeDrawable object.
      */
-    protected ShapeDrawable buildAvatarCircleOverlay() {
+    protected ShapeDrawable buildAvatarCircleOverlay()
+    {
         int radius = 666;
         ShapeDrawable overlay = new ShapeDrawable(new RoundRectShape(null,
                 new RectF(
@@ -544,15 +618,19 @@ public abstract class BaseActivity extends AppCompatActivity
         return overlay;
     }
 
-    public int dpToPx(int dp) {
+    public int dpToPx(int dp)
+    {
         return Math.round((float) dp * getResources().getDisplayMetrics().density);
     }
 
     @Override
-    public void onBackPressed() {
-        if (getState() == CustomState.Opened) {
+    public void onBackPressed()
+    {
+        if (getState() == CustomState.Opened)
+        {
             animateCloseProfileDetails();
-        } else if (getState() == CustomState.Closed) {
+        } else if (getState() == CustomState.Closed)
+        {
             super.onBackPressed();
         }
     }
@@ -565,7 +643,8 @@ public abstract class BaseActivity extends AppCompatActivity
     /**
      * Returns current profile details state.
      */
-    public CustomState getState() {
+    public CustomState getState()
+    {
         return mState;
     }
 
@@ -574,7 +653,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - duration in milliseconds.
      */
-    protected int getRevealAnimationDuration() {
+    protected int getRevealAnimationDuration()
+    {
         return REVEAL_ANIMATION_DURATION;
     }
 
@@ -586,7 +666,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - duration in milliseconds.
      */
-    protected int getMaxDelayShowDetailsAnimation() {
+    protected int getMaxDelayShowDetailsAnimation()
+    {
         return MAX_DELAY_SHOW_DETAILS_ANIMATION;
     }
 
@@ -595,7 +676,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - duration in milliseconds.
      */
-    protected int getAnimationDurationShowProfileDetails() {
+    protected int getAnimationDurationShowProfileDetails()
+    {
         return ANIMATION_DURATION_SHOW_PROFILE_DETAILS;
     }
 
@@ -604,7 +686,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - duration in milliseconds.
      */
-    protected int getStepDelayHideDetailsAnimation() {
+    protected int getStepDelayHideDetailsAnimation()
+    {
         return STEP_DELAY_HIDE_DETAILS_ANIMATION;
     }
 
@@ -613,11 +696,13 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - duration in milliseconds.
      */
-    protected int getAnimationDurationCloseProfileDetails() {
+    protected int getAnimationDurationCloseProfileDetails()
+    {
         return ANIMATION_DURATION_CLOSE_PROFILE_DETAILS;
     }
 
-    protected int getAnimationDurationShowProfileButton() {
+    protected int getAnimationDurationShowProfileButton()
+    {
         return ANIMATION_DURATION_SHOW_PROFILE_BUTTON;
     }
 
@@ -626,7 +711,8 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return - size dp.
      */
-    protected int getCircleRadiusDp() {
+    protected int getCircleRadiusDp()
+    {
         return CIRCLE_RADIUS_DP;
     }
 

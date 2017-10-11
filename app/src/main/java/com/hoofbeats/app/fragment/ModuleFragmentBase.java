@@ -16,21 +16,15 @@ import android.widget.ListView;
 
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.help.HelpOptionAdapter;
-import com.hoofbeats.app.model.Horseshoe;
 import com.hoofbeats.app.model.Wrapper;
-import com.hoofbeats.app.utility.DatabaseUtility;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.UnsupportedModuleException;
 import com.mbientlab.metawear.android.BtleService;
-import com.mbientlab.metawear.module.Logging;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import bolts.Continuation;
-import bolts.Task;
 
 public abstract class ModuleFragmentBase extends Fragment implements ServiceConnection
 {
@@ -144,7 +138,6 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
         {
             boardReady = true;
             boardReady();
-            startDownload();
         } catch (UnsupportedModuleException e)
         {
             unsupportedModule();
@@ -182,67 +175,6 @@ public abstract class ModuleFragmentBase extends Fragment implements ServiceConn
             if (view instanceof ViewGroup)
             {
                 enableDisableViewGroup((ViewGroup) view, enabled);
-            }
-        }
-    }
-
-    public void startDownload()
-    {
-        System.out.println("DOWNLOAD-LOG-CALLED");
-
-        modules = fragBus.getModules();
-
-        for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
-        {
-            if (entry.getKey().getMetaWearBoard().isConnected())
-            {
-                Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(entry.getValue().getAddress());
-
-                entry.getKey().getLogging().stop();
-
-                entry.getKey().getSensorFusionBosch().linearAcceleration().stop();
-                entry.getKey().getSensorFusionBosch().stop();
-
-                horseshoe.setLogging(false);
-                horseshoe.update();
-
-                entry.getKey().getLogging().downloadAsync(100, new Logging.LogDownloadUpdateHandler()
-                {
-                    @Override
-                    public void receivedUpdate(long nEntriesLeft, long totalEntries)
-                    {
-                        getActivity().runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                System.out.println("ENTRIES-REMAINING: " + nEntriesLeft);
-                            }
-                        });
-                    }
-                }).continueWithTask(new Continuation<Void, Task<Void>>()
-                {
-                    @Override
-                    public Task<Void> then(Task<Void> task) throws Exception
-                    {
-                        //wrapper.getLogging().clearEntries();
-                        //metaWearBoard.getModule(Debug.class).resetAfterGc();
-
-                        getActivity().runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                entry.getKey().getMetaWearBoard().tearDown();
-                                entry.getKey().getMetaWearBoard().disconnectAsync();
-                                //DialogUtility.showDownloadFinishedDialog((BaseActivity) getActivity());
-
-                                //setup();
-                            }
-                        });
-                        return null;
-                    }
-                });
             }
         }
     }

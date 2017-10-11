@@ -131,12 +131,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:paddingLeft="@dimen/pad_20dp"
-                        android:weightSum="12">
+                        android:paddingLeft="@dimen/pad_20dp">
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
                             android:orientation="vertical">
 
                             <TableLayout
@@ -203,6 +201,28 @@
 
                                     <TextView
                                         android:id="@+id/horse_color_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:gravity="center_horizontal"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                                </TableRow>
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/pad_2dp">
+
+                                    <TextView
+                                        android:id="@+id/horse_breed_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="@string/label_horse_breed"
+                                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+                                    <TextView
+                                        android:id="@+id/horse_breed_value"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="1"
@@ -305,10 +325,10 @@
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                                      android:layout_height="wrap_content"
-                                      android:gravity="center"
-                                      android:orientation="horizontal"
-                                      android:weightSum="3">
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
                             <Button
                                 android:id="@+id/capture_button"
                                 style="?android:attr/buttonBarButtonStyle"
@@ -318,7 +338,7 @@
                                 android:gravity="center"
                                 android:text="@string/label_capture"
                                 android:textColor="@color/orange"
-                                android:visibility="gone"/>
+                                android:visibility="visible"/>
                             <Button
                                 android:id="@+id/blescan_control"
                                 style="?android:attr/buttonBarButtonStyle"
@@ -327,7 +347,7 @@
                                 android:layout_weight="1"
                                 android:text="@string/ble_scan"
                                 android:textColor="@android:color/holo_green_dark"
-                                android:visibility="gone"/>
+                                android:visibility="visible"/>
                             <Button
                                 android:id="@+id/ble_connect_control"
                                 style="?android:attr/buttonBarButtonStyle"
@@ -336,15 +356,14 @@
                                 android:layout_weight="1"
                                 android:text="@string/label_connect"
                                 android:textColor="@android:color/holo_blue_dark"
-                                android:visibility="gone"/>
+                                android:visibility="visible"/>
                         </LinearLayout>
                         <View
                             style="@style/HorizontalLine"
                             android:background="@android:color/darker_gray"/>
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="9"
+                            android:layout_height="wrap_content"
                             android:orientation="vertical">
                             <FrameLayout android:id="@+id/container"
                                          android:layout_width="match_parent"

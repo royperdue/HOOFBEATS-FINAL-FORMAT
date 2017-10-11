@@ -1,7 +1,9 @@
 package com.hoofbeats.app.utility;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -191,5 +193,15 @@ public final class MathUtility
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
+    }
+
+    public static String convertMilliSecondsToFormattedDate(Float milliSeconds)
+    {
+        String dateFormat = "dd-MM-yyyy hh:mm";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis((long) Float.parseFloat(String.valueOf(milliSeconds)));
+
+        return simpleDateFormat.format(calendar.getTime());
     }
 }

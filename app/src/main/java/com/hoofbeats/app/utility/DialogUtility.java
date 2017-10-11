@@ -20,8 +20,6 @@ import com.liuguangqiang.cookie.CookieBar;
 import com.liuguangqiang.cookie.OnActionClickListener;
 import com.mbientlab.metawear.MetaWearBoard;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Map;
 
 import bolts.Continuation;
@@ -32,16 +30,71 @@ import bolts.Task;
  */
 public final class DialogUtility
 {
-    public static String convertMilliSecondsToFormattedDate(Float milliSeconds)
+    public static void showInformationSnackBarShort(Activity activity, String message)
     {
-        String dateFormat = "dd-MM-yyyy hh:mm";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis((long) Float.parseFloat(String.valueOf(milliSeconds)));
-
-        return simpleDateFormat.format(calendar.getTime());
+        new CookieBar.Builder(activity)
+                .setTitle(activity.getString(R.string.title_notice))
+                .setMessage(message)
+                .setBackgroundColor(R.color.grey_500)
+                .setTitleColor(R.color.grey_100)
+                .setMessageColor(R.color.white)
+                .setDuration(3000)
+                .show();
     }
 
+    public static void showNoticeSnackBarShort(Activity activity, String message)
+    {
+        new CookieBar.Builder(activity)
+                .setTitle(activity.getString(R.string.title_notice))
+                .setMessage(message)
+                .setBackgroundColor(R.color.yellow_500)
+                .setTitleColor(R.color.grey_400)
+                .setMessageColor(R.color.grey_500)
+                .setDuration(3000)
+                .show();
+    }
+
+    public static void showWarningSnackBarLong(Activity activity, String message)
+    {
+        new CookieBar.Builder(activity)
+                .setTitle(activity.getString(R.string.title_notice))
+                .setMessage(message)
+                .setBackgroundColor(R.color.red_600)
+                .setTitleColor(R.color.grey_100)
+                .setMessageColor(R.color.white)
+                .setDuration(4000)
+                .show();
+    }
+
+    public static void showAlertSnackBarMedium(Activity activity, String message)
+    {
+        new CookieBar.Builder(activity)
+                .setTitle(activity.getString(R.string.title_alert))
+                .setMessage(message)
+                .setDuration(3000)
+                .setBackgroundColor(R.color.orange_500)
+                .setActionColor(android.R.color.white)
+                .setTitleColor(R.color.white)
+                .setAction(activity.getString(R.string.label_ok), new OnActionClickListener() {
+                    @Override
+                    public void onClick() {
+
+                    }
+                })
+                .show();
+    }
+
+    public static void showAlertSnackBarShort(Activity activity, String message)
+    {
+        new CookieBar.Builder(activity)
+                .setTitle(activity.getString(R.string.title_notice))
+                .setMessage(message)
+                .setBackgroundColor(R.color.orange_500)
+                .setTitleColor(R.color.grey_100)
+                .setMessageColor(R.color.white)
+                .setDuration(2500)
+                .show();
+    }
 
     public static void showAlertDialog(String message, Activity activity)
     {
@@ -69,7 +122,7 @@ public final class DialogUtility
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which)
                     {
-                        baseActivity.finish();
+                        dialog.dismiss();
                     }
                 }).show();
     }
@@ -169,75 +222,9 @@ public final class DialogUtility
         }
     }
 
-    public static void showInformationSnackBarShort(Activity activity, String message)
+   public static void showConfirmDownloadDialog(NavigationActivity navigationActivity)
     {
-        new CookieBar.Builder(activity)
-                .setTitle(activity.getString(R.string.title_notice))
-                .setMessage(message)
-                .setBackgroundColor(R.color.grey_500)
-                .setTitleColor(R.color.grey_100)
-                .setMessageColor(R.color.white)
-                .setDuration(3000)
-                .show();
-    }
-
-    public static void showNoticeSnackBarShort(Activity activity, String message)
-    {
-        new CookieBar.Builder(activity)
-                .setTitle(activity.getString(R.string.title_notice))
-                .setMessage(message)
-                .setBackgroundColor(R.color.yellow_500)
-                .setTitleColor(R.color.grey_400)
-                .setMessageColor(R.color.grey_500)
-                .setDuration(3000)
-                .show();
-    }
-
-    public static void showWarningSnackBarLong(Activity activity, String message)
-    {
-        new CookieBar.Builder(activity)
-                .setTitle(activity.getString(R.string.title_notice))
-                .setMessage(message)
-                .setBackgroundColor(R.color.red_600)
-                .setTitleColor(R.color.grey_100)
-                .setMessageColor(R.color.white)
-                .setDuration(4000)
-                .show();
-    }
-
-    public static void showAlertSnackBarMedium(Activity activity, String message)
-    {
-        new CookieBar.Builder(activity)
-                .setTitle(activity.getString(R.string.title_alert))
-                .setMessage(message)
-                .setDuration(3000)
-                .setBackgroundColor(R.color.orange_500)
-                .setActionColor(android.R.color.white)
-                .setTitleColor(R.color.white)
-                .setAction(activity.getString(R.string.label_ok), new OnActionClickListener() {
-                    @Override
-                    public void onClick() {
-
-                    }
-                })
-                .show();
-    }
-
-    public static void showAlertSnackBarShort(Activity activity, String message)
-    {
-        new CookieBar.Builder(activity)
-                .setTitle(activity.getString(R.string.title_notice))
-                .setMessage(message)
-                .setBackgroundColor(R.color.orange_500)
-                .setTitleColor(R.color.grey_100)
-                .setMessageColor(R.color.white)
-                .setDuration(2500)
-                .show();
-    }
-
-   public static void showConfirmDownloadDialog(Activity activity, BaseActivity baseActivity)
-    {
-        new MaterialDialog.Builder(activity)
+        new MaterialDialog.Builder(navigationActivity)
                 .title(R.string.title_confirm)
                 .content(R.string.message_confirm_download)
                 .positiveText(R.string.label_ok)
@@ -247,12 +234,11 @@ public final class DialogUtility
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which)
                     {
-                        activity.runOnUiThread(new Runnable()
+                        navigationActivity.runOnUiThread(new Runnable()
                         {
                             @Override
                             public void run()
                             {
-                                //baseActivity.startDownload();
                             }
                         });
 
@@ -261,9 +247,9 @@ public final class DialogUtility
                 }).show();
     }
 
-    public static void showStartLoggingDialog(Activity activity, NavigationActivity navigationActivity)
+    public static void showStartLoggingDialog(NavigationActivity navigationActivity)
     {
-       new MaterialDialog.Builder(activity)
+       new MaterialDialog.Builder(navigationActivity)
                 .title(R.string.title_success)
                 .content(R.string.message_logging_started)
                 .positiveText(R.string.label_ok)
@@ -272,7 +258,7 @@ public final class DialogUtility
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which)
                     {
-                        activity.runOnUiThread(new Runnable()
+                        navigationActivity.runOnUiThread(new Runnable()
                         {
                             @Override
                             public void run()
@@ -332,6 +318,4 @@ public final class DialogUtility
             }
         }
     }
-
-
 }

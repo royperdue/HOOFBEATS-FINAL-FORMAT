@@ -520,6 +520,8 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     @Override
     public void onLogging(BluetoothDevice bluetoothDevice)
     {
+        bluetoothDevices.add(bluetoothDevice);
+        Horse horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
         Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(bluetoothDevice.getAddress());
 
         if (horseshoe.getHoof().equals("Left Hind"))
@@ -543,23 +545,11 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             metaWearBoards.add(metaWearBoard);
             connectBoard("Right Front", null, metaWearBoard);
         }
-
-        Horse horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
-
-        if (metaWearBoards.size() == horse.getHorseshoes().size())
-        {
-            addFragment(1);
-            LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING, false);
-        }
     }
 
     private MetaWearBoard getMetaWearBoard(String hoof, BluetoothDevice bluetoothDevice)
     {
-        MetaWearBoard metaWearBoard = BoardVault.get().getMetaWearBoard(hoof, serviceBinder.getMetaWearBoard(bluetoothDevice));
-
-        metaWearBoards.add(metaWearBoard);
-
-        return metaWearBoard;
+        return BoardVault.get().getMetaWearBoard(hoof, serviceBinder.getMetaWearBoard(bluetoothDevice));
     }
 
     private void connectBoard(String hoof, ScannedDeviceInfo scannedDeviceInfo, MetaWearBoard metaWearBoard)
@@ -667,7 +657,8 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                                     });
                             DialogUtility.showNoticeSnackBarShort(NavigationActivity.this, getString(R.string.message_soft_reset));
                         } else
-                        {   DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.message_no_soft_reset));
+                        {
+                            DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, getString(R.string.message_no_soft_reset));
                         }
                     }
                 }
@@ -715,19 +706,23 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     protected void addFragment(int position)
     {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction= fragmentManager.beginTransaction();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        if (currentFragment != null) {
+        if (currentFragment != null)
+        {
             transaction.detach(currentFragment);
         }
 
-        String fragmentTag= FRAGMENT_CLASSES.get(position).getCanonicalName();
-        currentFragment= fragmentManager.findFragmentByTag(fragmentTag);
+        String fragmentTag = FRAGMENT_CLASSES.get(position).getCanonicalName();
+        currentFragment = fragmentManager.findFragmentByTag(fragmentTag);
 
-        if (currentFragment == null) {
-            try {
-                currentFragment= FRAGMENT_CLASSES.get(position).getConstructor().newInstance();
-            } catch (Exception e) {
+        if (currentFragment == null)
+        {
+            try
+            {
+                currentFragment = FRAGMENT_CLASSES.get(position).getConstructor().newInstance();
+            } catch (Exception e)
+            {
                 throw new RuntimeException("Cannot instantiate fragment", e);
             }
 
@@ -737,7 +732,8 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         transaction.attach(currentFragment).commit();
 
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        if (actionBar != null)
+        {
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(currentFragment.getTag());
         }
@@ -745,35 +741,77 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
     private void setupFragment(MetaWearBoard metaWearBoard, String hoof)
     {
-            Gpio gpio = metaWearBoard.getModule(Gpio.class);
-            SensorFusionBosch sensorFusionBosch = metaWearBoard.getModule(SensorFusionBosch.class);
-            Logging logging = metaWearBoard.getModule(Logging.class);
-            Settings settings = metaWearBoard.getModule(Settings.class);
-            Wrapper wrapper = new Wrapper(gpio, sensorFusionBosch, logging,
-                    settings, metaWearBoard);
+        Gpio gpio = metaWearBoard.getModule(Gpio.class);
+        SensorFusionBosch sensorFusionBosch = metaWearBoard.getModule(SensorFusionBosch.class);
+        Logging logging = metaWearBoard.getModule(Logging.class);
+        Settings settings = metaWearBoard.getModule(Settings.class);
+        Wrapper wrapper = new Wrapper(gpio, sensorFusionBosch, logging,
+                settings, metaWearBoard);
 
-            if (hoof.contains("Left Hind"))
-            {
-                configureGpioLH(wrapper);
-                configureSensorFusionLH(wrapper);
-            } else if (hoof.contains("Left Front"))
-            {
-                configureGpioLF(wrapper);
-                configureSensorFusionLF(wrapper);
-            } else if (hoof.contains("Right Hind"))
-            {
-                configureGpioRH(wrapper);
-                configureSensorFusionRH(wrapper);
-            } else if (hoof.contains("Right Front"))
-            {
-                configureGpioRF(wrapper);
-                configureSensorFusionRF(wrapper);
-            }
-
-        for (BluetoothDevice bluetoothDevice : bluetoothDevices)
+        if (hoof.contains("Left Hind"))
         {
-            if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
-                modules.put(wrapper, bluetoothDevice);
+            configureGpioLH(wrapper);
+            configureSensorFusionLH(wrapper);
+
+            for (BluetoothDevice bluetoothDevice : bluetoothDevices)
+            {
+                if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
+                {
+                    modules.put(wrapper, bluetoothDevice);
+                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                        startDownload(wrapper, bluetoothDevice);
+
+                    break;
+                }
+            }
+        } else if (hoof.contains("Left Front"))
+        {
+            configureGpioLF(wrapper);
+            configureSensorFusionLF(wrapper);
+
+            for (BluetoothDevice bluetoothDevice : bluetoothDevices)
+            {
+                if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
+                {
+                    modules.put(wrapper, bluetoothDevice);
+                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                        startDownload(wrapper, bluetoothDevice);
+
+                    break;
+                }
+            }
+        } else if (hoof.contains("Right Hind"))
+        {
+            configureGpioRH(wrapper);
+            configureSensorFusionRH(wrapper);
+
+            for (BluetoothDevice bluetoothDevice : bluetoothDevices)
+            {
+                if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
+                {
+                    modules.put(wrapper, bluetoothDevice);
+                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                        startDownload(wrapper, bluetoothDevice);
+
+                    break;
+                }
+            }
+        } else if (hoof.contains("Right Front"))
+        {
+            configureGpioRF(wrapper);
+            configureSensorFusionRF(wrapper);
+
+            for (BluetoothDevice bluetoothDevice : bluetoothDevices)
+            {
+                if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
+                {
+                    modules.put(wrapper, bluetoothDevice);
+                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                        startDownload(wrapper, bluetoothDevice);
+
+                    break;
+                }
+            }
         }
     }
     // ************************** Configure horseshoes start ****************************
@@ -808,7 +846,8 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     {
                         wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc().read();
                     }
-                })).continueWith(task -> {
+                })).continueWith(task ->
+        {
             System.out.println("LH-CONFIGURED-2");
             task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
             return null;
@@ -999,7 +1038,8 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();
                             }
-                        })).continueWith(task -> {
+                        })).continueWith(task ->
+        {
             task.getResult().setEnvironment(0, new SaveUtility(NavigationActivity.this));
             return null;
         });
@@ -1086,7 +1126,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 // SET TO FALSE IN THE LOGGING DOWNLOAD SECTION.
                 LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING, true);
 
-                DialogUtility.showStartLoggingDialog(NavigationActivity.this, NavigationActivity.this);
+                DialogUtility.showStartLoggingDialog(NavigationActivity.this);
             }
         }
     }
@@ -1103,9 +1143,69 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 entry.getKey().getMetaWearBoard().tearDown();
                 entry.getKey().getMetaWearBoard().disconnectAsync();
             }
+
+            System.out.println("BOARD-SERIALIZED:");
         }
 
         finish();
+    }
+
+    public void startDownload(Wrapper wrapper, BluetoothDevice bluetoothDevice)
+    {
+        System.out.println("DOWNLOAD-LOG-CALLED");
+
+        if (wrapper.getMetaWearBoard().isConnected())
+        {
+            Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(bluetoothDevice.getAddress());
+
+            wrapper.getLogging().stop();
+
+            wrapper.getSensorFusionBosch().linearAcceleration().stop();
+            wrapper.getSensorFusionBosch().stop();
+
+            horseshoe.setLogging(false);
+            horseshoe.update();
+
+            wrapper.getLogging().downloadAsync(100, new Logging.LogDownloadUpdateHandler()
+            {
+                @Override
+                public void receivedUpdate(long nEntriesLeft, long totalEntries)
+                {
+                    runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            System.out.println("ENTRIES-REMAINING: " + nEntriesLeft);
+                        }
+                    });
+                }
+            }).continueWithTask(new Continuation<Void, Task<Void>>()
+            {
+                @Override
+                public Task<Void> then(Task<Void> task) throws Exception
+                {
+                    wrapper.getLogging().clearEntries();
+                    wrapper.getMetaWearBoard().getModule(Debug.class).resetAfterGc();
+
+                    runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            wrapper.getMetaWearBoard().tearDown();
+                            wrapper.getMetaWearBoard().disconnectAsync();
+                            addFragment(1);
+                            LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING, false);
+                            DialogUtility.showDownloadFinishedDialog(NavigationActivity.this);
+
+                            //setup();
+                        }
+                    });
+                    return null;
+                }
+            });
+        }
     }
 
     //********************* Dfu start **********************************

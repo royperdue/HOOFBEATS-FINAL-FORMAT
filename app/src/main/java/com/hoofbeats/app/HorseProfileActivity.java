@@ -105,7 +105,7 @@ public class HorseProfileActivity extends BaseActivity implements ActivityCompat
         });
 
         horseBreedSpinner = (MaterialSpinner) findViewById(R.id.horse_breed_spinner);
-        horseBreedSpinner.setItems("Thoroughbred", "Quarter Horse", "Andalusian", "Morgan", "Belgian");
+        horseBreedSpinner.setItems("Breed...", "Thoroughbred", "Quarter Horse", "Andalusian", "Morgan", "Belgian");
         horseBreedSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>()
         {
 
@@ -212,6 +212,9 @@ public class HorseProfileActivity extends BaseActivity implements ActivityCompat
                                                 horse.setHorseSex(horseSex);
 
                                                 Bitmap bitmap = Bitmap.createBitmap(horseProfileImage.getDrawingCache());
+
+                                                //if (horse.getProfilePictureURI() != null)
+                                                    //DatabaseUtility.deleteHorseProfileImage(HorseProfileActivity.this, horse.getProfilePictureURI());
 
                                                 horse.setProfilePictureURI(String.valueOf(DatabaseUtility.getImageUri(getApplicationContext(), bitmap, horseName)));
                                                 MyApplication.getInstance().getDaoSession().getHorseDao().insert(horse);
