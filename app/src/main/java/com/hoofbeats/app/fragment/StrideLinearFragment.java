@@ -276,7 +276,7 @@ public class StrideLinearFragment extends SingleDataSensorFragment {
                                 chartData.addXValue(String.format(Locale.US, "%.2f", x));
                             }
 
-                            chartData.addEntry(new Entry(z, sampleCount), 0);
+                            chartData.addEntry(new Entry(y, sampleCount), 0);
 
                             sampleCount++;
 
