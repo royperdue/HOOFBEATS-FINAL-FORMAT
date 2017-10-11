@@ -188,57 +188,25 @@ public class StrideLinearFragment extends ThreeAxisChartFragment
                                     StrideLinearFragment.this.dxLH[0] = (double) readings.get(i).getXValueLinearAcceleration();
                                     StrideLinearFragment.this.dxLH[1] = (double) readings.get(i).getYValueLinearAcceleration();
                                     StrideLinearFragment.this.dxLH[2] = (double) readings.get(i).getZValueLinearAcceleration();
-                                    int finalI3 = i;
-                                    getActivity().runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            updateGraph("Left Hind", dxLH, readings.get(finalI3 + 1).getTimestamp(), readings.get(finalI3).getTimestamp());
-                                        }
-                                    });
+                                    updateGraph("Left Hind", dxLH, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
                                 } else if (readings.get(i).getHoof().equals("Left Front"))
                                 {
                                     StrideLinearFragment.this.dxLF[0] = (double) readings.get(i).getXValueLinearAcceleration();
                                     StrideLinearFragment.this.dxLF[1] = (double) readings.get(i).getYValueLinearAcceleration();
                                     StrideLinearFragment.this.dxLF[2] = (double) readings.get(i).getZValueLinearAcceleration();
-                                    int finalI2 = i;
-                                    getActivity().runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            updateGraph("Left Front", dxLF, readings.get(finalI2 + 1).getTimestamp(), readings.get(finalI2).getTimestamp());
-                                        }
-                                    });
+                                    updateGraph("Left Front", dxLF, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
                                 } else if (readings.get(i).getHoof().equals("Right Hind"))
                                 {
                                     StrideLinearFragment.this.dxRH[0] = (double) readings.get(i).getXValueLinearAcceleration();
                                     StrideLinearFragment.this.dxRH[1] = (double) readings.get(i).getYValueLinearAcceleration();
                                     StrideLinearFragment.this.dxRH[2] = (double) readings.get(i).getZValueLinearAcceleration();
-                                    int finalI1 = i;
-                                    getActivity().runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            updateGraph("Right Hind", dxRH, readings.get(finalI1 + 1).getTimestamp(), readings.get(finalI1).getTimestamp());
-                                        }
-                                    });
+                                    updateGraph("Right Hind", dxRH, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
                                 } else if (readings.get(i).getHoof().equals("Right Front"))
                                 {
                                     StrideLinearFragment.this.dxRF[0] = (double) readings.get(i).getXValueLinearAcceleration();
                                     StrideLinearFragment.this.dxRF[1] = (double) readings.get(i).getYValueLinearAcceleration();
                                     StrideLinearFragment.this.dxRF[2] = (double) readings.get(i).getZValueLinearAcceleration();
-                                    int finalI = i;
-                                    getActivity().runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            updateGraph("Right Front", dxRF, readings.get(finalI + 1).getTimestamp(), readings.get(finalI).getTimestamp());
-                                        }
-                                    });
+                                    updateGraph("Right Front", dxRF, readings.get(i + 1).getTimestamp(), readings.get(i).getTimestamp());
                                 }
                             }
                         }
@@ -260,22 +228,22 @@ public class StrideLinearFragment extends ThreeAxisChartFragment
         }
         if (this.distance1 >= 0.05)
         {
-            this.timeSec3 = this.timeSec1 - this.timeSec2;
-            this.timeSec6 += this.timeSec3;
-            this.timeSec2 = this.timeSec1;
-            this.step_counter++;
-            DecimalFormat df1 = new DecimalFormat("0.00");
-            DecimalFormat df2 = new DecimalFormat("000");
-            this.avg = this.distance / ((double) this.step_counter);
-            this.speednow = (this.distance1 * 3.6d) / ((double) (this.timeSec3 / 1000));
-            this.Avgspeed = (this.distance * 3.6d) / ((double) (this.timeSec6 / 1000));
-            this.StepD = this.timeSec6 / ((long) this.step_counter);
-
             getActivity().runOnUiThread(new Runnable()
             {
                 @Override
                 public void run()
                 {
+                    StrideLinearFragment.this.timeSec3 = StrideLinearFragment.this.timeSec1 - StrideLinearFragment.this.timeSec2;
+                    StrideLinearFragment.this.timeSec6 += StrideLinearFragment.this.timeSec3;
+                    StrideLinearFragment.this.timeSec2 = StrideLinearFragment.this.timeSec1;
+                    StrideLinearFragment.this.step_counter++;
+                    DecimalFormat df1 = new DecimalFormat("0.00");
+                    DecimalFormat df2 = new DecimalFormat("000");
+                    StrideLinearFragment.this.avg = StrideLinearFragment.this.distance / ((double) StrideLinearFragment.this.step_counter);
+                    StrideLinearFragment.this.speednow = (StrideLinearFragment.this.distance1 * 3.6d) / ((double) (StrideLinearFragment.this.timeSec3 / 1000));
+                    StrideLinearFragment.this.Avgspeed = (StrideLinearFragment.this.distance * 3.6d) / ((double) (StrideLinearFragment.this.timeSec6 / 1000));
+                    StrideLinearFragment.this.StepD = StrideLinearFragment.this.timeSec6 / ((long) StrideLinearFragment.this.step_counter);
+
                     StrideLinearFragment.this.mConversationArrayAdapter.add("  " + StrideLinearFragment.this.step_counter + ". x= " + df1.format(StrideLinearFragment.this.final_data[0]) + "m   y= " + df1.format(StrideLinearFragment.this.final_data[1]) + "m   z= " + df1.format(StrideLinearFragment.this.final_data[2]) + "m" + " " + "Speed = " + df1.format(StrideLinearFragment.this.speednow) + "m");
                     DecimalFormat df = new DecimalFormat("0.000");
                     String Str = df.format(StrideLinearFragment.this.final_data[0]) + " " + df.format(StrideLinearFragment.this.final_data[1]) + " " + df.format(StrideLinearFragment.this.final_data[2]) + " " + (StrideLinearFragment.this.timeSec6 / 1000) + "." + df2.format(StrideLinearFragment.this.timeSec6 % 1000) + " " + df.format(StrideLinearFragment.this.distance) + "\n";
