@@ -97,7 +97,7 @@ import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 
 public class NavigationActivity extends BaseActivity implements OnMenuItemClickListener, OnMenuItemLongClickListener,
         ServiceConnection, BleScannerFragment.ScannerCommunicationBus, ModuleFragmentBase.FragmentBus, LoaderManager.LoaderCallbacks<Cursor>,
-        ScannedDeviceInfoAdapter.OnDeviceConfiguredListener
+        ScannedDeviceInfoAdapter.OnDeviceConfiguredListener, BleScannerFragment.OnLoggingListener
 {
     private final static Map<Integer, Class<? extends ModuleFragmentBase>> FRAGMENT_CLASSES;
     private final static Map<String, String> EXTENSION_TO_APP_TYPE;
@@ -518,15 +518,52 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     }
 
     @Override
-    public void onDeviceConfigured(View convertView, ScannedDeviceInfo scannedDeviceInfo)
+    public void onLogging(BluetoothDevice bluetoothDevice)
     {
-        ImageView connectedCheck = (ImageView) convertView.findViewById(R.id.ble_check_connected);
+        Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(bluetoothDevice.getAddress());
 
-        BluetoothDevice bluetoothDevice = scannedDeviceInfo.btDevice;
-        serviceBinder.removeMetaWearBoard(bluetoothDevice);
-        MetaWearBoard metaWearBoard = serviceBinder.getMetaWearBoard(bluetoothDevice);
-        bluetoothDevices.add(bluetoothDevice);
+        if (horseshoe.getHoof().equals("Left Hind"))
+        {
+            MetaWearBoard metaWearBoard = getMetaWearBoard("Left Hind", bluetoothDevice);
+            metaWearBoards.add(metaWearBoard);
+            connectBoard("Left Hind", null, metaWearBoard);
+        } else if (horseshoe.getHoof().equals("Left Front"))
+        {
+            MetaWearBoard metaWearBoard = getMetaWearBoard("Left Front", bluetoothDevice);
+            metaWearBoards.add(metaWearBoard);
+            connectBoard("Left Front", null, metaWearBoard);
+        } else if (horseshoe.getHoof().equals("Right Hind"))
+        {
+            MetaWearBoard metaWearBoard = getMetaWearBoard("Right Hind", bluetoothDevice);
+            metaWearBoards.add(metaWearBoard);
+            connectBoard("Right Hind", null, metaWearBoard);
+        } else if (horseshoe.getHoof().equals("Right Front"))
+        {
+            MetaWearBoard metaWearBoard = getMetaWearBoard("Right Front", bluetoothDevice);
+            metaWearBoards.add(metaWearBoard);
+            connectBoard("Right Front", null, metaWearBoard);
+        }
 
+        Horse horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
+
+        if (metaWearBoards.size() == horse.getHorseshoes().size())
+        {
+            addFragment(1);
+            LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING, false);
+        }
+    }
+
+    private MetaWearBoard getMetaWearBoard(String hoof, BluetoothDevice bluetoothDevice)
+    {
+        MetaWearBoard metaWearBoard = BoardVault.get().getMetaWearBoard(hoof, serviceBinder.getMetaWearBoard(bluetoothDevice));
+
+        metaWearBoards.add(metaWearBoard);
+
+        return metaWearBoard;
+    }
+
+    private void connectBoard(String hoof, ScannedDeviceInfo scannedDeviceInfo, MetaWearBoard metaWearBoard)
+    {
         final ProgressDialog connectDialog = new ProgressDialog(this);
         connectDialog.setTitle(getString(R.string.title_connecting));
         connectDialog.setMessage(getString(R.string.message_wait));
@@ -559,15 +596,31 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             @Override
                             public void run()
                             {
-                                scannedDeviceInfo.setConnected(true);
-                                scannedDeviceInfo.setColorCheckMark();
+                                if (scannedDeviceInfo != null)
+                                {
+                                    scannedDeviceInfo.setConnected(true);
+                                    scannedDeviceInfo.setColorCheckMark();
+                                }
 
-                                setupFragment(metaWearBoard, scannedDeviceInfo.getHoof());
+                                setupFragment(metaWearBoard, hoof);
                             }
                         });
                     }
                     return null;
                 });
+    }
+
+    @Override
+    public void onDeviceConfigured(View convertView, ScannedDeviceInfo scannedDeviceInfo)
+    {
+        ImageView connectedCheck = (ImageView) convertView.findViewById(R.id.ble_check_connected);
+
+        BluetoothDevice bluetoothDevice = scannedDeviceInfo.btDevice;
+        serviceBinder.removeMetaWearBoard(bluetoothDevice);
+        MetaWearBoard metaWearBoard = serviceBinder.getMetaWearBoard(bluetoothDevice);
+        bluetoothDevices.add(bluetoothDevice);
+
+        connectBoard(scannedDeviceInfo.getHoof(), scannedDeviceInfo, metaWearBoard);
     }
 
     @Override
@@ -952,15 +1005,6 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         });
     }// **************************** Configure horseshoes end **********************************
 
-    private MetaWearBoard getMetaWearBoard(String hoof, BluetoothDevice bluetoothDevice)
-    {
-        MetaWearBoard metaWearBoard = BoardVault.get().getMetaWearBoard(hoof, serviceBinder.getMetaWearBoard(bluetoothDevice));
-
-        metaWearBoards.add(metaWearBoard);
-
-        return metaWearBoard;
-    }
-
     private void startModules()
     {
         for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
@@ -1173,7 +1217,6 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
         return true;
     }
-
 
     public static class DfuProgressFragment extends DialogFragment
     {

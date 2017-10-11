@@ -41,28 +41,28 @@ public class BoardVault
     {
         try
         {
-            if (hoof.contains("LH"))
+            if (hoof.contains("Left Hind"))
             {
                 if (!getString(metaWearBoard.getMacAddress()).equals(""))
                 {
                     InputStream inputStream = new FileInputStream(getString(metaWearBoard.getMacAddress()));
                     metaWearBoard.deserialize(inputStream);
                 }
-            } else if (hoof.contains("LF"))
+            } else if (hoof.contains("Left Front"))
             {
                 if (!getString(metaWearBoard.getMacAddress()).equals(""))
                 {
                     InputStream inputStream = new FileInputStream(getString(metaWearBoard.getMacAddress()));
                     metaWearBoard.deserialize(inputStream);
                 }
-            } else if (hoof.contains("RH"))
+            } else if (hoof.contains("Right Hind"))
             {
                 if (!getString(metaWearBoard.getMacAddress()).equals(""))
                 {
                     InputStream inputStream = new FileInputStream(getString(metaWearBoard.getMacAddress()));
                     metaWearBoard.deserialize(inputStream);
                 }
-            } else if (hoof.contains("RF"))
+            } else if (hoof.contains("Right Front"))
             {
                 if (!getString(metaWearBoard.getMacAddress()).equals(""))
                 {
@@ -170,13 +170,13 @@ public class BoardVault
 
     private void savePath(String hoof, String path, String macAddress)
     {
-        if (hoof.contains("LH"))
+        if (hoof.contains("Left Hind"))
             putString(macAddress, path);
-        else if (hoof.contains("LF"))
+        else if (hoof.contains("Left Front"))
             putString(macAddress, path);
-        else if (hoof.contains("RH"))
+        else if (hoof.contains("Right Hind"))
             putString(macAddress, path);
-        else if (hoof.contains("RF"))
+        else if (hoof.contains("Right Front"))
             putString(macAddress, path);
     }
 

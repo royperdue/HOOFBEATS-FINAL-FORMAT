@@ -23,10 +23,12 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.hoofbeats.app.Config;
+import com.hoofbeats.app.NavigationActivity;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.adapter.ScannedDeviceInfoAdapter;
 import com.hoofbeats.app.fragment.ModuleFragmentBase;
 import com.hoofbeats.app.help.HelpOptionAdapter;
+import com.hoofbeats.app.utility.LittleDB;
 import com.mbientlab.metawear.UnsupportedModuleException;
 
 import java.nio.ByteBuffer;
@@ -44,6 +46,11 @@ public class BleScannerFragment extends ModuleFragmentBase
         UUID[] getFilterServiceUuids();
 
         long getScanDuration();
+    }
+
+    public interface OnLoggingListener
+    {
+        void onLogging(BluetoothDevice bluetoothDevice);
     }
 
     private ScannedDeviceInfoAdapter scannedDevicesAdapter;
@@ -224,7 +231,11 @@ public class BleScannerFragment extends ModuleFragmentBase
                                 {
                                     if (btDevice.getAddress().equals(macAddresses.get(i)))
                                     {
-                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi, null));
+                                        if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                                        {
+                                            ((NavigationActivity) getActivity()).onLogging(btDevice);
+                                        } else
+                                            scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi, null));
                                     }
                                 }
                             } else
@@ -320,7 +331,11 @@ public class BleScannerFragment extends ModuleFragmentBase
                                         {
                                             if (result.getDevice().getAddress().equals(macAddresses.get(i)))
                                             {
-                                                scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null));
+                                                if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                                                {
+                                                    ((NavigationActivity) getActivity()).onLogging(result.getDevice());
+                                                } else
+                                                    scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null));
                                             }
                                         }
                                     } else

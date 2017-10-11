@@ -1,7 +1,6 @@
 
 package com.hoofbeats.app.fragment;
 
-import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.View;
@@ -17,14 +16,11 @@ import com.hoofbeats.app.R;
 import com.hoofbeats.app.custom.chart.plot2d;
 import com.hoofbeats.app.help.HelpOption;
 import com.hoofbeats.app.help.HelpOptionAdapter;
-import com.hoofbeats.app.model.Horseshoe;
 import com.hoofbeats.app.model.Reading;
 import com.hoofbeats.app.model.Workout;
-import com.hoofbeats.app.model.Wrapper;
 import com.hoofbeats.app.utility.DatabaseUtility;
 import com.hoofbeats.app.utility.LittleDB;
 import com.mbientlab.metawear.UnsupportedModuleException;
-import com.mbientlab.metawear.module.Logging;
 
 import java.lang.reflect.Array;
 import java.text.DecimalFormat;
@@ -34,9 +30,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import bolts.Continuation;
-import bolts.Task;
 
 
 public class StrideLinearFragment extends SingleDataSensorFragment
@@ -200,14 +193,14 @@ public class StrideLinearFragment extends SingleDataSensorFragment
         }
 
         graphView = (LinearLayout) view.findViewById(R.id.graph);
-        StrideLinearFragment.this.graphView.setOrientation(LinearLayout.HORIZONTAL);
+        this.graphView.setOrientation(LinearLayout.HORIZONTAL);
 
     }
 
     @Override
     protected void boardReady() throws UnsupportedModuleException
     {
-        startDownload();
+        //startDownload();
     }
 
     @Override
@@ -229,9 +222,9 @@ public class StrideLinearFragment extends SingleDataSensorFragment
 
         for (int i = 0; i < readings.size(); i++)
         {
-            StrideLinearFragment.this.dx[0] = (double) readings.get(i).getXValueLinearAcceleration();
-            StrideLinearFragment.this.dx[1] = (double) readings.get(i).getYValueLinearAcceleration();
-            StrideLinearFragment.this.dx[2] = (double) readings.get(i).getZValueLinearAcceleration();
+            this.dx[0] = (double) readings.get(i).getXValueLinearAcceleration();
+            this.dx[1] = (double) readings.get(i).getZValueLinearAcceleration();
+            this.dx[2] = (double) readings.get(i).getYValueLinearAcceleration();
         }
 
         stepwise_dr_tu();
@@ -240,21 +233,21 @@ public class StrideLinearFragment extends SingleDataSensorFragment
 
         if (timeSec != StrideLinearFragment.this.timeSec1)
         {
-            StrideLinearFragment.this.timeSec1 = timeSec;
+            this.timeSec1 = timeSec;
         }
-        if (StrideLinearFragment.this.distance1 >= 0.05d)
+        if (this.distance1 >= 0.05d)
         {
-            StrideLinearFragment.this.timeSec3 = StrideLinearFragment.this.timeSec1 - StrideLinearFragment.this.timeSec2;
-            StrideLinearFragment.this.timeSec6 += StrideLinearFragment.this.timeSec3;
-            StrideLinearFragment.this.timeSec2 = StrideLinearFragment.this.timeSec1;
-            long timeSec5 = StrideLinearFragment.this.f1298c.getTimeInMillis() - StrideLinearFragment.this.filenameDate.getTimeInMillis();
-            StrideLinearFragment.this.step_counter++;
+            this.timeSec3 = this.timeSec1 - this.timeSec2;
+            this.timeSec6 += this.timeSec3;
+            this.timeSec2 = this.timeSec1;
+            long timeSec5 = this.f1298c.getTimeInMillis() - this.filenameDate.getTimeInMillis();
+            this.step_counter++;
             DecimalFormat df1 = new DecimalFormat("0.00");
             DecimalFormat df2 = new DecimalFormat("000");
-            StrideLinearFragment.this.avg = StrideLinearFragment.this.distance / ((double) StrideLinearFragment.this.step_counter);
-            StrideLinearFragment.this.speednow = (StrideLinearFragment.this.distance1 * 3.6d) / ((double) (StrideLinearFragment.this.timeSec3 / 1000));
-            StrideLinearFragment.this.Avgspeed = (StrideLinearFragment.this.distance * 3.6d) / ((double) (StrideLinearFragment.this.timeSec6 / 1000));
-            StrideLinearFragment.this.StepD = StrideLinearFragment.this.timeSec6 / ((long) StrideLinearFragment.this.step_counter);
+            this.avg = this.distance / ((double) this.step_counter);
+            this.speednow = (this.distance1 * 3.6d) / ((double) (this.timeSec3 / 1000));
+            this.Avgspeed = (this.distance * 3.6d) / ((double) (this.timeSec6 / 1000));
+            this.StepD = this.timeSec6 / ((long) this.step_counter);
 
             getActivity().runOnUiThread(new Runnable()
             {
@@ -379,66 +372,5 @@ public class StrideLinearFragment extends SingleDataSensorFragment
         this.f1296Y.invalidate();
         this.f1297Z.setText(" " + this.df1.format(this.final_data[2]));
         this.f1297Z.invalidate();
-    }
-
-    public void startDownload()
-    {
-        System.out.println("DOWNLOAD-LOG-CALLED");
-
-        modules = fragBus.getModules();
-
-        for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
-        {
-            if (entry.getKey().getMetaWearBoard().isConnected())
-            {
-                Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(entry.getValue().getAddress());
-
-                entry.getKey().getLogging().stop();
-
-                entry.getKey().getSensorFusionBosch().linearAcceleration().stop();
-                entry.getKey().getSensorFusionBosch().stop();
-
-                horseshoe.setLogging(false);
-                horseshoe.update();
-
-                entry.getKey().getLogging().downloadAsync(100, new Logging.LogDownloadUpdateHandler()
-                {
-                    @Override
-                    public void receivedUpdate(long nEntriesLeft, long totalEntries)
-                    {
-                        getActivity().runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-
-                            }
-                        });
-                    }
-                }).continueWithTask(new Continuation<Void, Task<Void>>()
-                {
-                    @Override
-                    public Task<Void> then(Task<Void> task) throws Exception
-                    {
-                        //wrapper.getLogging().clearEntries();
-                        //metaWearBoard.getModule(Debug.class).resetAfterGc();
-
-                        getActivity().runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                entry.getKey().getMetaWearBoard().tearDown();
-                                entry.getKey().getMetaWearBoard().disconnectAsync();
-                                //DialogUtility.showDownloadFinishedDialog((BaseActivity) getActivity());
-
-                                setup();
-                            }
-                        });
-                        return null;
-                    }
-                });
-            }
-        }
     }
 }
