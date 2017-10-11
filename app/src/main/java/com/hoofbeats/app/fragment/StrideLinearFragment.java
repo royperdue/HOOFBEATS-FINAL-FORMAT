@@ -192,7 +192,6 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
                     this.timeSec3 = this.timeSec1 - this.timeSec2;
                     this.timeSec6 += this.timeSec3;
                     this.timeSec2 = this.timeSec1;
-                    //long timeSec5 = this.f1298c.getTimeInMillis() - this.filenameDate.getTimeInMillis();
                     this.step_counter++;
                     DecimalFormat df1 = new DecimalFormat("0.00");
                     DecimalFormat df2 = new DecimalFormat("000");
@@ -201,6 +200,7 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
                     this.Avgspeed = (this.distance * 3.6d) / ((double) (this.timeSec6 / 1000));
                     this.StepD = this.timeSec6 / ((long) this.step_counter);
 
+                    int finalI = i;
                     getActivity().runOnUiThread(new Runnable()
                     {
                         @Override
@@ -210,7 +210,6 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
                             StrideLinearFragment.this.mConversationArrayAdapter.add("  " + StrideLinearFragment.this.step_counter + ". x= " + df1.format(StrideLinearFragment.this.final_data[0]) + "m   y= " + df1.format(StrideLinearFragment.this.final_data[1]) + "m   z= " + df1.format(StrideLinearFragment.this.final_data[2]) + "m" + " " + "Speed = " + df1.format(StrideLinearFragment.this.speednow) + "m");
                             DecimalFormat df = new DecimalFormat("0.000");
                             String Str = df.format(StrideLinearFragment.this.final_data[0]) + " " + df.format(StrideLinearFragment.this.final_data[1]) + " " + df.format(StrideLinearFragment.this.final_data[2]) + " " + (StrideLinearFragment.this.timeSec6 / 1000) + "." + df2.format(StrideLinearFragment.this.timeSec6 % 1000) + " " + df.format(StrideLinearFragment.this.distance) + "\n";
-                            //writetofile(StrideLinearFragment.this.filename, Str);
 
                             String[] xyztd = Str.split("\\s+");
                             float x = toDouble(xyztd[0].trim());
@@ -228,8 +227,14 @@ public class StrideLinearFragment extends ThreeAxisChartFragment {
                             stepDurAvg += stepDur;
                             numOfSteps++;
 
-
-                            addChartData(x, y, 0, 0, 0);
+                            if (readings.get(finalI).getHoof().equals("Left Hind"))
+                                addChartData(x, y, 0, 0, 0);
+                            else if (readings.get(finalI).getHoof().equals("Left Front"))
+                                addChartData(x, 0, y, 0, 0);
+                            else if (readings.get(finalI).getHoof().equals("Right Hind"))
+                                addChartData(x, 0, 0, y, 0);
+                            else if (readings.get(finalI).getHoof().equals("Right Front"))
+                                addChartData(x, 0, 0, 0, y);
 
                             sampleCount++;
 
