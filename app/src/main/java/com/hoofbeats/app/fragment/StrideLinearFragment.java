@@ -1,19 +1,14 @@
 package com.hoofbeats.app.fragment;
 
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
 import com.hoofbeats.app.Config;
 import com.hoofbeats.app.R;
 import com.hoofbeats.app.custom.chart.plot2d;
@@ -33,18 +28,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-public class StrideLinearFragment extends SingleDataSensorFragment {
-    private static final int TEMP_SAMPLE_PERIOD = 33;
-    private static final boolean f1294D = true;
+public class StrideLinearFragment extends ThreeAxisChartFragment {
     double Avgspeed;
     private long StepD = 0;
-    private TextView f1295X;
-    private TextView f1296Y;
-    private TextView f1297Z;
-    byte[] ack = new byte[5];
     double avg = 0.0d;
     private TextView avgdur;
     private TextView avgsl;
@@ -78,9 +66,6 @@ public class StrideLinearFragment extends SingleDataSensorFragment {
     int f1300i;
     int f1301j;
     private ArrayAdapter<String> mConversationArrayAdapter;
-    private Button mPlotButton;
-    private Button mStopButton;
-    boolean plotdraw = false;
     SimpleDateFormat sdf;
     private TextView sduration;
     double sin_phi;
@@ -92,34 +77,20 @@ public class StrideLinearFragment extends SingleDataSensorFragment {
     private ImageButton stepdetails;
     private Chronometer stopwatch;
     public String str2;
-    private TextView sview;
-    private Calendar t_origin;
-    byte[] temp = new byte[4];
-    long timeInMilliseconds = 0;
     long timeSec;
     long timeSec1 = 0;
     long timeSec2 = 0;
     long timeSec3 = 0;
     long timeSec6 = 0;
-    long timeSwapBuff = 0;
-    private long timeprint;
-    private int timer;
-    private TextView timerValue;
-
-    private Vibrator vib;
     double[] x_sw = new double[4];
     float[] xvalue = new float[]{-1.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
     public float[] xvalues = new float[1024];
     float[] yvalue = new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     public float[] yvalues = new float[1024];
-
+    private int numOfSteps;
     public List<Double> avgStepDurList;
     public List<Double> avgStepLenList;
     public List<Double> cumulativeDistList;
-    private String fileSep;
-    private int numOfSteps;
-    private String outputDir;
-    private String outputFileName;
     public List<Integer> sNoList;
     public double stepDurAvg;
     public List<Double> stepDurList;
@@ -130,22 +101,15 @@ public class StrideLinearFragment extends SingleDataSensorFragment {
     public List<Float> xAxisList;
     public List<Float> yAxisList;
     public List<Float> zAxisList;
-    protected LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-2, -2);
-    protected LinearLayout graphView;
-
 
     protected List<Workout> workouts = null;
 
     public StrideLinearFragment() {
-        super(R.string.navigation_fragment_stride_linear, "adc", R.layout.fragment_stride_linear, Config.GPIO_SAMPLE_PERIOD / 1000.f, 0, 1023);
+        super("linear", R.layout.fragment_stride_linear, R.string.navigation_fragment_stride_linear, 0f, 14f, 25f);
 
         this.unexpectedData = null;
         this.stepLenAvg = 0.0d;
         this.stepDurAvg = 0.0d;
-        this.numOfSteps = 0;
-        this.outputDir = "";
-        this.outputFileName = "";
-        this.fileSep = "/";
         this.sNoList = new ArrayList();
         this.xAxisList = new ArrayList();
         this.yAxisList = new ArrayList();
@@ -170,9 +134,6 @@ public class StrideLinearFragment extends SingleDataSensorFragment {
         super.onViewCreated(view, savedInstanceState);
 
         System.out.println("ON-VIEW-CREATED");
-
-        //graphView = (LinearLayout) view.findViewById(R.id.graph);
-        //graphView.setOrientation(LinearLayout.HORIZONTAL);
     }
 
     @Override
@@ -189,7 +150,7 @@ public class StrideLinearFragment extends SingleDataSensorFragment {
         this.f1298c = Calendar.getInstance();
         this.filenameDate = Calendar.getInstance();
         this.sdf = new SimpleDateFormat("HHmmss");
-
+        this.numOfSteps = 0;
         this.filenameDate = Calendar.getInstance();
         this.sdf = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
         this.str2 = this.sdf.format(this.filenameDate.getTime());
@@ -268,15 +229,7 @@ public class StrideLinearFragment extends SingleDataSensorFragment {
                             numOfSteps++;
 
 
-                            LineData chartData = chart.getData();
-                            if (startTime == -1) {
-                                chartData.addXValue("0");
-                                startTime= System.currentTimeMillis();
-                            } else {
-                                chartData.addXValue(String.format(Locale.US, "%.2f", x));
-                            }
-
-                            chartData.addEntry(new Entry(y, sampleCount), 0);
+                            addChartData(x, y, 0, 0, 0);
 
                             sampleCount++;
 
@@ -376,15 +329,15 @@ public class StrideLinearFragment extends SingleDataSensorFragment {
 
     public void Printdata()
     {
-        this.dis.setText(" " + this.df1.format(this.distance));
-        this.avgspeed.setText(" " + this.df1.format(this.Avgspeed));
-        this.sview.setText(" " + this.step_counter);
-        this.f1295X.setText(" " + this.df1.format(this.final_data[0]));
-        this.f1295X.invalidate();
-        this.f1296Y.setText(" " + this.df1.format(this.final_data[1]));
-        this.f1296Y.invalidate();
-        this.f1297Z.setText(" " + this.df1.format(this.final_data[2]));
-        this.f1297Z.invalidate();
+        //this.dis.setText(" " + this.df1.format(this.distance));
+        //this.avgspeed.setText(" " + this.df1.format(this.Avgspeed));
+        //this.sview.setText(" " + this.step_counter);
+        //this.f1295X.setText(" " + this.df1.format(this.final_data[0]));
+        //this.f1295X.invalidate();
+        //this.f1296Y.setText(" " + this.df1.format(this.final_data[1]));
+        //this.f1296Y.invalidate();
+        //this.f1297Z.setText(" " + this.df1.format(this.final_data[2]));
+        //this.f1297Z.invalidate();
     }
 
     @Override

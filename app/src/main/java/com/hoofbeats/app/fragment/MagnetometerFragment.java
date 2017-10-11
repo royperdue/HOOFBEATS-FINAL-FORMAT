@@ -39,7 +39,7 @@ public class MagnetometerFragment extends ThreeAxisChartFragment {
                 magnetometer.magneticField();
         producer.addRouteAsync(source -> source.stream((data, env) -> {
             final MagneticField value = data.value(MagneticField.class);
-            addChartData(value.x() * 1000000f, value.y() * 1000000f, value.z() * 1000000f, period);
+            //addChartData(value.x() * 1000000f, value.y() * 1000000f, value.z() * 1000000f, period);
         })).continueWith(task -> {
             streamRoute = task.getResult();
 

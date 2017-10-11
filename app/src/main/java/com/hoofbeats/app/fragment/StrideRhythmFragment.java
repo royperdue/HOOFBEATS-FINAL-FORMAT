@@ -97,7 +97,7 @@ public class StrideRhythmFragment extends ThreeAxisChartFragment
                 accelerometer.acceleration();
         producer.addRouteAsync(source -> source.stream((data, env) -> {
             final Acceleration value = data.value(Acceleration.class);
-            addChartData(value.x(), value.y(), value.z(), samplePeriod);
+            //addChartData(value.x(), value.y(), value.z(), samplePeriod);
         })).continueWith(task -> {
             streamRoute = task.getResult();
             producer.start();

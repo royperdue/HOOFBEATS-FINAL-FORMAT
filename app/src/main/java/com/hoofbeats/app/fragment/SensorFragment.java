@@ -18,7 +18,7 @@ import java.util.Calendar;
 
 public abstract class SensorFragment extends ModuleFragmentBase
 {
-    protected final ArrayList<String> chartXValues= new ArrayList<>();
+    protected final ArrayList<String> chartXValues = new ArrayList<>();
     protected LineChart chart;
     protected int sampleCount;
     protected long prevUpdate = -1;
@@ -26,22 +26,26 @@ public abstract class SensorFragment extends ModuleFragmentBase
     protected float min, max;
     protected Route streamRoute = null;
 
-    private byte globalLayoutListenerCounter= 0;
+    private byte globalLayoutListenerCounter = 0;
     private final int layoutId;
 
-    private final Handler chartHandler= new Handler();
+    private final Handler chartHandler = new Handler();
 
-    protected SensorFragment(int sensorResId, int layoutId, float min, float max) {
+    protected SensorFragment(int sensorResId, int layoutId, float min, float max)
+    {
         super(sensorResId);
-        this.layoutId= layoutId;
-        this.min= min;
-        this.max= max;
+        this.layoutId = layoutId;
+        this.min = min;
+        this.max = max;
     }
 
-    protected void updateChart() {
+    protected void updateChart()
+    {
         long current = Calendar.getInstance().getTimeInMillis();
-        if (prevUpdate == -1 || (current - prevUpdate) >= 33) {
-            chartHandler.post(() -> {
+        if (prevUpdate == -1 || (current - prevUpdate) >= 33)
+        {
+            chartHandler.post(() ->
+            {
                 chart.getData().notifyDataChanged();
                 chart.notifyDataSetChanged();
 
@@ -51,29 +55,36 @@ public abstract class SensorFragment extends ModuleFragmentBase
             prevUpdate = current;
         }
     }
-    private void moveViewToLast() {
+
+    private void moveViewToLast()
+    {
         chart.setVisibleXRangeMinimum(120);
         chart.setVisibleXRangeMaximum(120);
         chart.moveViewToX(Math.max(0f, chartXValues.size() - 1));
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         setRetainInstance(true);
 
-        View v= inflater.inflate(layoutId, container, false);
+        View v = inflater.inflate(layoutId, container, false);
         final View scrollView = v.findViewById(R.id.scrollView);
-        if (scrollView != null && chart != null) {
-            globalLayoutListenerCounter= 1;
-            scrollView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        if (scrollView != null && chart != null)
+        {
+            globalLayoutListenerCounter = 1;
+            scrollView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+            {
                 @Override
-                public void onGlobalLayout() {
+                public void onGlobalLayout()
+                {
                     LineChart.LayoutParams params = chart.getLayoutParams();
                     params.height = scrollView.getHeight();
                     chart.setLayoutParams(params);
 
                     globalLayoutListenerCounter--;
-                    if (globalLayoutListenerCounter < 0) {
+                    if (globalLayoutListenerCounter < 0)
+                    {
                         scrollView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     }
                 }
@@ -84,15 +95,16 @@ public abstract class SensorFragment extends ModuleFragmentBase
     }
 
     @Override
-    public void onViewCreated(final View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
 
         chart = (LineChart) view.findViewById(R.id.data_chart);
 
         initializeChart();
         resetData(false);
-       chart.invalidate();
-       chart.setDescription(null);
+        chart.invalidate();
+        chart.setDescription(null);
 /*
         Button clearButton= (Button) view.findViewById(R.id.layout_two_button_left);
         clearButton.setOnClickListener(view1 -> refreshChart(true));
@@ -117,13 +129,16 @@ public abstract class SensorFragment extends ModuleFragmentBase
             }
         });*/
 
-        ((Switch) view.findViewById(R.id.sample_control)).setOnCheckedChangeListener((compoundButton, b) -> {
-            if (b) {
+        ((Switch) view.findViewById(R.id.sample_control)).setOnCheckedChangeListener((compoundButton, b) ->
+        {
+            if (b)
+            {
                 if (chart != null)
                     moveViewToLast();
 
                 setup();
-            } else {
+            } else
+            {
                 if (chart != null)
                 {
                     chart.setVisibleXRangeMinimum(1);
@@ -139,7 +154,8 @@ public abstract class SensorFragment extends ModuleFragmentBase
         });
     }
 
-    protected void refreshChart(boolean clearData) {
+    protected void refreshChart(boolean clearData)
+    {
         chart.resetTracking();
         chart.clear();
         resetData(clearData);
@@ -147,7 +163,8 @@ public abstract class SensorFragment extends ModuleFragmentBase
         chart.fitScreen();
     }
 
-    protected void initializeChart() {
+    protected void initializeChart()
+    {
         ///< configure axis settings
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setStartAtZero(false);
@@ -157,7 +174,10 @@ public abstract class SensorFragment extends ModuleFragmentBase
     }
 
     protected abstract void setup();
+
     protected abstract void clean();
+
     protected abstract String saveData();
+
     protected abstract void resetData(boolean clearData);
 }
