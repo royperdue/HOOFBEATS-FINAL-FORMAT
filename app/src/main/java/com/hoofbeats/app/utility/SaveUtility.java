@@ -151,7 +151,8 @@ public class SaveUtility
                     List<Reading> readings = sensorFusionReadingDao.queryBuilder()
                             .where(ReadingDao.Properties.Timestamp.eq(LittleDB.get().getLong(Config.TIME_SENSOR_FUSION_READING, -1L))).list();
 
-                    readings.get(0).setForce(forceValue);
+                    if (readings.size() > 0)
+                        readings.get(0).setForce(forceValue);
 
                     ((MyApplication) activity.getApplication()).getDaoSession().getReadingDao().update(readings.get(0));
 

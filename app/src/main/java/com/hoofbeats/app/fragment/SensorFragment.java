@@ -6,8 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Switch;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.hoofbeats.app.R;
 import com.mbientlab.metawear.Route;
 
@@ -61,7 +63,7 @@ public abstract class SensorFragment extends ModuleFragmentBase
 
         View v= inflater.inflate(layoutId, container, false);
         final View scrollView = v.findViewById(R.id.scrollView);
-        if (scrollView != null) {
+        if (scrollView != null && chart != null) {
             globalLayoutListenerCounter= 1;
             scrollView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
@@ -89,27 +91,14 @@ public abstract class SensorFragment extends ModuleFragmentBase
 
         initializeChart();
         resetData(false);
-/*        chart.invalidate();
-        chart.setDescription(null);
-
+       chart.invalidate();
+       chart.setDescription(null);
+/*
         Button clearButton= (Button) view.findViewById(R.id.layout_two_button_left);
         clearButton.setOnClickListener(view1 -> refreshChart(true));
         clearButton.setText(R.string.label_clear);
 
-        ((Switch) view.findViewById(R.id.sample_control)).setOnCheckedChangeListener((compoundButton, b) -> {
-            if (b) {
-                moveViewToLast();
-                setup();
-            } else {
-                chart.setVisibleXRangeMinimum(1);
-                chart.setVisibleXRangeMaximum(sampleCount);
-                clean();
-                if (streamRoute != null) {
-                    streamRoute.remove();
-                    streamRoute = null;
-                }
-            }
-        });
+
 
         Button saveButton= (Button) view.findViewById(R.id.layout_two_button_right);
         saveButton.setText(R.string.label_save);
@@ -127,23 +116,44 @@ public abstract class SensorFragment extends ModuleFragmentBase
                 startActivity(Intent.createChooser(intent, "Saving Data"));
             }
         });*/
+
+        ((Switch) view.findViewById(R.id.sample_control)).setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                if (chart != null)
+                    moveViewToLast();
+
+                setup();
+            } else {
+                if (chart != null)
+                {
+                    chart.setVisibleXRangeMinimum(1);
+                    chart.setVisibleXRangeMaximum(sampleCount);
+                    clean();
+                    if (streamRoute != null)
+                    {
+                        streamRoute.remove();
+                        streamRoute = null;
+                    }
+                }
+            }
+        });
     }
 
     protected void refreshChart(boolean clearData) {
-       // chart.resetTracking();
-        //chart.clear();
+        chart.resetTracking();
+        chart.clear();
         resetData(clearData);
-        //chart.invalidate();
-       // chart.fitScreen();
+        chart.invalidate();
+        chart.fitScreen();
     }
 
     protected void initializeChart() {
         ///< configure axis settings
-        //YAxis leftAxis = chart.getAxisLeft();
-        //leftAxis.setStartAtZero(false);
-        //leftAxis.setAxisMaxValue(max);
-        //leftAxis.setAxisMinValue(min);
-        //chart.getAxisRight().setEnabled(false);
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setStartAtZero(false);
+        leftAxis.setAxisMaxValue(max);
+        leftAxis.setAxisMinValue(min);
+        chart.getAxisRight().setEnabled(false);
     }
 
     protected abstract void setup();
