@@ -181,15 +181,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         mProfileDetails = (LinearLayout) findViewById(R.id.wrapper_profile_details);
         mToolBarTextView = (TextView) findViewById(R.id.text_view_toolbar_title);
         connectButton = (Button) findViewById(R.id.ble_connect_control);
-        mButtonProfile = findViewById(R.id.button_profile);
-        mButtonProfile.post(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                mInitialProfileButtonX = mButtonProfile.getX();
-            }
-        });
+
         findViewById(R.id.toolbar_profile_back).setOnClickListener(new View.OnClickListener()
         {
             @Override

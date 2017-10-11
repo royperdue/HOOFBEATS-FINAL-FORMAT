@@ -380,15 +380,4 @@
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
-
-    <include
-        android:id="@+id/button_profile"
-        layout="@layout/button_round_msg"
-        android:layout_width="@dimen/size_button_message"
-        android:layout_height="@dimen/size_button_message"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="@dimen/margin_top_button_message"
-        android:visibility="invisible"/>
-
 </RelativeLayout>

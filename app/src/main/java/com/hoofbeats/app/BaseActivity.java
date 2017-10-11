@@ -63,7 +63,6 @@ public abstract class BaseActivity extends AppCompatActivity
     protected RelativeLayout mToolbarProfile;
     protected LinearLayout mProfileDetails;
     protected TextView mToolBarTextView;
-    protected View mButtonProfile;
     protected NestedScrollView nestedScrollView;
     protected FloatingActionButton fab;
     protected Button connectButton;
@@ -84,8 +83,6 @@ public abstract class BaseActivity extends AppCompatActivity
 
     private View mOverlayListItemView;
     private CustomState mState = CustomState.Closed;
-
-    protected float mInitialProfileButtonX;
 
     private AnimatorSet mOpenProfileAnimatorSet;
     private AnimatorSet mCloseProfileAnimatorSet;
@@ -413,7 +410,6 @@ public abstract class BaseActivity extends AppCompatActivity
                 @Override
                 public void onAnimationStart(Animation animation)
                 {
-                    mButtonProfile.setVisibility(View.VISIBLE);
                     fab.setVisibility(View.GONE);
                 }
 
@@ -451,16 +447,11 @@ public abstract class BaseActivity extends AppCompatActivity
                 mProfileDetails.setX(0);
                 mProfileDetails.bringToFront();
                 mProfileDetails.setVisibility(View.VISIBLE);
-
-                mButtonProfile.setX(mInitialProfileButtonX);
-                mButtonProfile.bringToFront();
             }
 
             @Override
             public void onAnimationEnd(Animator animation)
             {
-                mButtonProfile.startAnimation(mProfileButtonShowAnimation);
-
                 mState = CustomState.Opened;
             }
 
@@ -520,10 +511,6 @@ public abstract class BaseActivity extends AppCompatActivity
                     0, mOverlayListItemView.getWidth());
             profilePhotoAnimator.setStartDelay(getStepDelayHideDetailsAnimation());
 
-            Animator profileButtonAnimator = ObjectAnimator.ofFloat(mButtonProfile, View.X,
-                    mInitialProfileButtonX, mOverlayListItemView.getWidth() + mInitialProfileButtonX);
-            profileButtonAnimator.setStartDelay(getStepDelayHideDetailsAnimation() * 2);
-
             Animator profileDetailsAnimator = ObjectAnimator.ofFloat(mProfileDetails, View.X,
                     0, mToolbarProfile.getWidth());
             profileDetailsAnimator.setStartDelay(getStepDelayHideDetailsAnimation() * 2);
@@ -531,7 +518,6 @@ public abstract class BaseActivity extends AppCompatActivity
             List<Animator> profileAnimators = new ArrayList<>();
             profileAnimators.add(profileToolbarAnimator);
             profileAnimators.add(profilePhotoAnimator);
-            profileAnimators.add(profileButtonAnimator);
             profileAnimators.add(profileDetailsAnimator);
 
             mCloseProfileAnimatorSet = new AnimatorSet();
@@ -554,7 +540,6 @@ public abstract class BaseActivity extends AppCompatActivity
                 public void onAnimationEnd(Animator animation)
                 {
                     mToolbarProfile.setVisibility(View.INVISIBLE);
-                    mButtonProfile.setVisibility(View.INVISIBLE);
                     mProfileDetails.setVisibility(View.INVISIBLE);
                     fab.setVisibility(View.VISIBLE);
                     mListView.setEnabled(true);
