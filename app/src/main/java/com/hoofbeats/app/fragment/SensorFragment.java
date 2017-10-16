@@ -172,7 +172,7 @@ public abstract class SensorFragment extends ModuleFragmentBase
         ///< configure axis settings
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setStartAtZero(false);
-        leftAxis.setAxisMaxValue(10);
+        leftAxis.setAxisMaxValue(max);
         leftAxis.setAxisMinValue(0);
         chart.getAxisRight().setEnabled(false);
     }

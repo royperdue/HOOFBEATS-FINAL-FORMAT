@@ -828,7 +828,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                         SaveUtility saveUtility = ((SaveUtility) env[0]);
                         saveUtility.setSensor(Config.SENSOR_FUSION_BOSCH);
                         saveUtility.setHoof("Left Hind");
-                        saveUtility.setTimestamp(data.timestamp().getTimeInMillis());
+                        saveUtility.setTimestamp(System.nanoTime());
                         saveUtility.setxValueLinearAcceleration(data.value(Acceleration.class).x());
                         saveUtility.setyValueLinearAcceleration(data.value(Acceleration.class).y());
                         saveUtility.setzValueLinearAcceleration(data.value(Acceleration.class).z());
@@ -864,7 +864,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     {
                         ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
                         ((SaveUtility) env[0]).setHoof("Left Front");
-                        ((SaveUtility) env[0]).setTimestamp(data.timestamp().getTimeInMillis());
+                        ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                         ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
                         ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
                         ((SaveUtility) env[0]).setzValueLinearAcceleration(data.value(Acceleration.class).z());
@@ -899,7 +899,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     {
                         ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
                         ((SaveUtility) env[0]).setHoof("Right Hind");
-                        ((SaveUtility) env[0]).setTimestamp(data.timestamp().getTimeInMillis());
+                        ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                         ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
                         ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
                         ((SaveUtility) env[0]).setzValueLinearAcceleration(data.value(Acceleration.class).z());
@@ -934,7 +934,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     {
                         ((SaveUtility) env[0]).setSensor(Config.SENSOR_FUSION_BOSCH);
                         ((SaveUtility) env[0]).setHoof("Right Front");
-                        ((SaveUtility) env[0]).setTimestamp(data.timestamp().getTimeInMillis());
+                        ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                         ((SaveUtility) env[0]).setxValueLinearAcceleration(data.value(Acceleration.class).x());
                         ((SaveUtility) env[0]).setyValueLinearAcceleration(data.value(Acceleration.class).y());
                         ((SaveUtility) env[0]).setzValueLinearAcceleration(data.value(Acceleration.class).z());
@@ -956,6 +956,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
     private void configureGpioLH(Wrapper wrapper)
     {
+        wrapper.getGpio().pin((byte) 0).setOutput();
         wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc()
                 .addRouteAsync(source -> source
                         .log((data, env) ->
@@ -966,7 +967,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
                                 ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
                                 ((SaveUtility) env[0]).setHoof("Left Hind");
-                                ((SaveUtility) env[0]).setTimestamp(data.timestamp().getTimeInMillis());
+                                ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();
                             }
@@ -979,6 +980,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
     private void configureGpioLF(Wrapper wrapper)
     {
+        wrapper.getGpio().pin((byte) 0).setOutput();
         wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc()
                 .addRouteAsync(source -> source
                         .log((data, env) ->
@@ -987,7 +989,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             {
                                 ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
                                 ((SaveUtility) env[0]).setHoof("Left Front");
-                                ((SaveUtility) env[0]).setTimestamp(data.timestamp().getTimeInMillis());
+                                ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();
                             }
@@ -1000,6 +1002,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
     private void configureGpioRH(Wrapper wrapper)
     {
+        wrapper.getGpio().pin((byte) 0).setOutput();
         wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc()
                 .addRouteAsync(source -> source
                         .log((data, env) ->
@@ -1008,7 +1011,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             {
                                 ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
                                 ((SaveUtility) env[0]).setHoof("Right Hind");
-                                ((SaveUtility) env[0]).setTimestamp(data.timestamp().getTimeInMillis());
+                                ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();
                             }
@@ -1021,6 +1024,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
 
     private void configureGpioRF(Wrapper wrapper)
     {
+        wrapper.getGpio().pin((byte) 0).setOutput();
         wrapper.getGpio().pin(Config.GPIO_PIN).analogAdc()
                 .addRouteAsync(source -> source
                         .log((data, env) ->
@@ -1029,7 +1033,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                             {
                                 ((SaveUtility) env[0]).setSensor(Config.GPIO_SENSOR);
                                 ((SaveUtility) env[0]).setHoof("Right Front");
-                                ((SaveUtility) env[0]).setTimestamp(data.timestamp().getTimeInMillis());
+                                ((SaveUtility) env[0]).setTimestamp(System.nanoTime());
                                 ((SaveUtility) env[0]).setForceValue(data.value(Short.class));
                                 ((SaveUtility) env[0]).executeSave();
                             }

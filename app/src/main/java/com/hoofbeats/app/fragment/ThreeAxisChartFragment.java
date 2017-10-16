@@ -18,6 +18,7 @@ public abstract class ThreeAxisChartFragment extends SensorFragment
     private final ArrayList<Entry> axisDataLF = new ArrayList<>();
     private final ArrayList<Entry> axisDataRH = new ArrayList<>();
     private final ArrayList<Entry> axisDataRF = new ArrayList<>();
+    private final ArrayList<Entry> xAxisValues = new ArrayList<>();
     private final String dataType;
     protected float samplePeriod;
 
@@ -26,7 +27,8 @@ public abstract class ThreeAxisChartFragment extends SensorFragment
         LineData chartData = chart.getData();
         chartData.addXValue(String.format(Locale.US, "%.2f", x));
 
-        chartData.addEntry(new Entry(y0, sampleCountLH), 0);
+        if (y0 > 0)
+            chartData.addEntry(new Entry(y0, sampleCountLH), 0);
 
         sampleCountLH++;
 
@@ -38,7 +40,8 @@ public abstract class ThreeAxisChartFragment extends SensorFragment
         LineData chartData = chart.getData();
         chartData.addXValue(String.format(Locale.US, "%.2f", x));
 
-        chartData.addEntry(new Entry(y1, sampleCountLF), 1);
+        if (y1 > 0)
+            chartData.addEntry(new Entry(y1, sampleCountLF), 1);
 
         sampleCountLF++;
 
@@ -50,7 +53,8 @@ public abstract class ThreeAxisChartFragment extends SensorFragment
         LineData chartData = chart.getData();
         chartData.addXValue(String.format(Locale.US, "%.2f", x));
 
-        chartData.addEntry(new Entry(y2, sampleCountRH), 2);
+        if (y2 > 0)
+            chartData.addEntry(new Entry(y2, sampleCountRH), 2);
 
         sampleCountRH++;
 
@@ -62,7 +66,8 @@ public abstract class ThreeAxisChartFragment extends SensorFragment
         LineData chartData = chart.getData();
         chartData.addXValue(String.format(Locale.US, "%.2f", x));
 
-        chartData.addEntry(new Entry(y3, sampleCountRF), 3);
+        if (y3 > 0)
+            chartData.addEntry(new Entry(y3, sampleCountRF), 3);
 
         sampleCountRF++;
 
@@ -118,10 +123,11 @@ public abstract class ThreeAxisChartFragment extends SensorFragment
     {
         if (clearData)
         {
+            sampleCount = 0;
             sampleCountLH = 0;
             sampleCountLF = 0;
             sampleCountRH = 0;
-            sampleCountRF = 0;
+            sampleCount = 0;
             chartXValues.clear();
             axisDataLH.clear();
             axisDataLF.clear();
