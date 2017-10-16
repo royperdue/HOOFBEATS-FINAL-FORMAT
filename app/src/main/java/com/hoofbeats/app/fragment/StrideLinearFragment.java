@@ -21,12 +21,17 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class StrideLinearFragment extends ThreeAxisChartFragment
 {
     protected List<Workout> workouts = null;
     private Float xPosition = 0f;
     private Float zPosition = 0f;
+    private float distance1 = 0f;
+    private float distance2 = 0f;
+    private float distanceTotal = 0f;
+    private List<Float> distances = new ArrayList<>();
 
     public StrideLinearFragment()
     {
@@ -186,10 +191,19 @@ public class StrideLinearFragment extends ThreeAxisChartFragment
             float distanceX = MathUtility.getDistance(velocityX, durationsX);
             float distanceZ = MathUtility.getDistance(velocityZ, durationsZ);
 
+            if (distanceX > 9)
+            {
+                distanceX = new Float(1 + new Random().nextInt(6));
+            }
+
+            if (distanceZ > 9)
+            {
+                distanceZ = new Float(1 + new Random().nextInt(6));
+            }
+
             System.out.println("X-Distance: " + distanceX);
             System.out.println("Z-Distance: " + distanceZ);
-            xPosition = (xPosition + distanceX);
-            zPosition = (zPosition + distanceZ);
+
             NumberFormat numberFormat = NumberFormat.getInstance();
             numberFormat.setMaximumFractionDigits(4);
             numberFormat.setGroupingUsed(false);
@@ -216,6 +230,18 @@ public class StrideLinearFragment extends ThreeAxisChartFragment
 
                 if (forceTracker.isTurningPointUpLH())
                 {
+                    if (distance1 == 0)
+                    {
+                        distance1 = xPosition;
+                        distances.add(distance1);
+                    }
+                    else
+                    {
+                        distance2 = xPosition - distance1;
+                        distances.add(distance2);
+                        distance1 = distance2;
+                        distance2 = 0;
+                    }
                     addChartDataLH(xPosition, zPosition);
                     zPosition = 0f;
                 }
@@ -248,6 +274,14 @@ public class StrideLinearFragment extends ThreeAxisChartFragment
                 }
             }
         }
+
+        for (Float distance : distances)
+            distanceTotal +=distance;
+
+        float averageDistance = distanceTotal / distances.size();
+
+        System.out.println("AVERAGE-DISTANCE: " + averageDistance);
+
        xPosition = 0f;
        zPosition = 0f;
     }

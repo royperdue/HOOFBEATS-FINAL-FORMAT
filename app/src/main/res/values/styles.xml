@@ -2,10 +2,10 @@
 <resources>
     <style name="Widget.ActionBar"
            parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="background">@color/actionBarColor</item>
-        <item name="android:background">@color/actionBarColor</item>
-        <item name="android:backgroundStacked">@color/actionBarColor</item>
-        <item name="android:backgroundSplit">@color/actionBarColor</item>
+        <item name="background">@color/gray</item>
+        <item name="android:background">@color/gray</item>
+        <item name="android:backgroundStacked">@color/gray</item>
+        <item name="android:backgroundSplit">@color/gray</item>
         <item name="android:displayOptions">useLogo|showHome|showTitle</item>
     </style>
 
@@ -16,13 +16,13 @@
         <item name="android:actionBarStyle">@style/Widget.ActionBar</item>
         <item name="actionBarStyle">@style/Widget.ActionBar</item>
         <item name="android:windowBackground">@mipmap/background</item>
-        <item name="colorPrimary">@color/actionBarColor</item>
-        <item name="colorPrimaryDark">@color/actionBarColorDark</item>
+        <item name="colorPrimary">@color/gray</item>
+        <item name="colorPrimaryDark">@color/gray</item>
     </style>
 
     <style name="EditTextLabel"
            parent="TextAppearance.AppCompat.Medium">
-        <item name="android:textColor">@color/orange</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="HorizontalLine">
@@ -63,7 +63,7 @@
     <style name="TextView" />
 
     <style name="TextView.DefaultStyle">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:textSize">@dimen/menu_text_size</item>
     </style>
 </resources>

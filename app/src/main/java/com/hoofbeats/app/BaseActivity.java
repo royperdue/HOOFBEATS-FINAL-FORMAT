@@ -189,21 +189,21 @@ public abstract class BaseActivity extends AppCompatActivity
         {
             Picasso.with(BaseActivity.this).load(String.valueOf(item.get(CustomListAdapter.KEY_AVATAR)))
                     .resize(sScreenWidth, sProfileImageHeight).centerCrop()
-                    .placeholder(R.color.blue)
+                    .placeholder(R.color.gray)
                     .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_reveal_avatar));
             Picasso.with(BaseActivity.this).load(String.valueOf(item.get(CustomListAdapter.KEY_AVATAR)))
                     .resize(sScreenWidth, sProfileImageHeight).centerCrop()
-                    .placeholder(R.color.blue)
+                    .placeholder(R.color.gray)
                     .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_avatar));
         } else
         {
             Picasso.with(BaseActivity.this).load((Integer) item.get(CustomListAdapter.KEY_AVATAR))
                     .resize(sScreenWidth, sProfileImageHeight).centerCrop()
-                    .placeholder(R.color.blue)
+                    .placeholder(R.color.gray)
                     .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_reveal_avatar));
             Picasso.with(BaseActivity.this).load((Integer) item.get(CustomListAdapter.KEY_AVATAR))
                     .resize(sScreenWidth, sProfileImageHeight).centerCrop()
-                    .placeholder(R.color.blue)
+                    .placeholder(R.color.gray)
                     .into((ImageView) mOverlayListItemView.findViewById(R.id.image_view_avatar));
         }
 
@@ -544,18 +544,6 @@ public abstract class BaseActivity extends AppCompatActivity
     public int dpToPx(int dp)
     {
         return Math.round((float) dp * getResources().getDisplayMetrics().density);
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        if (getState() == CustomState.Opened)
-        {
-            animateCloseProfileDetails();
-        } else if (getState() == CustomState.Closed)
-        {
-            super.onBackPressed();
-        }
     }
 
     /**

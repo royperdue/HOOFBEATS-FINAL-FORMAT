@@ -401,14 +401,20 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             mMenuDialogFragment.dismiss();
         } else
         {
-            for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
+            if (getState() == CustomState.Opened)
             {
-                BoardVault.get().putMetaWearBoard(entry.getValue().getName(), Config.SERIALIZED_BOARDS_FILE,
-                        entry.getKey().getMetaWearBoard().getMacAddress(), entry.getKey().getMetaWearBoard());
-            }
+                animateCloseProfileDetails();
+            } else
+            {
+                for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
+                {
+                    BoardVault.get().putMetaWearBoard(entry.getValue().getName(), Config.SERIALIZED_BOARDS_FILE,
+                            entry.getKey().getMetaWearBoard().getMacAddress(), entry.getKey().getMetaWearBoard());
+                }
 
-            finish();
-            super.onBackPressed();
+                finish();
+                super.onBackPressed();
+            }
         }
 
     }

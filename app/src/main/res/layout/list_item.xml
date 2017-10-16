@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
-    android:background="@color/gray">
+    android:background="@color/purple_800">
 
     <ImageView
         android:id="@+id/image_view_avatar"
@@ -40,7 +40,7 @@
 
     <TextView
         android:id="@+id/text_view_description"
-        android:textColor="@color/orange"
+        android:textColor="@color/white"
         android:textSize="18sp"
         android:padding="10dp"
         android:fontFamily="sans-serif"
