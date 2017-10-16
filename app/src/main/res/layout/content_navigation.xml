@@ -53,7 +53,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:padding="15dp"
-            android:src="@drawable/ic_arrow_left"/>
+            android:src="@drawable/ic_arrow_back_white_36dp"/>
 
         <RelativeLayout
             android:layout_width="200dp"
@@ -84,7 +84,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="end|center"
             android:padding="15dp"
-            android:src="@drawable/ic_arrow_drop_down_circle_white_36dp"/>
+            android:src="@drawable/ic_add_circle_outline_white_36dp"/>
 
     </RelativeLayout>
 

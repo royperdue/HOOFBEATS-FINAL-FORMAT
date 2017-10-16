@@ -222,7 +222,7 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
                 {
                     ScannedDeviceInfo deviceInfo = getItem(i);
 
-                    if (deviceInfo != null)
+                    if (deviceInfo != null && deviceInfo.isAssigned)
                         onDeviceConfiguredListener.onDeviceConfigured(hoof, convertView, deviceInfo);
                 } else
                     DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_convertView_null));

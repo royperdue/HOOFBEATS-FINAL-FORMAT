@@ -169,52 +169,149 @@ public class StrideLinearFragment extends ThreeAxisChartFragment
         List<Reading> readingsLF = new ArrayList<>();
         List<Reading> readingsRH = new ArrayList<>();
         List<Reading> readingsRF = new ArrayList<>();
+        List<Reading> readings = null;
 
-        List<Reading> readings = workouts.get(0).getReadings();
-        Collections.sort(readings, (a, b) -> a.getTimestamp() < b.getTimestamp() ? -1 : a.getTimestamp() == b.getTimestamp() ? 0 : 1);
-
-        for (int i = 0; i < readings.size(); i++)
+        if (workouts.size() > 0)
         {
-            if (readings.get(i).getHoof().equals("Left Hind"))
-                readingsLH.add(readings.get(i));
-            else if (readings.get(i).getHoof().equals("Left Front"))
-                readingsLF.add(readings.get(i));
-            else if (readings.get(i).getHoof().equals("Right Hind"))
-                readingsRH.add(readings.get(i));
-            else if (readings.get(i).getHoof().equals("Right Front"))
-                readingsRF.add(readings.get(i));
-        }
+            readings = workouts.get(0).getReadings();
 
-        if (readingsLH.size() > 0)
-        {
-            new AsyncJob.AsyncJobBuilder<Boolean>()
-                    .doInBackground(new AsyncJob.AsyncAction<Boolean>()
-                    {
-                        @Override
-                        public Boolean doAsync()
+            Collections.sort(readings, (a, b) -> a.getTimestamp() < b.getTimestamp() ? -1 : a.getTimestamp() == b.getTimestamp() ? 0 : 1);
+
+            for (int i = 0; i < readings.size(); i++)
+            {
+                if (readings.get(i).getHoof().equals("Left Hind"))
+                    readingsLH.add(readings.get(i));
+                else if (readings.get(i).getHoof().equals("Left Front"))
+                    readingsLF.add(readings.get(i));
+                else if (readings.get(i).getHoof().equals("Right Hind"))
+                    readingsRH.add(readings.get(i));
+                else if (readings.get(i).getHoof().equals("Right Front"))
+                    readingsRF.add(readings.get(i));
+            }
+
+            if (readingsLH.size() > 0)
+            {
+                new AsyncJob.AsyncJobBuilder<Boolean>()
+                        .doInBackground(new AsyncJob.AsyncAction<Boolean>()
                         {
-                            Collections.sort(readingsLH, (a, b) -> a.getTimestamp() < b.getTimestamp() ? -1 : a.getTimestamp() == b.getTimestamp() ? 0 : 1);
-
-                            for (int i = 0; i < readingsLH.size(); i++)
+                            @Override
+                            public Boolean doAsync()
                             {
-                                System.out.println("X-----" + readingsLH.get(i).getXValueLinearAcceleration());
-                                System.out.println("Y-----" + readingsLH.get(i).getZValueLinearAcceleration());
-                                System.out.println("Z-----" + readingsLH.get(i).getZValueLinearAcceleration());
-                                if ((i + 1) < readingsLH.size())
+                                Collections.sort(readingsLH, (a, b) -> a.getTimestamp() < b.getTimestamp() ? -1 : a.getTimestamp() == b.getTimestamp() ? 0 : 1);
+
+                                for (int i = 0; i < readingsLH.size(); i++)
                                 {
-                                    StrideLinearFragment.this.dxLH[0] = (double) readingsLH.get(i).getXValueLinearAcceleration();
-                                    StrideLinearFragment.this.dxLH[1] = (double) readingsLH.get(i).getZValueLinearAcceleration();
-                                    StrideLinearFragment.this.dxLH[2] = (double) readingsLH.get(i).getZValueLinearAcceleration();
-                                    stepwise_dr_tu(dxLH);
-
-                                    timeSec = readingsLH.get(i).getTimestamp() - readingsLH.get(i + 1).getTimestamp();
-
-                                    if (timeSec != StrideLinearFragment.this.timeSec1)
+                                    System.out.println("X-----" + readingsLH.get(i).getXValueLinearAcceleration());
+                                    System.out.println("Y-----" + readingsLH.get(i).getYValueLinearAcceleration());
+                                    System.out.println("Z-----" + readingsLH.get(i).getZValueLinearAcceleration());
+                                    if ((i + 1) < readingsLH.size())
                                     {
-                                        StrideLinearFragment.this.timeSec1 = timeSec;
+                                        StrideLinearFragment.this.dxLH[0] = (double) readingsLH.get(i).getXValueLinearAcceleration();
+                                        StrideLinearFragment.this.dxLH[1] = (double) readingsLH.get(i).getYValueLinearAcceleration();
+                                        StrideLinearFragment.this.dxLH[2] = (double) readingsLH.get(i).getZValueLinearAcceleration();
+                                        sin_phi = (double) ((float) Math.sin(x_sw[3]));
+                                        cos_phi = (double) ((float) Math.cos(x_sw[3]));
+                                        delta[0] = (cos_phi * dxLH[0]) - (sin_phi * dxLH[1]);
+                                        delta[1] = (sin_phi * dxLH[0]) + (cos_phi * dxLH[1]);
+                                        delta[2] = dxLH[2];
+                                        double[] dArr = x_sw;
+                                        dArr[0] = dArr[0] + delta[0];
+                                        dArr = x_sw;
+                                        dArr[1] = dArr[1] + delta[1];
+                                        dArr = x_sw;
+                                        dArr[2] = dArr[2] + delta[2];
+                                        dArr = x_sw;
+                                        dArr[3] = dArr[3] + dxLH[3];
+                                        final_data[0] = x_sw[0];
+                                        final_data[1] = x_sw[1];
+                                        final_data[2] = x_sw[2];
+                                        distance1 = Math.sqrt(((delta[0] * delta[0]) + (delta[1] * delta[1])) + (delta[2] * delta[2]));
+                                        distance += Math.sqrt((delta[0] * delta[0]) + (delta[1] * delta[1]));
+
+                                        timeSec = readingsLH.get(i).getTimestamp() - readingsLH.get(i + 1).getTimestamp();
+
+                                        if (timeSec != StrideLinearFragment.this.timeSec1)
+                                        {
+                                            StrideLinearFragment.this.timeSec1 = timeSec;
+                                        }
+                                        StrideLinearFragment.this.timeSec3 = StrideLinearFragment.this.timeSec1 - StrideLinearFragment.this.timeSec2;
+                                        StrideLinearFragment.this.timeSec6 += StrideLinearFragment.this.timeSec3;
+                                        StrideLinearFragment.this.timeSec2 = StrideLinearFragment.this.timeSec1;
+                                        StrideLinearFragment.this.step_counter++;
+                                        DecimalFormat df1 = new DecimalFormat("0.00");
+                                        DecimalFormat df2 = new DecimalFormat("000");
+                                        StrideLinearFragment.this.avg = StrideLinearFragment.this.distance / ((double) StrideLinearFragment.this.step_counter);
+                                        StrideLinearFragment.this.speednow = (StrideLinearFragment.this.distance1 * 3.6d) / ((double) (StrideLinearFragment.this.timeSec3 / 1000));
+                                        StrideLinearFragment.this.Avgspeed = (StrideLinearFragment.this.distance * 3.6d) / ((double) (StrideLinearFragment.this.timeSec6 / 1000));
+                                        StrideLinearFragment.this.StepD = StrideLinearFragment.this.timeSec6 / ((long) StrideLinearFragment.this.step_counter);
+
+                                        StrideLinearFragment.this.mConversationArrayAdapter.add("  " + StrideLinearFragment.this.step_counter + ". x= " + df1.format(StrideLinearFragment.this.final_data[0]) + "m   y= " + df1.format(StrideLinearFragment.this.final_data[1]) + "m   z= " + df1.format(StrideLinearFragment.this.final_data[2]) + "m" + " " + "Speed = " + df1.format(StrideLinearFragment.this.speednow) + "m");
+                                        DecimalFormat df = new DecimalFormat("0.000");
+                                        String Str = df.format(StrideLinearFragment.this.final_data[0]) + " " + df.format(StrideLinearFragment.this.final_data[1]) + " " + df.format(StrideLinearFragment.this.final_data[2]) + " " + (StrideLinearFragment.this.timeSec6 / 1000) + "." + df2.format(StrideLinearFragment.this.timeSec6 % 1000) + " " + df.format(StrideLinearFragment.this.distance) + "\n";
+
+                                        String[] xyztd = Str.split("\\s+");
+                                        float x = toDouble(xyztd[0].trim());
+                                        float y = toDouble(xyztd[1].trim());
+                                        float z = toDouble(xyztd[2].trim());
+                                        double stepLen = (double) toDouble(xyztd[3].trim());
+                                        double stepDur = (double) toDouble(xyztd[4].trim());
+
+                                        // xAxisList.add(Float.valueOf(x));
+                                        // yAxisList.add(Float.valueOf(z));
+                                        // zAxisList.add(Float.valueOf(z));
+                                        stepLenList.add(Double.valueOf(stepLen));
+                                        stepDurList.add(Double.valueOf(stepDur));
+                                        stepLenAvg += stepLen;
+                                        stepDurAvg += stepDur;
+                                        numOfSteps++;
+
+                                        addChartDataLH(y, z);
+
+                                        System.out.println(Str);
+
+                                        // this.sview = (TextView) view.findViewById(R.id.stepcount);
+                                        // this.dis = (TextView) view.findViewById(R.id.dis);
+                                        // this.avgspeed = (TextView) view.findViewById(R.id.avgspeed);
+                                        // this.f1295X = (TextView) view.findViewById(R.id.X);
+                                        // this.f1296Y = (TextView) view.findViewById(R.id.Y);
+                                        // this.f1297Z = (TextView) view.findViewById(R.id.Z);
+                                        // this.timerValue = (TextView) view.findViewById(R.id.timer);
                                     }
-                                    if (StrideLinearFragment.this.distance1 >= 0.05)
+                                }
+                                return true;
+                            }
+                        }).create().start();
+
+            } else
+                System.out.println("READINGS-LH-SIZE-EQUALS-ZERO");
+
+            if (readingsLF.size() > 0)
+            {
+                new AsyncJob.AsyncJobBuilder<Boolean>()
+                        .doInBackground(new AsyncJob.AsyncAction<Boolean>()
+                        {
+                            @Override
+                            public Boolean doAsync()
+                            {
+                                Collections.sort(readingsLF, (a, b) -> a.getTimestamp() < b.getTimestamp() ? -1 : a.getTimestamp() == b.getTimestamp() ? 0 : 1);
+
+                                for (int i = 0; i < readingsLF.size(); i++)
+                                {
+                                    if ((i + 1) < readingsLF.size())
                                     {
+                                        StrideLinearFragment.this.dxLF[0] = (double) readingsLF.get(i).getXValueLinearAcceleration();
+                                        StrideLinearFragment.this.dxLF[1] = (double) readingsLF.get(i).getZValueLinearAcceleration();
+                                        StrideLinearFragment.this.dxLF[2] = (double) readingsLF.get(i).getZValueLinearAcceleration();
+                                        stepwise_dr_tu(dxLF);
+
+                                        timeSec = readingsLF.get(i).getTimestamp() - readingsLF.get(i + 1).getTimestamp();
+
+                                        if (timeSec != StrideLinearFragment.this.timeSec1)
+                                        {
+                                            StrideLinearFragment.this.timeSec1 = timeSec;
+                                        }
+                                        //if (StrideLinearFragment.this.distance1 >= 0.05)
+                                        //{
                                         getActivity().runOnUiThread(new Runnable()
                                         {
                                             @Override
@@ -242,116 +339,29 @@ public class StrideLinearFragment extends ThreeAxisChartFragment
                                                 double stepLen = (double) toDouble(xyztd[3].trim());
                                                 double stepDur = (double) toDouble(xyztd[4].trim());
 
-                                               // xAxisList.add(Float.valueOf(x));
-                                               // yAxisList.add(Float.valueOf(z));
-                                               // zAxisList.add(Float.valueOf(z));
                                                 stepLenList.add(Double.valueOf(stepLen));
                                                 stepDurList.add(Double.valueOf(stepDur));
                                                 stepLenAvg += stepLen;
                                                 stepDurAvg += stepDur;
                                                 numOfSteps++;
 
-                                                addChartDataLH(x, y);
+                                                addChartDataLF(x, y);
 
                                                 System.out.println(Str);
 
-                                                // this.sview = (TextView) view.findViewById(R.id.stepcount);
-                                                // this.dis = (TextView) view.findViewById(R.id.dis);
-                                                // this.avgspeed = (TextView) view.findViewById(R.id.avgspeed);
-                                                // this.f1295X = (TextView) view.findViewById(R.id.X);
-                                                // this.f1296Y = (TextView) view.findViewById(R.id.Y);
-                                                // this.f1297Z = (TextView) view.findViewById(R.id.Z);
-                                                // this.timerValue = (TextView) view.findViewById(R.id.timer);
-
                                             }
                                         });
+                                        // }
+
                                     }
-
                                 }
+                                return true;
                             }
-                            return true;
-                        }
-                    }).create().start();
+                        }).create().start();
 
-        } else
-            System.out.println("READINGS-LH-SIZE-EQUALS-ZERO");
-
-        if (readingsLF.size() > 0)
-        {
-            new AsyncJob.AsyncJobBuilder<Boolean>()
-                    .doInBackground(new AsyncJob.AsyncAction<Boolean>()
-                    {
-                        @Override
-                        public Boolean doAsync()
-                        {
-                            Collections.sort(readingsLF, (a, b) -> a.getTimestamp() < b.getTimestamp() ? -1 : a.getTimestamp() == b.getTimestamp() ? 0 : 1);
-
-                            for (int i = 0; i < readingsLF.size(); i++)
-                            {
-                                if ((i + 1) < readingsLF.size())
-                                {
-                                    StrideLinearFragment.this.dxLF[0] = (double) readingsLF.get(i).getXValueLinearAcceleration();
-                                    StrideLinearFragment.this.dxLF[1] = (double) readingsLF.get(i).getZValueLinearAcceleration();
-                                    StrideLinearFragment.this.dxLF[2] = (double) readingsLF.get(i).getZValueLinearAcceleration();
-                                    stepwise_dr_tu(dxLF);
-
-                                    timeSec = readingsLF.get(i).getTimestamp() - readingsLF.get(i + 1).getTimestamp();
-
-                                    if (timeSec != StrideLinearFragment.this.timeSec1)
-                                    {
-                                        StrideLinearFragment.this.timeSec1 = timeSec;
-                                    }
-                                    //if (StrideLinearFragment.this.distance1 >= 0.05)
-                                    //{
-                                    getActivity().runOnUiThread(new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            StrideLinearFragment.this.timeSec3 = StrideLinearFragment.this.timeSec1 - StrideLinearFragment.this.timeSec2;
-                                            StrideLinearFragment.this.timeSec6 += StrideLinearFragment.this.timeSec3;
-                                            StrideLinearFragment.this.timeSec2 = StrideLinearFragment.this.timeSec1;
-                                            StrideLinearFragment.this.step_counter++;
-                                            DecimalFormat df1 = new DecimalFormat("0.00");
-                                            DecimalFormat df2 = new DecimalFormat("000");
-                                            StrideLinearFragment.this.avg = StrideLinearFragment.this.distance / ((double) StrideLinearFragment.this.step_counter);
-                                            StrideLinearFragment.this.speednow = (StrideLinearFragment.this.distance1 * 3.6d) / ((double) (StrideLinearFragment.this.timeSec3 / 1000));
-                                            StrideLinearFragment.this.Avgspeed = (StrideLinearFragment.this.distance * 3.6d) / ((double) (StrideLinearFragment.this.timeSec6 / 1000));
-                                            StrideLinearFragment.this.StepD = StrideLinearFragment.this.timeSec6 / ((long) StrideLinearFragment.this.step_counter);
-
-                                            StrideLinearFragment.this.mConversationArrayAdapter.add("  " + StrideLinearFragment.this.step_counter + ". x= " + df1.format(StrideLinearFragment.this.final_data[0]) + "m   y= " + df1.format(StrideLinearFragment.this.final_data[1]) + "m   z= " + df1.format(StrideLinearFragment.this.final_data[2]) + "m" + " " + "Speed = " + df1.format(StrideLinearFragment.this.speednow) + "m");
-                                            DecimalFormat df = new DecimalFormat("0.000");
-                                            String Str = df.format(StrideLinearFragment.this.final_data[0]) + " " + df.format(StrideLinearFragment.this.final_data[1]) + " " + df.format(StrideLinearFragment.this.final_data[2]) + " " + (StrideLinearFragment.this.timeSec6 / 1000) + "." + df2.format(StrideLinearFragment.this.timeSec6 % 1000) + " " + df.format(StrideLinearFragment.this.distance) + "\n";
-
-                                            String[] xyztd = Str.split("\\s+");
-                                            float x = toDouble(xyztd[0].trim());
-                                            float y = toDouble(xyztd[1].trim());
-                                            float z = (float) toDouble(xyztd[2].trim());
-                                            double stepLen = (double) toDouble(xyztd[3].trim());
-                                            double stepDur = (double) toDouble(xyztd[4].trim());
-
-                                            stepLenList.add(Double.valueOf(stepLen));
-                                            stepDurList.add(Double.valueOf(stepDur));
-                                            stepLenAvg += stepLen;
-                                            stepDurAvg += stepDur;
-                                            numOfSteps++;
-
-                                            addChartDataLF(x, y);
-
-                                            System.out.println(Str);
-
-                                        }
-                                    });
-                                    // }
-
-                                }
-                            }
-                            return true;
-                        }
-                    }).create().start();
-
-        } else
-            System.out.println("READINGS-LF-SIZE-EQUALS-ZERO");
+            } else
+                System.out.println("READINGS-LF-SIZE-EQUALS-ZERO");
+        }
     }
 
     @Override

@@ -233,7 +233,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        mToolbar.setNavigationIcon(R.drawable.btn_back);
+        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_36dp);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -276,28 +276,28 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         List<MenuObject> menuObjects = new ArrayList<>();
 
         MenuObject close = new MenuObject();
-        close.setResource(R.drawable.icn_close);
+        close.setResource(R.drawable.ic_close_white_36dp);
 
         MenuObject send = new MenuObject("Configure");
-        send.setResource(R.drawable.icn_5);
+        send.setResource(R.drawable.ic_close_white_36dp);
 
         MenuObject like = new MenuObject("Linear Data");
-        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.icn_5);
+        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.ic_close_white_36dp);
         like.setBitmap(b);
 
         MenuObject addFr = new MenuObject("Reset");
         BitmapDrawable bd = new BitmapDrawable(getResources(),
-                BitmapFactory.decodeResource(getResources(), R.drawable.icn_5));
+                BitmapFactory.decodeResource(getResources(), R.drawable.ic_close_white_36dp));
         addFr.setDrawable(bd);
 
         MenuObject addFav = new MenuObject("Disconnect");
-        addFav.setResource(R.drawable.icn_5);
+        addFav.setResource(R.drawable.ic_close_white_36dp);
 
         MenuObject block = new MenuObject("Update");
-        block.setResource(R.drawable.icn_5);
+        block.setResource(R.drawable.ic_close_white_36dp);
 
         MenuObject newHorse = new MenuObject("New Horse");
-        newHorse.setResource(R.drawable.icn_5);
+        newHorse.setResource(R.drawable.ic_close_white_36dp);
 
         menuObjects.add(close);
         menuObjects.add(send);

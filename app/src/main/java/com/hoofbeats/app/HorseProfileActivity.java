@@ -211,12 +211,15 @@ public class HorseProfileActivity extends BaseActivity implements ActivityCompat
                                                 horse.setHorseHeight(Double.parseDouble(horseHeight));
                                                 horse.setHorseSex(horseSex);
 
-                                                Bitmap bitmap = Bitmap.createBitmap(horseProfileImage.getDrawingCache());
+                                                if (horseProfileImage.getDrawingCache() != null)
+                                                {
+                                                    Bitmap bitmap = Bitmap.createBitmap(horseProfileImage.getDrawingCache());
 
-                                                //if (horse.getProfilePictureURI() != null)
-                                                //DatabaseUtility.deleteHorseProfileImage(HorseProfileActivity.this, horse.getProfilePictureURI());
+                                                    //if (horse.getProfilePictureURI() != null)
+                                                    //DatabaseUtility.deleteHorseProfileImage(HorseProfileActivity.this, horse.getProfilePictureURI());
 
-                                                horse.setProfilePictureURI(String.valueOf(DatabaseUtility.getImageUri(getApplicationContext(), bitmap, horseName)));
+                                                    horse.setProfilePictureURI(String.valueOf(DatabaseUtility.getImageUri(getApplicationContext(), bitmap, horseName)));
+                                                }
                                                 MyApplication.getInstance().getDaoSession().getHorseDao().insert(horse);
 
                                                 List<Note> noteList = horse.getNotes();
