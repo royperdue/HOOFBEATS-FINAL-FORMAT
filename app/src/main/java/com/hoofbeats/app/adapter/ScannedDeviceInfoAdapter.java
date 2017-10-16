@@ -30,7 +30,7 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
 
     public interface OnDeviceConfiguredListener
     {
-        void onDeviceConfigured(View convertView, ScannedDeviceInfo deviceInfo);
+        void onDeviceConfigured(String hoof, View convertView, ScannedDeviceInfo deviceInfo);
     }
 
     public ScannedDeviceInfoAdapter(Context context, int resource)
@@ -223,7 +223,7 @@ public class ScannedDeviceInfoAdapter extends ArrayAdapter<ScannedDeviceInfo>
                     ScannedDeviceInfo deviceInfo = getItem(i);
 
                     if (deviceInfo != null)
-                        onDeviceConfiguredListener.onDeviceConfigured(convertView, deviceInfo);
+                        onDeviceConfiguredListener.onDeviceConfigured(hoof, convertView, deviceInfo);
                 } else
                     DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_convertView_null));
             }

@@ -264,10 +264,9 @@ public final class DialogUtility
                             public void run()
                             {
                                 navigationActivity.closeModules();
+                                dialog.dismiss();
                             }
                         });
-
-                        dialog.dismiss();
                     }
                 }).show();
     }

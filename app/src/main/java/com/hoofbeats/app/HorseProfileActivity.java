@@ -214,7 +214,7 @@ public class HorseProfileActivity extends BaseActivity implements ActivityCompat
                                                 Bitmap bitmap = Bitmap.createBitmap(horseProfileImage.getDrawingCache());
 
                                                 //if (horse.getProfilePictureURI() != null)
-                                                    //DatabaseUtility.deleteHorseProfileImage(HorseProfileActivity.this, horse.getProfilePictureURI());
+                                                //DatabaseUtility.deleteHorseProfileImage(HorseProfileActivity.this, horse.getProfilePictureURI());
 
                                                 horse.setProfilePictureURI(String.valueOf(DatabaseUtility.getImageUri(getApplicationContext(), bitmap, horseName)));
                                                 MyApplication.getInstance().getDaoSession().getHorseDao().insert(horse);
@@ -289,6 +289,14 @@ public class HorseProfileActivity extends BaseActivity implements ActivityCompat
 
             horseProfileImage.setDrawingCacheEnabled(true);
         }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        startActivity(new Intent(HorseProfileActivity.this, NavigationActivity.class));
+        finish();
+        super.onBackPressed();
     }
 
     private void fillHelpOptionAdapter(HelpOptionAdapter adapter)

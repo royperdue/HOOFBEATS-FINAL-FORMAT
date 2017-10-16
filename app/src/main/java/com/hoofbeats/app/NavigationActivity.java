@@ -37,7 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -199,16 +198,6 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             }
         });
 
-        startModulesButton = (Button) findViewById(R.id.capture_button);
-        startModulesButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                startModules();
-            }
-        });
-
         sScreenWidth = getResources().getDisplayMetrics().widthPixels;
         sProfileImageHeight = getResources().getDimensionPixelSize(R.dimen.height_profile_image);
         sOverlayShape = buildAvatarCircleOverlay();
@@ -243,6 +232,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
             actionBar.setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
+
         mToolbar.setNavigationIcon(R.drawable.btn_back);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener()
         {
@@ -316,6 +306,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         menuObjects.add(addFav);
         menuObjects.add(block);
         menuObjects.add(newHorse);
+
         return menuObjects;
     }
 
@@ -515,7 +506,6 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     public void onLogging(BluetoothDevice bluetoothDevice)
     {
         bluetoothDevices.add(bluetoothDevice);
-        Horse horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
         Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(bluetoothDevice.getAddress());
 
         if (horseshoe.getHoof().equals("Left Hind"))
@@ -586,7 +576,10 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                                     scannedDeviceInfo.setColorCheckMark();
                                 }
 
-                                setupFragment(metaWearBoard, hoof);
+                                if (hoof != null)
+                                    setupFragment(metaWearBoard, hoof);
+                                else
+                                    DialogUtility.showAlertSnackBarMedium(NavigationActivity.this, "Hoof is null...");
                             }
                         });
                     }
@@ -595,16 +588,14 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
     }
 
     @Override
-    public void onDeviceConfigured(View convertView, ScannedDeviceInfo scannedDeviceInfo)
+    public void onDeviceConfigured(String hoof, View convertView, ScannedDeviceInfo scannedDeviceInfo)
     {
-        ImageView connectedCheck = (ImageView) convertView.findViewById(R.id.ble_check_connected);
-
         BluetoothDevice bluetoothDevice = scannedDeviceInfo.btDevice;
         serviceBinder.removeMetaWearBoard(bluetoothDevice);
         MetaWearBoard metaWearBoard = serviceBinder.getMetaWearBoard(bluetoothDevice);
         bluetoothDevices.add(bluetoothDevice);
 
-        connectBoard(scannedDeviceInfo.getHoof(), scannedDeviceInfo, metaWearBoard);
+        connectBoard(hoof, scannedDeviceInfo, metaWearBoard);
     }
 
     @Override
@@ -631,7 +622,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 break;
             case 1:
                 addFragment(0);
-                mToolBarTextView.setText("Capture");
+                mToolBarTextView.setText("Configure");
                 break;
             case 2:
                 addFragment(1);
@@ -742,6 +733,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         Settings settings = metaWearBoard.getModule(Settings.class);
         Wrapper wrapper = new Wrapper(gpio, sensorFusionBosch, logging,
                 settings, metaWearBoard);
+        wrapper.setHoof(hoof);
 
         if (hoof.contains("Left Hind"))
         {
@@ -753,8 +745,10 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
                 {
                     modules.put(wrapper, bluetoothDevice);
-                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_LH, false))
+                    {
                         startDownload(wrapper, bluetoothDevice);
+                    }
 
                     break;
                 }
@@ -769,8 +763,10 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
                 {
                     modules.put(wrapper, bluetoothDevice);
-                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_LF, false))
+                    {
                         startDownload(wrapper, bluetoothDevice);
+                    }
 
                     break;
                 }
@@ -785,8 +781,10 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
                 {
                     modules.put(wrapper, bluetoothDevice);
-                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_RH, false))
+                    {
                         startDownload(wrapper, bluetoothDevice);
+                    }
 
                     break;
                 }
@@ -801,8 +799,10 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 if (bluetoothDevice.getAddress().equals(metaWearBoard.getMacAddress()))
                 {
                     modules.put(wrapper, bluetoothDevice);
-                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
+                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_RF, false))
+                    {
                         startDownload(wrapper, bluetoothDevice);
+                    }
 
                     break;
                 }
@@ -1040,7 +1040,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         });
     }// **************************** Configure horseshoes end **********************************
 
-    private void startModules()
+    public void startModules()
     {
         for (final Map.Entry<Wrapper, BluetoothDevice> entry : modules.entrySet())
         {
@@ -1062,17 +1062,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                     System.out.println("ACCELEROMETER-STARTED");
                 }
 
-                Horse horse = null;
-
-                Horseshoe horseshoe = DatabaseUtility.retrieveHorseShoeForMacAddress(entry.getKey().getMetaWearBoard().getMacAddress());
-
-                if (horseshoe != null)
-                {
-                    horseshoe.setLogging(true);
-                    horseshoe.update();
-
-                    horse = horseshoe.getHorse();
-                }
+                Horse horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
 
                 Workout workout = null;
 
@@ -1118,8 +1108,14 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                 LittleDB.get().putLong(Config.WORKOUT_ID, workout.getId());
                 horse.getWorkouts().add(workout);
 
-                // SET TO FALSE IN THE LOGGING DOWNLOAD SECTION.
-                LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING, true);
+                if (entry.getKey().getHoof().equals("Left Hind"))
+                    LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING_LH, true);
+                else if (entry.getKey().getHoof().equals("Left Front"))
+                    LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING_LF, true);
+                else if (entry.getKey().getHoof().equals("Right Hind"))
+                    LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING_RH, true);
+                else if (entry.getKey().getHoof().equals("Right Front"))
+                    LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING_RF, true);
 
                 DialogUtility.showStartLoggingDialog(NavigationActivity.this);
             }
@@ -1191,7 +1187,16 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
                         {
                             wrapper.getMetaWearBoard().tearDown();
                             wrapper.getMetaWearBoard().disconnectAsync();
-                            LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING, false);
+
+                            if (wrapper.getHoof().equals("Left Hind"))
+                                LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING_LH, false);
+                            else if (wrapper.getHoof().equals("Left Front"))
+                                LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING_LF, false);
+                            else if (wrapper.getHoof().equals("Right Hind"))
+                                LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING_RH, false);
+                            else if (wrapper.getHoof().equals("Right Front"))
+                                LittleDB.get().putBoolean(Config.MODULES_CURRENTLY_LOGGING_RF, false);
+
                             DialogUtility.showDownloadFinishedDialog(NavigationActivity.this);
                             materialDialog.dismiss();
                         }
@@ -1505,7 +1510,7 @@ public class NavigationActivity extends BaseActivity implements OnMenuItemClickL
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState)
         {
-            bluetoothDevices = getArguments().getParcelable(KEY_BLUETOOTH_DEVICE);
+            bluetoothDevices = getArguments().getParcelableArrayList(KEY_BLUETOOTH_DEVICE);
             getActivity().getApplicationContext().bindService(new Intent(getActivity(), BtleService.class), this, BIND_AUTO_CREATE);
 
             reconnectDialog = new ProgressDialog(getActivity());

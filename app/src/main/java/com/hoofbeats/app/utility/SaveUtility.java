@@ -152,12 +152,13 @@ public class SaveUtility
                             .where(ReadingDao.Properties.Timestamp.eq(LittleDB.get().getLong(Config.TIME_SENSOR_FUSION_READING, -1L))).list();
 
                     if (readings.size() > 0)
+                    {
                         readings.get(0).setForce(forceValue);
 
-                    ((MyApplication) activity.getApplication()).getDaoSession().getReadingDao().update(readings.get(0));
+                        ((MyApplication) activity.getApplication()).getDaoSession().getReadingDao().update(readings.get(0));
 
-                    ((MyApplication) activity.getApplication()).getDaoSession().clear();
-
+                        ((MyApplication) activity.getApplication()).getDaoSession().clear();
+                    }
                     /*ForceReading forceReading = new ForceReading();
                     forceReading.setWorkoutId(workout.getId());
                     forceReading.setWorkout(workout);

@@ -217,9 +217,9 @@ public final class DatabaseUtility
         clearSession();
     }
 
-    public static void deleteTrack(long trackId)
+    public static void deleteHorseshoe(long horseshoeId)
     {
-        MyApplication.getInstance().getDaoSession().getTrackDao().deleteByKey(trackId);
+        MyApplication.getInstance().getDaoSession().getHorseshoeDao().deleteByKey(horseshoeId);
 
         clearSession();
     }

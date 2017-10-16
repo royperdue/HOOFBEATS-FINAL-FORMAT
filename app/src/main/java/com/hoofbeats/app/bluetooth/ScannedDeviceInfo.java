@@ -211,7 +211,7 @@ public class ScannedDeviceInfo
     public void setHorseNameTextView(TextView horseNameTextView)
     {
         this.horseNameTextView = horseNameTextView;
-        horseNameTextView.setText(horseName);
+        horseNameTextView.setText(horseName + " " + btDevice.getAddress());
         horseNameTextView.invalidate();
     }
 
@@ -274,6 +274,7 @@ public class ScannedDeviceInfo
                 radioButton.setEnabled(false);
                 configureButton.setText(activity.getString(R.string.label_horseshoe_remove));
                 isAssigned = true;
+
                 DialogUtility.showNoticeSnackBarShort(activity, activity.getString(R.string.message_successful));
             } else
                 DialogUtility.showAlertSnackBarMedium(activity, activity.getString(R.string.message_unsuccessful));
@@ -305,12 +306,12 @@ public class ScannedDeviceInfo
 
     public void setColorCheckMark()
     {
-        if (isConnected)
+      /*  if (isConnected)
             connectedCheck.setImageDrawable(activity.getDrawable(R.drawable.ic_check_circle_green_600_24dp));
         else
             connectedCheck.setImageDrawable(activity.getDrawable(R.drawable.ic_check_circle_red_700_36dp));
 
-        connectedCheck.invalidate();
+        connectedCheck.invalidate();*/
     }
 
     private void deleteSerializedBoard(String path)

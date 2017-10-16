@@ -21,6 +21,10 @@ public abstract class SensorFragment extends ModuleFragmentBase
     protected final ArrayList<String> chartXValues = new ArrayList<>();
     protected LineChart chart;
     protected int sampleCount;
+    protected int sampleCountLH;
+    protected int sampleCountLF;
+    protected int sampleCountRH;
+    protected int sampleCountRF;
     protected long prevUpdate = -1;
 
     protected float min, max;

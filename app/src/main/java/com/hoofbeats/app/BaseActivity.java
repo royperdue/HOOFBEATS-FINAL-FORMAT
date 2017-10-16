@@ -29,7 +29,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hoofbeats.app.adapter.CustomListAdapter;
-import com.hoofbeats.app.bluetooth.BleScannerFragment;
 import com.hoofbeats.app.model.Horse;
 import com.hoofbeats.app.model.Horseshoe;
 import com.hoofbeats.app.utility.DatabaseUtility;
@@ -87,10 +86,6 @@ public abstract class BaseActivity extends AppCompatActivity
     private AnimatorSet mOpenProfileAnimatorSet;
     private AnimatorSet mCloseProfileAnimatorSet;
     private Animation mProfileButtonShowAnimation;
-
-    protected Button scanControl;
-    protected Button connectControl;
-    protected Button startModulesButton;
 
     protected TextView horseNameTextView;
     protected TextView horseAgeTextView;
@@ -152,46 +147,7 @@ public abstract class BaseActivity extends AppCompatActivity
                 showProfileDetails(profileMap, view);
             }
         });
-
-        scanControl = (Button) findViewById(R.id.blescan_control);
-        scanControl.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                if (((BleScannerFragment) currentFragment).isScanning)
-                {
-                    ((BleScannerFragment) currentFragment).stopBleScan();
-                } else
-                {
-                    ((BleScannerFragment) currentFragment).startBleScan();
-                }
-            }
-        });
-
-        connectControl = (Button) findViewById(R.id.ble_connect_control);
-        connectControl.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                if (((BleScannerFragment) currentFragment).isScanning)
-                {
-                    ((BleScannerFragment) currentFragment).stopBleScan();
-                }
-
-                ((BleScannerFragment) currentFragment).getScannedDevicesAdapter().connectAssignedDevices();
-            }
-        });
-
-        if (currentFragment instanceof BleScannerFragment)
-        {
-            scanControl.setVisibility(View.VISIBLE);
-            connectControl.setVisibility(View.VISIBLE);
-            startModulesButton.setVisibility(View.VISIBLE);
-        }
     }
-
     /**
      * This method counts delay before profile toolbar and profile details start their transition
      * animations, depending on clicked list item on-screen position.

@@ -20,6 +20,7 @@ import android.os.ParcelUuid;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -69,6 +70,10 @@ public class BleScannerFragment extends ModuleFragmentBase
     private Horse horse;
     private List<Horseshoe> horseshoes = null;
     private MaterialDialog materialDialog;
+
+    private Button scanControl;
+    private Button connectControl;
+    private Button startModulesButton;
 
     public BleScannerFragment()
     {
@@ -125,10 +130,6 @@ public class BleScannerFragment extends ModuleFragmentBase
         {
             isScanReady = true;
         }
-
-        horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
-        if (horse != null)
-            horseshoes = horse.getHorseshoes();
     }
 
     @Override
@@ -157,6 +158,47 @@ public class BleScannerFragment extends ModuleFragmentBase
         scannedDevicesAdapter = new ScannedDeviceInfoAdapter(getActivity(), R.id.blescan_entry_layout);
         scannedDevicesAdapter.setNotifyOnChange(true);
         mHandler = new Handler();
+
+        scanControl = (Button) view.findViewById(R.id.blescan_control);
+        scanControl.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                if (isScanning)
+                {
+                    stopBleScan();
+                } else
+                {
+                    startBleScan();
+                }
+            }
+        });
+
+        connectControl = (Button) view.findViewById(R.id.ble_connect_control);
+        connectControl.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                if (isScanning)
+                {
+                    stopBleScan();
+                }
+
+                scannedDevicesAdapter.connectAssignedDevices();
+            }
+        });
+
+        startModulesButton = (Button) view.findViewById(R.id.capture_button);
+        startModulesButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                ((NavigationActivity) getActivity()).startModules();
+            }
+        });
 
         return view;
     }
@@ -187,7 +229,7 @@ public class BleScannerFragment extends ModuleFragmentBase
 
         if (isScanReady)
         {
-            //startBleScan();
+           // startBleScan();
         }
     }
 
@@ -209,13 +251,13 @@ public class BleScannerFragment extends ModuleFragmentBase
     {
         if (!checkLocationPermission())
         {
-            //scanControl.setText(R.string.ble_scan);
+            scanControl.setText(R.string.ble_scan);
             return;
         }
         materialDialog = DialogUtility.showProgressDialogScanning(getActivity());
         scannedDevicesAdapter.clear();
         isScanning = true;
-        //scanControl.setText(R.string.ble_scan_cancel);
+        scanControl.setText(R.string.ble_scan_cancel);
         mHandler.postDelayed(new Runnable()
         {
             @Override
@@ -236,6 +278,15 @@ public class BleScannerFragment extends ModuleFragmentBase
                         @Override
                         public void run()
                         {
+                            horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
+
+                            if (horse != null)
+                                horseshoes = horse.getHorseshoes();
+
+                            if (horseshoes != null)
+                                if (horseshoes.size() == 0)
+                                    horseshoes = null;
+
                             if (horseshoes != null)
                             {
                                 if (horseshoes.size() > 0)
@@ -244,19 +295,24 @@ public class BleScannerFragment extends ModuleFragmentBase
                                     {
                                         if (btDevice.getAddress().equals(horseshoes.get(i).getMacAddress()))
                                         {
-                                            if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
-                                            {
+                                            if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_LH, false))
                                                 ((NavigationActivity) getActivity()).onLogging(btDevice);
-                                            } else
+                                            else if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_LF, false))
+                                                ((NavigationActivity) getActivity()).onLogging(btDevice);
+                                            else if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_RH, false))
+                                                ((NavigationActivity) getActivity()).onLogging(btDevice);
+                                            else if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_RF, false))
+                                                ((NavigationActivity) getActivity()).onLogging(btDevice);
+                                            else
                                                 scannedDevicesAdapter.update(new ScannedDeviceInfo(btDevice, rssi, null));
                                         }
                                     }
-                                } else
-                                {
-                                    ScannedDeviceInfo scannedDeviceInfo = new ScannedDeviceInfo(btDevice, rssi, null);
-                                    scannedDeviceInfo.setHorseName(horse.getHorseName());
-                                    scannedDevicesAdapter.update(scannedDeviceInfo);
                                 }
+                            } else
+                            {
+                                ScannedDeviceInfo scannedDeviceInfo = new ScannedDeviceInfo(btDevice, rssi, null);
+                                scannedDeviceInfo.setHorseName(horse.getHorseName());
+                                scannedDevicesAdapter.update(scannedDeviceInfo);
                             }
                         }
                     });
@@ -341,10 +397,14 @@ public class BleScannerFragment extends ModuleFragmentBase
                                 @Override
                                 public void run()
                                 {
-                                    List<Horseshoe> horseshoes = null;
+                                    horse = DatabaseUtility.retrieveHorseForId(LittleDB.get().getLong(Config.SELECTED_HORSE_ID, -1));
 
                                     if (horse != null)
                                         horseshoes = horse.getHorseshoes();
+
+                                    if (horseshoes != null)
+                                        if (horseshoes.size() == 0)
+                                            horseshoes = null;
 
                                     if (horseshoes != null)
                                     {
@@ -354,10 +414,15 @@ public class BleScannerFragment extends ModuleFragmentBase
                                             {
                                                 if (result.getDevice().getAddress().equals(horseshoes.get(i).getMacAddress()))
                                                 {
-                                                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING, false))
-                                                    {
+                                                    if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_LH, false))
                                                         ((NavigationActivity) getActivity()).onLogging(result.getDevice());
-                                                    } else
+                                                    else if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_LF, false))
+                                                        ((NavigationActivity) getActivity()).onLogging(result.getDevice());
+                                                    else if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_RH, false))
+                                                        ((NavigationActivity) getActivity()).onLogging(result.getDevice());
+                                                    else if (LittleDB.get().getBoolean(Config.MODULES_CURRENTLY_LOGGING_RF, false))
+                                                        ((NavigationActivity) getActivity()).onLogging(result.getDevice());
+                                                    else
                                                     {
                                                         ScannedDeviceInfo scannedDeviceInfo = new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null);
                                                         scannedDeviceInfo.setHorseName(horse.getHorseName());
@@ -365,10 +430,10 @@ public class BleScannerFragment extends ModuleFragmentBase
                                                     }
                                                 }
                                             }
-                                        } else
-                                        {
-                                            scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null));
                                         }
+                                    } else
+                                    {
+                                        scannedDevicesAdapter.update(new ScannedDeviceInfo(result.getDevice(), result.getRssi(), null));
                                     }
                                 }
                             });
@@ -398,7 +463,7 @@ public class BleScannerFragment extends ModuleFragmentBase
                 materialDialog.dismiss();
 
             isScanning = false;
-            //scanControl.setText(R.string.ble_scan);
+            scanControl.setText(R.string.ble_scan);
         }
     }
 
